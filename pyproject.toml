@@ -1,0 +1,97 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-reliability"
+version = "0.1.0.dev0"
+description = "Vendor-neutral reliability primitives for operating autonomous AI agents (pre-alpha)."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [{ name = "Agent Reliability contributors" }]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/agent-reliability/agent-reliability"
+Documentation = "https://github.com/agent-reliability/agent-reliability/tree/main/docs"
+Changelog = "https://github.com/agent-reliability/agent-reliability/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-asyncio>=0.24",
+    "hypothesis>=6.108",
+    "build>=1.2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_reliability"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "RUF", # ruff-specific rules
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["agent_reliability"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["agent_reliability"]
+mypy_path = "src"
+warn_unused_ignores = true
+warn_redundant_casts = true
+enable_error_code = ["ignore-without-code", "truthy-bool"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "--strict-markers --strict-config"
+testpaths = ["tests"]
+markers = [
+    "unit: pure, fast, no I/O",
+    "integration: exercises a real external boundary",
+    "contract: verifies an implementation against a port's contract",
+    "property: hypothesis-based property tests",
+]
+
+[tool.coverage.run]
+source = ["src/agent_reliability"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
