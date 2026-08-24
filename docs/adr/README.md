@@ -50,3 +50,4 @@ Compatibility Impact
 | ADR | Title | Status |
 |---|---|---|
 | [0001](0001-architecture-boundaries.md) | Core architecture and dependency boundaries | Accepted |
+| [0002](0002-reliability-mathematics-and-undefined-data-semantics.md) | Reliability mathematics and undefined-data semantics | Accepted |

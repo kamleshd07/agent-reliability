@@ -33,15 +33,27 @@ Identifies *what* is running.
 
 ```text
 agent_id       — stable identity across versions (this agent, over time)
-name           — human-readable
-version        — this specific build/prompt/config revision
+                 — required
+name           — human-readable — required
+version        — this specific build/prompt/config revision — required
 environment    — e.g. production, staging (open string, not an enum —
-                 environments are organization-specific)
+                 environments are organization-specific) — optional
 ```
 
 `agent_id` and `version` are distinct on purpose: reliability regression
 detection (future milestone) compares the *same* `agent_id` across
 different `version`s.
+
+`environment` is modeled as optional metadata carried on the identity,
+not as part of what makes two `AgentIdentity` values equal in any
+special ("same logical agent") sense — M1 implements only ordinary
+structural equality (all four fields must match). Whether/how
+`environment` should scope or filter the population of runs feeding an
+SLI (e.g. should staging and production traffic ever share one SLI) is
+not decided here; it is a future SLO-scoping question (M6). Making it
+optional rather than forcing a default like `"production"` avoids
+silently mislabeling data whose environment the caller genuinely did
+not specify.
 
 ## AgentRun
 
@@ -49,32 +61,72 @@ One logical execution of an agent — the unit that evaluations attach to
 and that reliability indicators are computed over.
 
 ```text
-run_id          — globally unique (see "Identifiers" below)
+run_id          — globally unique (see "Identifiers" below); supplied
+                  by the caller, never generated inside the domain
+                  (see [ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md))
 agent           — AgentIdentity
-started_at      — UTC, timezone-aware
+started_at      — UTC, timezone-aware; supplied by the caller, never
+                  read from the wall clock inside the domain (ADR-0002)
 ended_at        — UTC, timezone-aware, optional (unset while in flight)
 status          — run-lifecycle status (see below) — NOT task success
 parent_run_id   — optional; supports nested agent/tool/sub-agent runs
-trace_context   — carries the OpenTelemetry trace/span context this run
-                  belongs to (see TELEMETRY_SPEC.md); this project does
-                  not invent its own trace ID scheme
-metadata        — open key/value bag, subject to the privacy/redaction
-                  rules in SECURITY_MODEL.md
 ```
+
+`trace_context` and `metadata` from the earlier illustrative field list
+are **not** implemented on `AgentRun` at M1. `trace_context` needs a
+concrete type to carry, and the right type only exists once the OTel
+bridge (M3) is built against it; a placeholder field with no real type
+would be worse than no field. `metadata` is an open bag whose privacy
+and redaction handling ([SECURITY_MODEL.md](SECURITY_MODEL.md)) has no
+consumer yet at the pure-math-kernel stage. Both are deferred to the
+milestone that actually needs them, not spoken for now.
 
 ### Run lifecycle status (transport/execution-level only)
 
-Illustrative states: `STARTED`, `COMPLETED`, `FAILED`, `CANCELLED`,
-`TIMED_OUT`. This status describes whether the run *executed to
-completion*, not whether it *did the right thing*. Task success,
-correctness, and policy compliance are `Evaluation`s, computed
-separately and possibly by a different party, possibly asynchronously,
-possibly never (see "eligibility" below). The exact enum is an M1 ADR
-item ("Run lifecycle semantics"), not decided here.
+Resolved for M1 by [ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md)
+as a minimal, deliberately small set:
+
+```text
+STARTED     — ended_at is None (run in progress)
+COMPLETED   — terminal, ended_at is set
+FAILED      — terminal, ended_at is set
+CANCELLED   — terminal, ended_at is set
+```
+
+This status describes whether the run *executed to completion*, not
+whether it *did the right thing*. Task success, correctness, and policy
+compliance are `Evaluation`s, computed separately and possibly by a
+different party, possibly asynchronously, possibly never (see
+"eligibility" below).
+
+`TIMED_OUT` (present in the original illustrative list above) is
+deliberately not a distinct M1 state — a timeout is a *cause* of a run
+not completing, and a richer failure-cause taxonomy needs real
+instrumentation (M2+) to design against rather than being guessed at
+now. It currently falls under `FAILED`. This is a narrower, resolved
+version of what `ARCHITECTURE.md` previously listed as a fully deferred
+"run lifecycle state machine" — the minimal four-state lifecycle above
+is decided; a richer failure-cause model remains deferred.
 
 ## Evaluation
 
 An assessment of some property of a run.
+
+**M1 scope note:** M1 implements only `EvaluationOutcome` (the
+`PASS`/`FAIL`/`UNKNOWN` enum below) and the ratio math built on it. The
+full `Evaluation` record described in this section — with evaluator
+identity, version, configuration, evidence, and timestamp — is deferred
+to M4 ("Evaluator framework"), where it can be designed against real
+evaluator implementations instead of speculatively now. M1's ratio
+kernel takes a plain `Iterable[EvaluationOutcome]`; it does not need to
+know who produced each outcome or when.
+
+M1 also does **not** introduce a separate "Reliability Observation"
+type distinct from `EvaluationOutcome`. For every purpose the ratio
+kernel needs, an eligible observation *is* its outcome — wrapping a
+single `EvaluationOutcome` in another single-field type would duplicate
+the concept without adding meaning (see
+[ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md)).
 
 ```text
 evaluation_type     — e.g. "task_success", "correctness",

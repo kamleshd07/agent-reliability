@@ -42,12 +42,22 @@ should make an OTel or LangChain import inside `domain` a visible
 mistake in a diff, not something that requires institutional memory to
 catch.
 
-## Current state (M0)
+## Current state (M1)
 
-Every layer package (`domain`, `application`, `ports`, `adapters`,
-`experimental`) exists as an empty, documented placeholder. No business
-logic has been implemented. The package currently exports only
-`agent_reliability.__version__`.
+`domain` now contains the reliability math kernel: `AgentIdentity`,
+`AgentRun`/`RunStatus`, `EvaluationOutcome`, `UnknownPolicy`/`RatioResult`,
+`ObjectiveDirection`/`Slo`/`SloStatus`/`SloEvaluation`, and
+`BudgetStatus`/`ErrorBudget`/`BurnRate` — pure, typed, deterministic,
+zero I/O (see [DOMAIN_MODEL.md](DOMAIN_MODEL.md),
+[SLO_SEMANTICS.md](SLO_SEMANTICS.md), and
+[ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md)
+for the full specification these implement). `application`, `ports`,
+`adapters`, and `experimental` remain empty, documented placeholders.
+These domain types are exported from `agent_reliability.domain`, not
+from the package root (`agent_reliability.__version__` is still the
+only root-level export) — see the M1 entry in
+[CHANGELOG.md](../CHANGELOG.md) for the full symbol list, all
+pre-alpha/unstable per [COMPATIBILITY.md](COMPATIBILITY.md).
 
 ## Why `experimental` is a package, not a decorator
 
@@ -95,8 +105,13 @@ for it to be critiqued, not copied blindly. Deviations made at M0:
 - OpenTelemetry integration strategy (SDK bridge vs. optional exporter
   vs. required dependency)
 - Telemetry schema/semantic-convention versioning mechanism
-- Agent identity semantics (what makes two runs "the same agent")
-- Run lifecycle state machine
+- Agent identity semantics (what makes two runs "the same agent" across
+  versions; how `environment` participates in SLO scoping)
+- Richer run failure-cause taxonomy (e.g. distinguishing timeout from
+  other failure causes) — the minimal four-state run lifecycle
+  (`STARTED`/`COMPLETED`/`FAILED`/`CANCELLED`) needed for M1's
+  invariants was resolved by
+  [ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md)
 - SLO calculation model specifics (rolling vs. calendar windows,
   multi-window burn-rate alerting)
 - Error-budget mathematics for non-ratio SLIs

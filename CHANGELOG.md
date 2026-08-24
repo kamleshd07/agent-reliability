@@ -8,6 +8,21 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ### Added
 
+- Milestone M1: the reliability domain kernel, under
+  `agent_reliability.domain` (not the package root). Pure, typed,
+  deterministic, zero I/O:
+  - `EvaluationOutcome` (`PASS`/`FAIL`/`UNKNOWN`)
+  - `AgentIdentity`
+  - `AgentRun`, `RunStatus` (minimal four-state lifecycle)
+  - `UnknownPolicy`, `ObservationCounts`, `RatioResult`, `compute_ratio`
+  - `ObjectiveDirection`, `Slo`, `SloStatus`, `SloEvaluation`, `evaluate_slo`
+  - `BudgetStatus`, `ErrorBudget`, `BurnRate`, `compute_error_budget`,
+    `compute_burn_rate`
+  - ADR-0002 resolves the ratio-math and undefined-data semantics this
+    kernel implements, correcting an ambiguity found in the M0
+    `SLO_SEMANTICS.md` draft. All public symbols remain pre-alpha with
+    no compatibility guarantee (see `docs/COMPATIBILITY.md`).
+
 - Repository foundation (milestone M0): engineering principles,
   architecture and domain-model specifications, telemetry contract
   approach, SLO/error-budget/burn-rate mathematics specification,

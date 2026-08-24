@@ -88,39 +88,61 @@ between meeting and breaching a 99.5% target.
 
 ## SLO
 
-For a ratio SLI with `objective_direction = ">= target"`:
+**Corrected by [ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md)**,
+which resolved a contradiction in an earlier revision of this document
+(it had claimed the SLI itself "is already the bad fraction" for
+`AT_MOST` SLOs, which conflicts with `good_event` always meaning `PASS`
+per [DOMAIN_MODEL.md](DOMAIN_MODEL.md)). The corrected model:
+
+`PASS` always means "good," for both directions — the ratio SLI itself
+(`pass_ratio = good_events / valid_events`) never changes meaning.
+Direction only changes how the SLO's `allowed_bad_fraction` is derived
+from `target`, and the SLO is evaluated by comparing the *observed* bad
+fraction (`fail_ratio = 1 - pass_ratio`, i.e. the complement of the SLI,
+computed directly rather than by subtraction) against it:
 
 ```text
-target = 0.995                       (99.5%)
-allowed_bad_fraction = 1 - target    = 0.005  (0.5%)
-```
+AT_LEAST (e.g. task_success >= 0.995):
+    allowed_bad_fraction = 1 - target   = 1 - 0.995 = 0.005
 
-For `objective_direction = "<= target"` (a "lower is better" SLI, e.g.
-a hallucination rate), the SLI itself is already defined as the *bad*
-fraction, so:
+AT_MOST (e.g. hallucination_rate <= 0.001):
+    allowed_bad_fraction = target       = 0.001
+```
 
 ```text
-target = 0.001                       (0.1%)
-allowed_bad_fraction = target        = 0.001
+SLO is MET      iff fail_ratio <= allowed_bad_fraction
+SLO is BREACHED iff fail_ratio >  allowed_bad_fraction
+SLO is UNKNOWN  iff there is no data (see "Undefined and zero-tolerance
+                    cases" below)
 ```
 
-Both directions reduce to the same downstream quantity —
-`allowed_bad_fraction` over the window — which is what feeds the error
-budget below. This is why `objective_direction` must be recorded on
-every SLO: it changes how `allowed_bad_fraction` is derived from
-`target`, even though everything after that point is direction-agnostic.
+This single comparison formula covers both directions — it is
+algebraically identical to "`pass_ratio >= target`" for `AT_LEAST`
+(substitute `fail_ratio = 1 - pass_ratio` and
+`allowed_bad_fraction = 1 - target` and the inequality is unchanged),
+so nothing about `AT_LEAST` behavior changes; it simply extends
+correctly to `AT_MOST` instead of requiring a second, contradictory
+formula. The practical consequence for an `AT_MOST` SLI like
+hallucination rate: the underlying evaluator still reports `PASS` for
+"no hallucination" and `FAIL` for "hallucination detected" — `fail_ratio`
+is then literally the hallucination rate, directly comparable to the
+`AT_MOST` target.
+
+`objective_direction` must still be recorded on every SLO: it is what
+determines how `allowed_bad_fraction` is derived from `target`, even
+though the comparison itself is direction-agnostic once
+`allowed_bad_fraction` is known.
 
 ## Error Budget
 
 ```text
-allowed_bad_events = allowed_bad_fraction × valid_events
-consumed_bad_events = valid_events × (1 - SLI)     [for ">=" SLOs]
-                    = valid_events × SLI            [for "<=" SLOs,
-                                                      since SLI already
-                                                      represents the bad
-                                                      fraction]
-error_budget_remaining_fraction =
-    (allowed_bad_events - consumed_bad_events) / allowed_bad_events
+allowed_bad_events = allowed_bad_fraction × considered_events
+observed_bad_events = the actual observed count of bad (FAIL, or
+                       UNKNOWN-under-TREAT_AS_BAD) events — always an
+                       exact integer, never derived by multiplying a
+                       ratio back out
+consumption_ratio = fail_ratio / allowed_bad_fraction
+error_budget_remaining_fraction = 1 - consumption_ratio
 ```
 
 Worked example, continuing the `TREAT_AS_BAD` case above
@@ -129,8 +151,12 @@ Worked example, continuing the `TREAT_AS_BAD` case above
 ```text
 allowed_bad_fraction  = 1 - 0.995 = 0.005
 allowed_bad_events    = 0.005 × 10,000 = 50
-consumed_bad_events   = 10,000 × (1 - 0.9920) = 80
-error_budget_remaining_fraction = (50 - 80) / 50 = -0.60
+observed_bad_events   = 80                       (the 50 FAIL + 30
+                                                   UNKNOWN-under-
+                                                   TREAT_AS_BAD)
+fail_ratio            = 80 / 10,000 = 0.0080
+consumption_ratio     = 0.0080 / 0.005 = 1.60
+error_budget_remaining_fraction = 1 - 1.60 = -0.60
 ```
 
 A negative remaining fraction means the budget is **exhausted and
@@ -139,6 +165,19 @@ budget remaining is not clamped to `[0, 1]` by the domain math itself;
 clamping (if a presentation layer wants to show "0% remaining" rather
 than "-60%") is a display decision, not a domain one, so that the
 magnitude of a breach is never silently lost.
+
+## Undefined and zero-tolerance cases
+
+Two distinct situations make the formulas above unable to produce an
+ordinary number, and they are not the same situation — see
+[ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md)
+for the full reasoning:
+
+| Situation | `considered_events` | `allowed_bad_fraction` | Result |
+|---|---|---|---|
+| No data | `0` | any | SLI, error budget, and burn rate are all **undefined** — not `0`, not `1`. The SLO status is `UNKNOWN`. |
+| Zero tolerance, intact | `> 0` | `0` (a 100% `AT_LEAST` or 0% `AT_MOST` target) | `0` observed bad events → budget fully intact (`remaining_fraction = 1`, burn rate `0`); this is well-defined, not undefined, because zero violations against a zero-tolerance target is a real, decidable outcome. |
+| Zero tolerance, exceeded | `> 0` | `0` | `> 0` observed bad events → the true consumption/burn magnitude is unbounded (division by zero). This is reported as its own explicit state rather than as a floating-point infinity or `NaN` — see ADR-0002. |
 
 ## Burn Rate
 
@@ -169,6 +208,15 @@ burn_rate = 0.015 / 0.005 = 3.0
 At a sustained burn rate of 3.0, the 30-day budget would be exhausted in
 `30 days / 3.0 = 10 days`.
 
+Burn rate and the cumulative `consumption_ratio` used in the error
+budget above are, mechanically, the *same* division
+(`bad_fraction / allowed_bad_fraction`) applied to two different
+observation windows — a full window for the error budget, an arbitrary
+shorter lookback for burn rate. This is a discovered simplification,
+not two independently-specified formulas that happen to look similar;
+see ADR-0002. The zero-data and zero-tolerance cases above therefore
+apply identically to burn rate.
+
 **Not specified here (future ADR item):** multi-window burn-rate
 alerting (comparing a short lookback against a long one to distinguish a
 brief spike from a sustained regression, as is common SRE practice) and
@@ -186,7 +234,8 @@ numbers, and property-based tests must confirm the general invariants
 (see [TESTING_STRATEGY.md](TESTING_STRATEGY.md)):
 
 ```text
-0 <= SLI <= 1
-error_budget_remaining_fraction is never NaN
+0 <= SLI <= 1 whenever it is defined
+error_budget_remaining_fraction is never NaN (it is a Fraction, or
+    None with an explicit status — see ADR-0002)
 identical input always produces identical output
 ```
