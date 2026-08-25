@@ -59,24 +59,31 @@ engine. These are product evolution, not missing pieces of the frozen core.
    been verified.~~ **Resolved 2026-08-25.** Private vulnerability reporting
    is enabled account-wide for public repositories, which covers this
    repository.
-2. M2 through M7 were a large uncommitted working tree based on
-   `d099bdc450b387c6938f3db1010766825536aa87`. **Partially resolved
-   2026-08-25:** six reviewed commits now carry that work on `main`
-   (`82308a1`..`9b29dee`), one per milestone boundary, with the full suite
-   re-verified at 350/350 on the committed tree. Still open: this has not
-   been pushed to `origin/main`, and no remote CI run exists for this exact
-   commit sequence yet.
+2. ~~M2 through M7 were a large uncommitted working tree based on
+   `d099bdc450b387c6938f3db1010766825536aa87`, with no reviewed
+   release-candidate commit or remote CI result.~~ **Resolved 2026-08-25.**
+   Seven reviewed commits now carry that work on `main`
+   (`82308a1`..`6976d0a`), one per milestone boundary plus the GA-readiness
+   status update and the new release workflow, with the full suite
+   re-verified at 350/350 on the committed tree. Pushed to `origin/main` as a
+   clean fast-forward from `d099bdc`; the `CI` workflow run against
+   `6976d0a` completed with all jobs (lint/format/mypy, the 3.11/3.12/3.13
+   test matrix, and the release-artifact verification job) passing.
 3. PyPI ownership/availability and Trusted Publishing configuration for
-   `agent-reliability` have not been confirmed. No distribution with that name
-   was visible on PyPI during the review, which does not by itself reserve the
-   name or prove publishing authority.
+   `agent-reliability`. **Partially resolved 2026-08-25:** a pending trusted
+   publisher is registered on PyPI (repository `kamleshd07/agent-reliability`,
+   workflow `release.yml`, environment `pypi`), and
+   `.github/workflows/release.yml` now exists to satisfy it — previously the
+   publisher pointed at a workflow file that did not exist in the repository.
+   Still open: PyPI does not reserve the `agent-reliability` name until the
+   first successful publish through that pending publisher creates the
+   project; until then, another party could still claim the name first.
 
-After those operational prerequisites are resolved, push to `origin/main` and
-confirm remote CI passes the full matrix and artifact-verification job, then
-create a reviewed `1.0.0rc1` commit, publish the candidate through the
-documented trusted path, and repeat the installed-distribution sanity test.
-Only then should the final release commit change the single version source to
-`1.0.0`, update release metadata/changelog, and be tagged.
+After the first publish confirms project ownership, create a reviewed
+`1.0.0rc1` commit, publish the candidate through the documented trusted path,
+and repeat the installed-distribution sanity test. Only then should the final
+release commit change the single version source to `1.0.0`, update release
+metadata/changelog, and be tagged.
 
-NOT READY FOR 1.0.0 — one blocker remains (PyPI), plus pushing/remote CI for
-blocker 2.
+NOT READY FOR 1.0.0 — blockers 1 and 2 are resolved; blocker 3 needs a
+successful first publish (recommended: `1.0.0rc1`) to fully close.
