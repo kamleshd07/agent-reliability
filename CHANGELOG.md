@@ -6,6 +6,43 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+## [1.0.0]
+
+First General Availability release. The public contract frozen for `1.0.0rc1`
+is unchanged; this release differs from `1.0.0rc1` only in version, release
+metadata, and documentation status — no production code, public API, or
+documented semantic changed. See [GA_CONTRACT.md](docs/GA_CONTRACT.md) for
+the full normative 1.0 contract and [VERSIONING.md](docs/VERSIONING.md) for
+the compatibility and deprecation policy this version now follows.
+
+Stable, user-facing capabilities as of `1.0.0`:
+
+- Safe synchronous and asynchronous agent instrumentation: instrumentation
+  dependency failures are isolated from application code, and initialization
+  failure degrades to a no-telemetry handle instead of raising.
+- Optional OpenTelemetry trace interoperability, with the host owning the
+  provider, sampling, propagation, processing, and export.
+- Explicit `PASS`/`FAIL`/`UNKNOWN` evaluation outcomes, with evaluator
+  execution failure kept categorically distinct from all three.
+- A deterministic evaluator framework (`agent_reliability.evaluation`) with
+  immutable evaluator identity, decisions, results, and provenance.
+- Exact `fractions.Fraction` SLO, error-budget, and burn-rate mathematics,
+  including explicit `UnknownPolicy` handling and defined no-data/
+  zero-tolerance states.
+- Provenance-safe local reliability aggregation
+  (`agent_reliability.reliability`): incompatible measurement methodologies
+  return a typed conflict rather than a misleading combined number.
+- A typed public API (`py.typed` shipped, strict-mypy verified against the
+  installed package) with zero base runtime dependencies and fully offline,
+  local operation — no network service, database, or hosted platform is
+  required.
+- Privacy-first defaults throughout: no automatic capture of prompts,
+  responses, tool arguments/results, exception messages, tracebacks, or
+  arbitrary payloads.
+
+This is an open-source SDK release. It does not include any hosted,
+multi-tenant, or commercial control-plane functionality.
+
 ## [1.0.0rc1]
 
 This first public release candidate establishes the frozen 1.0 contracts for

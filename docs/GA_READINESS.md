@@ -1,9 +1,12 @@
 # GA readiness: Agent Reliability 1.0.0
 
 This is the M7 engineering sign-off for the first General Availability
-release. It records the state verified on 2026-08-25. The target is `1.0.0`;
-the working tree intentionally remains `0.1.0.dev0` until the release
-preconditions below are satisfied.
+release, updated after the `1.0.0rc1` release candidate. It records the
+state verified on 2026-08-25. The target is `1.0.0`. `1.0.0rc1` was
+published to PyPI through GitHub OIDC Trusted Publishing on 2026-08-25 and
+independently reinstalled and re-verified from the public artifact — see
+"Release-candidate validation" below. All release blockers identified during
+M7 engineering sign-off are now resolved with evidence.
 
 ## Engineering gates
 
@@ -55,6 +58,8 @@ engine. These are product evolution, not missing pieces of the frozen core.
 
 ## Release blockers
 
+All three blockers identified during M7 engineering sign-off are resolved.
+
 1. ~~The repository's GitHub private vulnerability reporting setting has not
    been verified.~~ **Resolved 2026-08-25.** Confirmed directly on this
    repository (Settings → Advanced Security → Private vulnerability
@@ -65,28 +70,37 @@ engine. These are product evolution, not missing pieces of the frozen core.
 2. ~~M2 through M7 were a large uncommitted working tree based on
    `d099bdc450b387c6938f3db1010766825536aa87`, with no reviewed
    release-candidate commit or remote CI result.~~ **Resolved 2026-08-25.**
-   Seven reviewed commits now carry that work on `main`
-   (`82308a1`..`6976d0a`), one per milestone boundary plus the GA-readiness
-   status update and the new release workflow, with the full suite
-   re-verified at 350/350 on the committed tree. Pushed to `origin/main` as a
-   clean fast-forward from `d099bdc`; the `CI` workflow run against
-   `6976d0a` completed with all jobs (lint/format/mypy, the 3.11/3.12/3.13
-   test matrix, and the release-artifact verification job) passing.
-3. PyPI ownership/availability and Trusted Publishing configuration for
-   `agent-reliability`. **Partially resolved 2026-08-25:** a pending trusted
-   publisher is registered on PyPI (repository `kamleshd07/agent-reliability`,
-   workflow `release.yml`, environment `pypi`), and
-   `.github/workflows/release.yml` now exists to satisfy it — previously the
-   publisher pointed at a workflow file that did not exist in the repository.
-   Still open: PyPI does not reserve the `agent-reliability` name until the
-   first successful publish through that pending publisher creates the
-   project; until then, another party could still claim the name first.
+   Seven reviewed commits carried that work onto `main` (`82308a1`..`6976d0a`),
+   one per milestone boundary plus the GA-readiness status update and the new
+   release workflow, with the full suite re-verified at 350/350 on the
+   committed tree. Pushed to `origin/main` as a clean fast-forward from
+   `d099bdc`; the `CI` workflow run against `6976d0a` completed with all jobs
+   (lint/format/mypy, the 3.11/3.12/3.13 test matrix, and the
+   release-artifact verification job) passing.
+3. ~~PyPI ownership/availability and Trusted Publishing configuration for
+   `agent-reliability` have not been confirmed.~~ **Resolved 2026-08-25.**
+   `1.0.0rc1` (tag `v1.0.0rc1`, commit `ec467f6ea462a314f5f04321e314564c8c45f177`)
+   was published to PyPI through the registered GitHub OIDC Trusted Publisher
+   (repository `kamleshd07/agent-reliability`, workflow `release.yml`,
+   environment `pypi`) with no stored PyPI token. The successful publish
+   created the `agent-reliability` PyPI project, proving both ownership and
+   that the Trusted Publishing path works end to end. Independently
+   re-verified afterward from the public artifact alone (not local
+   `dist/`/editable install): wheel and sdist downloaded directly from
+   `pypi.org`/`files.pythonhosted.org` with matching SHA-256 hashes, a
+   fresh-venv install with zero base dependencies, the README quickstart,
+   a strict-mypy downstream consumer, the `[otel]` extra, and adversarial
+   secret-leak checks (`SdkDiagnostic`, `EvaluationExecutionFailure`,
+   default diagnostic logging) against the live installed package.
 
-After the first publish confirms project ownership, create a reviewed
-`1.0.0rc1` commit, publish the candidate through the documented trusted path,
-and repeat the installed-distribution sanity test. Only then should the final
-release commit change the single version source to `1.0.0`, update release
-metadata/changelog, and be tagged.
+## Release-candidate validation
 
-NOT READY FOR 1.0.0 — blockers 1 and 2 are resolved; blocker 3 needs a
-successful first publish (recommended: `1.0.0rc1`) to fully close.
+`1.0.0rc1` is the release-candidate baseline for `1.0.0`: same source tree,
+same public contract, same dependency-free base install, same OTel-optional
+adapter, same measurement-integrity and privacy behavior — differing only in
+version string and pre-release status. GA preparation from this point is
+intentionally limited to version, changelog, and documentation-status
+changes; see the RC → GA diff recorded in the release commit for the exact,
+minimal set of differences.
+
+READY FOR 1.0.0

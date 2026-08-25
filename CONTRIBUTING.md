@@ -1,8 +1,8 @@
 # Contributing
 
-Thank you for your interest. Agent Reliability is pre-GA. Core semantics are
-substantially complete; public APIs may receive limited refinement before
-`1.0.0`. Questions and precise critique remain welcome.
+Thank you for your interest. Agent Reliability `1.0.0` is released; public
+APIs documented as stable in [docs/GA_CONTRACT.md](docs/GA_CONTRACT.md)
+follow Semantic Versioning. Questions and precise critique remain welcome.
 
 ## Development setup
 

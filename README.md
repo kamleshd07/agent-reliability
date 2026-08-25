@@ -8,7 +8,8 @@ It brings evaluations, SLOs, error budgets, burn rates, and measurement
 provenance to agent applications—and refuses to produce a misleading number
 when evaluation methodologies are incompatible.
 
-**Status: PRE-GA.** Public APIs may receive limited refinement before `1.0.0`.
+**Status: GA (`1.0.0`).** Public APIs documented as stable in
+[GA_CONTRACT.md](docs/GA_CONTRACT.md) follow Semantic Versioning.
 See [compatibility](docs/COMPATIBILITY.md).
 
 ## Why this exists
@@ -150,8 +151,8 @@ none of them and exports nothing by itself. See the
 M1–M5 established the domain, sync/async instrumentation, optional OTel
 context interoperability, evaluator provenance, and local aggregation. M6 adds
 the adoption path and installed-artifact verification. M7 defines the GA
-contract and release gates. The version remains pre-GA until a reviewed release
-candidate is cut.
+contract and release gates, released as `1.0.0` after `1.0.0rc1` was
+published and independently reinstalled from PyPI.
 
 No remote ingestion, dashboard, LLM judge, persistence, auto-instrumentation,
 or framework-specific adapter is included. See the [roadmap](docs/ROADMAP.md).
