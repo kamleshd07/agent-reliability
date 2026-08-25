@@ -13,7 +13,7 @@ preconditions below are satisfied.
 | Public API | PASS | Frozen and classified in [GA_CONTRACT.md](GA_CONTRACT.md) and [PUBLIC_API_REVIEW.md](PUBLIC_API_REVIEW.md); compatibility tests protect exports, signatures, and enums. |
 | Semantic contract | PASS | Golden tests protect outcomes, UNKNOWN policies, exact arithmetic, boundary/no-data/zero-tolerance behavior, and provenance conflicts. |
 | OpenTelemetry | PASS | The stable Python bridge is optional; the external mapping is explicitly EXTERNAL-EVOLVING. Context, failure isolation, privacy, and the `>=1.44,<2` bounds were tested. |
-| Security/privacy | PASS WITH OPERATIONAL BLOCKER | Adversarial tests found and closed a diagnostic `repr` secret path. BaseException/control-flow handling and bounded telemetry fields were reviewed. A private reporting channel is not yet verified. |
+| Security/privacy | PASS | Adversarial tests found and closed a diagnostic `repr` secret path. BaseException/control-flow handling and bounded telemetry fields were reviewed. GitHub private vulnerability reporting is enabled account-wide for public repositories, which covers this repository. |
 | Dependencies | PASS | The base wheel declares zero runtime dependencies. OTel API/SDK packages remain extras. |
 | Packaging | PASS | Isolated wheel and sdist builds and installs pass. Metadata, contents, offline examples, OTel extra, and installed-wheel typing pass. |
 | Typing | PASS | `py.typed` ships and a representative downstream consumer passes strict mypy against the wheel. |
@@ -55,21 +55,28 @@ engine. These are product evolution, not missing pieces of the frozen core.
 
 ## Release blockers
 
-1. The repository's GitHub private vulnerability reporting setting (or another
-   real private reporting channel) has not been verified. `SECURITY.md`
-   correctly treats publication without one as blocked.
-2. M2 through M7 are still a large uncommitted working tree based on
-   `d099bdc450b387c6938f3db1010766825536aa87`. There is no immutable reviewed
-   release-candidate commit or remote CI result for this complete state.
+1. ~~The repository's GitHub private vulnerability reporting setting has not
+   been verified.~~ **Resolved 2026-08-25.** Private vulnerability reporting
+   is enabled account-wide for public repositories, which covers this
+   repository.
+2. M2 through M7 were a large uncommitted working tree based on
+   `d099bdc450b387c6938f3db1010766825536aa87`. **Partially resolved
+   2026-08-25:** six reviewed commits now carry that work on `main`
+   (`82308a1`..`9b29dee`), one per milestone boundary, with the full suite
+   re-verified at 350/350 on the committed tree. Still open: this has not
+   been pushed to `origin/main`, and no remote CI run exists for this exact
+   commit sequence yet.
 3. PyPI ownership/availability and Trusted Publishing configuration for
    `agent-reliability` have not been confirmed. No distribution with that name
    was visible on PyPI during the review, which does not by itself reserve the
    name or prove publishing authority.
 
-After those operational prerequisites are resolved, create a reviewed
-`1.0.0rc1` commit, run all protected CI gates, publish the candidate through
-the documented trusted path, and repeat the installed-distribution sanity
-test. Only then should the final release commit change the single version
-source to `1.0.0`, update release metadata/changelog, and be tagged.
+After those operational prerequisites are resolved, push to `origin/main` and
+confirm remote CI passes the full matrix and artifact-verification job, then
+create a reviewed `1.0.0rc1` commit, publish the candidate through the
+documented trusted path, and repeat the installed-distribution sanity test.
+Only then should the final release commit change the single version source to
+`1.0.0`, update release metadata/changelog, and be tagged.
 
-NOT READY FOR 1.0.0
+NOT READY FOR 1.0.0 — one blocker remains (PyPI), plus pushing/remote CI for
+blocker 2.
