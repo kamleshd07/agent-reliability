@@ -1,22 +1,35 @@
 # Telemetry Contract
 
-Status: **specification only**, and even at the specification level,
-partially deferred. No telemetry emission exists yet in this repository
-(that begins at M2/M3). This document exists so that when it is built,
-it is built on OpenTelemetry rather than around it.
+Status: the M2 vendor-neutral event contract, M3 OpenTelemetry run-span
+mapping, and M4 evaluation provenance extension are implemented. M5 adds
+pure local analysis and does not change or emit telemetry.
+Evaluation-to-OpenTelemetry mapping remains deferred.
 
 ## Principle
 
-This project does not invent its own trace/span infrastructure. Every
-`AgentRun` carries the OpenTelemetry `trace_context` it belongs to (see
-[DOMAIN_MODEL.md](DOMAIN_MODEL.md)). Our additional semantics concern
+This project does not invent its own trace/span infrastructure. Domain
+`AgentRun` values deliberately carry no OpenTelemetry types or identifiers.
+The optional runtime adapter participates in the host's current OTel context
+without changing the domain. Our additional semantics concern
 *agent reliability* — they extend telemetry, they do not replace
 distributed tracing, metrics, or logging as already defined by OTel.
 
-## Before defining any attribute or event name
+## M4 evaluation event extension
 
-Before this project adopts a single span name or attribute key, the
-implementing milestone (M3, "OpenTelemetry Bridge") must:
+`EvaluationRecorded` preserves its existing run ID, indicator, outcome, and
+recording timestamp. It additively carries optional immutable evaluator
+provenance and a bounded reason code. `provenance=None` identifies the existing
+manual assertion path; evaluator-produced records contain evaluator name,
+opaque version, optional configuration identity, evaluation completion time,
+and determinism declaration. No evaluation input, output, evidence payload,
+score, exception, or arbitrary metadata is emitted.
+
+This remains a vendor-neutral `EventSink` event. M4 does not add an OTel event,
+span attribute, metric, log mapping, or semantic-convention claim.
+
+## M3 resolution and continuing review rule
+
+Before this project adopts or changes a span name or attribute key, it must:
 
 1. Inspect the current OpenTelemetry **GenAI semantic conventions**
    (`gen_ai.*`) as published at implementation time — they are still
@@ -29,19 +42,15 @@ implementing milestone (M3, "OpenTelemetry Bridge") must:
 4. Document the stability level of every convention adopted or
    introduced.
 
-This document intentionally does **not** freeze `gen_ai.*` attribute
-names today, because doing so risks contradicting the upstream
-convention by the time it's implemented. What it does freeze is the
-*namespacing and versioning discipline* below.
+M3's normative mapping, reviewed upstream versions, stability, privacy, and
+compatibility rules are in [OTEL_MAPPING.md](OTEL_MAPPING.md).
 
 ## Namespacing
 
 - Attributes and events defined by this project, not by OpenTelemetry
   upstream, live under a distinct namespace prefix reserved for this
-  project (exact prefix decided at M3, alongside the OTel-integration
-  ADR — candidates include `agent_reliability.*` or a shorter
-  project-specific prefix once the project's final name is set; see
-  the working-name note in the repository root).
+  project. M3 selected `agent_reliability.*`; every such attribute is
+  Project Experimental and is not presented as an upstream convention.
 - Nothing under that namespace is considered stable until explicitly
   promoted; see versioning below.
 
@@ -72,9 +81,9 @@ stable         — follows semantic versioning; breaking changes require
                  a major version bump and a deprecation window
 ```
 
-The mechanism for attaching that marker (a schema version attribute
-alongside each event, a documented convention registry file, or
-something else) is an open decision for the M3 ADR — not decided here.
+M3 identifies its mapping with `agent_reliability.schema.version=1`. It does
+not claim an OpenTelemetry schema URL because the project has not published a
+schema file or transformation.
 What is decided now is that **no experimental convention may be
 described as part of a "stable" telemetry contract**; the two must
 never be presented to users as equally reliable.
