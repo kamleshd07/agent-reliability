@@ -1,46 +1,35 @@
-# Compatibility & Versioning
+# Compatibility
 
-## Package version
+The current development version is `0.1.0.dev0`; it is being prepared for the
+first 1.0 release. The normative 1.0 contract is [GA_CONTRACT.md](GA_CONTRACT.md)
+and the release policy is [VERSIONING.md](VERSIONING.md).
 
-The project uses [Semantic Versioning](https://semver.org/). It starts
-at `0.1.0.dev0`.
+## Pre-GA
 
-## Pre-alpha status
+Core semantics are substantially complete, but no 1.0 artifact has been
+published. Until the release tag, public APIs may receive a documented change
+only when the GA audit identifies a material correctness, safety, or long-term
+compatibility problem.
 
-**No public API is stable during the `0.x.y.devN` / `0.x` pre-alpha and
-alpha phase.** Anything exported from `agent_reliability` may change or
-be removed between any two releases, including patch releases, without
-a deprecation period. This is stated explicitly so that early adopters
-do not mistake "importable" for "guaranteed."
+## 1.x promise
 
-## Stability tiers, once they exist
+At 1.0, package-level exports documented as stable, their typing, signatures,
+value semantics, and reliability behavior follow SemVer. Compatibility
+includes UNKNOWN interpretation, exact SLO boundaries, no-data behavior,
+error-budget/burn-rate formulas, provenance compatibility, evaluator failure
+classification, and instrumentation failure isolation.
 
-Once the project leaves pre-alpha, three tiers apply:
+Internal names have no compatibility guarantee. Experimental names, if ever
+introduced, must be explicitly labeled. The OTel adapter API is stable while
+its identified external semantic mapping is external-evolving.
 
-| Tier | Guarantee |
-|---|---|
-| Stable | Follows SemVer. Breaking changes require a major version bump and a documented deprecation window. |
-| Experimental (`agent_reliability.experimental.*`) | May change or be removed in any release, including patch releases. Never silently promoted — promotion to stable is a deliberate, documented, reviewed step. |
-| Internal (no leading-underscore convention assumed — anything not re-exported from a package's public `__all__`) | No compatibility guarantee whatsoever, at any project stage. |
+## Python
 
-## Telemetry contract stability
+The supported and CI-tested matrix is Python 3.11, 3.12, and 3.13. See
+[VERSIONING.md](VERSIONING.md) for removal policy.
 
-Emitted telemetry (event names, attribute keys, semantic conventions)
-follows the same tiering, tracked separately in
-[TELEMETRY_SPEC.md](TELEMETRY_SPEC.md), because a telemetry contract can
-break downstream dashboards and alerts independently of the Python API
-breaking anything. A change can be telemetry-breaking without being
-API-breaking, or vice versa; both must be considered independently when
-evaluating a change's compatibility impact.
+## Telemetry
 
-## Supported Python versions
-
-`>= 3.11` at project start. Support-window policy for newer Python
-minor releases and eventual dropping of old ones will be documented once
-the project reaches its first stable release; not fixed prematurely.
-
-## Deprecation policy
-
-Not yet defined in detail — deferred until the project has a stable
-public API to deprecate anything from. Once defined, it will live in
-this document.
+Telemetry compatibility is tracked separately because a mapping can break a
+consumer without changing Python imports. See [TELEMETRY_SPEC.md](TELEMETRY_SPEC.md)
+and [OTEL_MAPPING.md](OTEL_MAPPING.md).

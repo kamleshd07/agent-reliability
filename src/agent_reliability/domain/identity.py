@@ -1,10 +1,8 @@
 """Agent identity.
 
 Deliberately minimal: models only what M1 needs, per docs/DOMAIN_MODEL.md.
-What makes two ``AgentIdentity`` values represent "the same agent" across
-versions (for future regression detection, M7) is an open question this
-milestone does not answer — ``AgentIdentity`` here has ordinary
-structural (dataclass) equality only, nothing more.
+The library intentionally makes no cross-version identity inference:
+``AgentIdentity`` has ordinary structural (dataclass) equality only.
 """
 
 from __future__ import annotations

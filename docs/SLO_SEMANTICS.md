@@ -1,7 +1,8 @@
 # SLO Semantics
 
-Status: **specification only** — this document defines the mathematics
-that milestone M1 (Reliability Domain Kernel) must implement exactly.
+Status: implemented by M1 and consumed without formula duplication by M5.
+This document defines the mathematics that the Reliability Domain Kernel
+implements exactly.
 No rolling-window algorithms, multi-window burn-rate alerting, or
 statistical smoothing are specified here; those are explicit future ADR
 items. This document covers single-window, batch (not streaming)

@@ -7,11 +7,12 @@ inconclusive evidence (``UNKNOWN``) is a distinct, first-class outcome,
 never collapsed into ``PASS`` or ``FAIL`` and never represented as
 ``None`` (see docs/DOMAIN_MODEL.md).
 
-This module intentionally does not define a richer ``Evaluation``
-record (evaluator identity/version/evidence/timestamp) or a separate
-"reliability observation" wrapper type. For the ratio mathematics in
-``sli.py``, an eligible observation *is* its outcome — see ADR-0002.
-The richer record is deferred to the M4 "Evaluator framework" milestone.
+This module intentionally does not define the richer M4 ``EvaluationResult``
+or a separate "reliability observation" wrapper type. For the ratio
+mathematics in ``sli.py``, an eligible observation *is* its outcome — see
+ADR-0002. Evaluator execution and provenance live one layer above in
+``agent_reliability.evaluation``; the mathematical domain does not depend on
+them.
 """
 
 from __future__ import annotations

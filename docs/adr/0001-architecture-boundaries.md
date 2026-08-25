@@ -44,7 +44,12 @@ them automatically:
 - `application` imports `domain` and `ports` (interfaces) only — never
   a concrete adapter.
 - `ports` defines typed interfaces (initially: exporter, clock,
-  evaluator, storage) in terms of domain types only.
+  evaluator, storage) in terms of domain types only. Refined at M4 by
+  [ADR-0007](0007-evaluator-architecture-and-provenance-semantics.md) §11:
+  ports may also reference immutable, vendor-neutral evaluation contract
+  values, not only `domain` types — they still may not depend on evaluator
+  execution, SDK runtime, or concrete adapters. This note is added without
+  editing the decision above; see ADR-0007 for the full reasoning.
 - `adapters` implements `ports` and is the only layer permitted to
   import a specific vendor SDK, transport library, or agent framework.
 - `experimental` is a separate namespace for anything not yet subject

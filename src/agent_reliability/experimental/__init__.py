@@ -1,8 +1,7 @@
 """Experimental APIs.
 
-Anything under ``agent_reliability.experimental`` may change or be
-removed in any release, including patch releases, without following
-semantic versioning. See docs/COMPATIBILITY.md.
+Anything exported here in the future must follow the explicitly Experimental
+policy in docs/VERSIONING.md. Importability alone is not an export.
 
 Nothing is exported here yet.
 """

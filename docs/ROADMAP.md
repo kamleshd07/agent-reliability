@@ -3,7 +3,7 @@
 No dates are attached to any milestone below, intentionally. Milestones
 are ordered by dependency, not by calendar.
 
-## M0 — Repository & specification foundation *(this milestone)*
+## M0 — Repository & specification foundation
 
 Repository structure, engineering principles, domain model
 specification, telemetry contract approach, SLO mathematics
@@ -28,37 +28,67 @@ contexts). Context propagation via `contextvars`. Failure isolation and
 bounded overhead become concretely testable here — this is also where
 `benchmarks/` is introduced (see [ARCHITECTURE.md](ARCHITECTURE.md)).
 
+### M2.1 — Instrumentation runtime hardening
+
+A follow-up hardening pass on M2, not a new top-level milestone: found
+that a clock or run-id-generator failure inside `__enter__`/`__aenter__`
+was allowed to raise under M2's original failure-isolation rule
+(ADR-0004), which — because Python never runs a context manager's body
+unless entry succeeds — meant a broken instrumentation dependency could
+still prevent the application code being instrumented from running at
+all, contradicting the SDK's own core safety requirement. M2.1
+introduces a degraded-run mode for exactly that case (see
+[ADR-0005](adr/0005-instrumentation-initialization-degraded-mode.md),
+which supersedes ADR-0004's `__enter__`/`__aenter__` sub-rule), sanitizes
+the default diagnostic logger to stop rendering exception message
+content, and adds constructor-time validation that injected SDK
+dependencies structurally implement their ports. No public symbol was
+added; `RunHandle.run_id` widens from `str` to `str | None`.
+
 ## M3 — OpenTelemetry bridge
 
 Concrete telemetry emission aligned with OTel GenAI semantic
 conventions, per [TELEMETRY_SPEC.md](TELEMETRY_SPEC.md). This is where
 the OTel integration strategy, schema versioning mechanism, and
 project-specific namespace get decided via ADR and actually implemented.
+M3 is now implemented via the optional API-only run-context bridge, ADR-0006,
+and [OTEL_MAPPING.md](OTEL_MAPPING.md). It adds no provider, exporter, custom
+propagation, metrics, or evaluation-event mapping.
 
 ## M4 — Evaluator framework
 
-The `Evaluator` protocol, provenance tracking, and initial deterministic/
-rule-based evaluator implementations. LLM-as-judge evaluators arrive
-here as one implementation among several, never as a requirement for the
-core.
+Implemented: separate typed sync/async evaluator protocols, immutable
+behavior/configuration identity and provenance, explicit evaluation decisions
+and results, safe execution failures, equality/predicate evaluators, and
+run-event association. The framework retains no evaluation input and has no
+provider, agent-framework, hosted-platform, or runtime dependency. LLM-as-judge
+remains deliberately deferred until a later adapter milestone can define its
+privacy, nondeterminism, remote-failure, and provenance semantics explicitly.
 
-## M5 — Local reliability report
+## M5 — Local reliability engine
 
-A local, offline report (the `Task Success / Correctness / Policy
-Compliance / Tool Reliability / SLO / Error Budget / Burn Rate / Status`
-view described in the project's product thesis) computed entirely from
-locally recorded runs and evaluations — no backend required, honoring
-the vision that the OSS SDK stands on its own.
+Implemented: a local, offline, immutable report computed from explicit
+`ReliabilityObservation` values. The engine validates exact indicator and M4
+methodology cohorts, preserves manual/evaluated separation, rejects
+incompatible full/lookback collections without a partial number, and composes
+M1 ratio, SLO, error-budget, and burn-rate values. It does not depend directly
+on telemetry transport events and never counts `EvaluationExecutionFailure`.
+No backend, I/O, window selection, or new runtime dependency is required.
 
-## M6 — Agent SLO monitoring
+## M6 — Developer experience
 
-Continuous (not just batch-report) SLO evaluation and reliability-state
-tracking over live traffic.
+Implemented: an executable quickstart, product-first README, concepts and
+integration guidance, four contract-tested examples, PEP 561 packaging, and
+clean-wheel/base/OTel-extra verification. No core semantic or runtime-
+dependency change was required.
 
-## M7 — Reliability regression detection
+## M7 — GA hardening
 
-Comparing reliability indicators across `AgentIdentity` versions to
-surface regressions automatically.
+Implemented in the pre-release tree: normative GA/compatibility/deprecation
+contracts, public API and semantic regression locks, security/privacy review,
+single-source versioning, supported-Python CI, and wheel/sdist release gates.
+Operational release prerequisites and the final verdict are tracked in
+[GA_READINESS.md](GA_READINESS.md).
 
 ## M8 — Framework integrations
 

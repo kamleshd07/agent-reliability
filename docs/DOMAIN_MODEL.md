@@ -1,11 +1,10 @@
 # Domain Model
 
-Status: **specification only**. None of the types below are implemented
-in M0. This document exists to pin down semantics *before* code is
-written, per
-[ENGINEERING_PRINCIPLES.md](ENGINEERING_PRINCIPLES.md) #1. Field lists
-are illustrative of the concepts, not a final schema — types will be
-finalized alongside ADRs at M1.
+Status: implemented incrementally through M5. This document pins down
+semantics before implementation, per
+[ENGINEERING_PRINCIPLES.md](ENGINEERING_PRINCIPLES.md) #1. M1 implements the
+reliability mathematics and M4 implements evaluator attribution; later-layer
+concepts remain explicitly marked as future work.
 
 ## Layered concepts — do not mix these
 
@@ -112,14 +111,11 @@ is decided; a richer failure-cause model remains deferred.
 
 An assessment of some property of a run.
 
-**M1 scope note:** M1 implements only `EvaluationOutcome` (the
-`PASS`/`FAIL`/`UNKNOWN` enum below) and the ratio math built on it. The
-full `Evaluation` record described in this section — with evaluator
-identity, version, configuration, evidence, and timestamp — is deferred
-to M4 ("Evaluator framework"), where it can be designed against real
-evaluator implementations instead of speculatively now. M1's ratio
-kernel takes a plain `Iterable[EvaluationOutcome]`; it does not need to
-know who produced each outcome or when.
+M1 implements `EvaluationOutcome` and ratio math. M4 adds immutable
+`EvaluationResult` and `EvaluationProvenance` above the domain kernel; the M1
+ratio kernel deliberately continues accepting `Iterable[EvaluationOutcome]`.
+See [EVALUATOR_FRAMEWORK.md](EVALUATOR_FRAMEWORK.md),
+[EVALUATION_PROVENANCE.md](EVALUATION_PROVENANCE.md), and ADR-0007.
 
 M1 also does **not** introduce a separate "Reliability Observation"
 type distinct from `EvaluationOutcome`. For every purpose the ratio
@@ -128,25 +124,26 @@ single `EvaluationOutcome` in another single-field type would duplicate
 the concept without adding meaning (see
 [ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md)).
 
+M5 introduces `ReliabilityObservation` outside the M1 domain kernel because
+aggregation integrity needs two additional facts the ratio formula does not:
+the exact indicator and optional evaluator provenance. It projects only the
+outcome into M1 after validating that every observation represents one
+compatible methodology. This does not alter ADR-0002's decision that the
+mathematical kernel itself needs only `EvaluationOutcome`.
+
 ```text
-evaluation_type     — e.g. "task_success", "correctness",
-                       "policy_compliance", "tool_success" — an open,
-                       versioned vocabulary, not a closed enum, because
-                       organizations define their own properties
-value / score       — the evaluator's judgment (see PASS/FAIL/UNKNOWN
-                       below; numeric scores are a separate, optional
-                       concern from the categorical outcome)
-threshold           — if the evaluator reduces a score to pass/fail via
-                       a threshold, that threshold is recorded, not
-                       implied
-evaluator           — identity of what produced this evaluation
-evaluator_version   — because evaluator behavior itself can change
-configuration       — evaluator-specific config in effect at eval time
-evidence            — optional supporting data (subject to the same
-                       privacy rules as run metadata)
-timestamp           — UTC, timezone-aware
-method              — deterministic | rule_based | llm_judge | human | …
+indicator             — what reliability property is measured; recorded at
+                         run association, not embedded in evaluator identity
+outcome               — PASS / FAIL / UNKNOWN
+reason_code           — optional bounded machine-readable explanation
+evaluator identity    — name, opaque version, optional configuration_id
+evaluated_at          — explicit timezone-aware UTC completion instant
+deterministic         — expected reproducibility declaration
 ```
+
+Generic score, confidence, threshold, evidence, and metadata fields are not
+part of the M4 foundational result because their scale, meaning, and privacy
+properties are not universal.
 
 **Provenance is not optional.** An `Evaluation` must always be traceable
 to the evaluator identity, version, configuration, and timestamp that
@@ -162,11 +159,14 @@ Every `Evaluation` outcome is one of `PASS`, `FAIL`, or `UNKNOWN` —
 never forced into a boolean. Reasons `UNKNOWN` must exist as a first-
 class outcome, not an implementation detail:
 
-- the evaluator itself failed or timed out (`EVALUATOR_FAILURE`)
 - the run is still in flight / not yet evaluated
 - the evaluator explicitly abstains (e.g. an LLM judge declines to
   score ambiguous input)
 - required evidence is missing
+
+An evaluator exception is not `UNKNOWN`: it means no evaluation result exists.
+M4 represents safe-runner failure separately as `EvaluationExecutionFailure`.
+It is never silently counted as agent `FAIL` or `UNKNOWN`.
 
 `UNKNOWN` is never silently treated as `PASS` or `FAIL`. How `UNKNOWN`
 affects a specific SLI's ratio is a per-SLI, explicitly chosen policy —

@@ -9,13 +9,13 @@ Rules for this package, enforced by review (not yet by tooling):
 - No dependency on any specific LLM provider or agent framework.
 - Values are immutable.
 
-Everything exported here is pre-alpha with no compatibility guarantee
-(see docs/COMPATIBILITY.md) — it is exported from this subpackage, not
-from the ``agent_reliability`` package root, which still exports only
-``__version__``.
+The exports of this subpackage are part of the stable 1.0 contract documented
+in docs/GA_CONTRACT.md. They are not re-exported from the
+``agent_reliability`` package root, which exposes only ``__version__``.
 
-``application``, ``ports``, ``adapters``, and ``experimental`` remain
-empty placeholders; see docs/ARCHITECTURE.md.
+M4 evaluator execution/provenance lives in the separate
+``agent_reliability.evaluation`` namespace and depends on this domain, never
+the reverse; see docs/ARCHITECTURE.md.
 """
 
 from __future__ import annotations

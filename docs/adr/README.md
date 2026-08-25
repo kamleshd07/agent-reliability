@@ -51,3 +51,9 @@ Compatibility Impact
 |---|---|---|
 | [0001](0001-architecture-boundaries.md) | Core architecture and dependency boundaries | Accepted |
 | [0002](0002-reliability-mathematics-and-undefined-data-semantics.md) | Reliability mathematics and undefined-data semantics | Accepted |
+| [0003](0003-python-sdk-runtime-and-context-architecture.md) | Python SDK runtime and context architecture | Accepted |
+| [0004](0004-instrumentation-failure-isolation.md) | Instrumentation failure isolation | Superseded by ADR-0005 |
+| [0005](0005-instrumentation-initialization-degraded-mode.md) | Instrumentation initialization failures degrade instead of raising | Accepted |
+| [0006](0006-opentelemetry-interoperability-and-context-ownership.md) | OpenTelemetry interoperability and context ownership | Accepted |
+| [0007](0007-evaluator-architecture-and-provenance-semantics.md) | Evaluator architecture and provenance semantics | Accepted |
+| [0008](0008-reliability-aggregation-and-provenance-compatibility.md) | Reliability aggregation and provenance compatibility | Accepted |
