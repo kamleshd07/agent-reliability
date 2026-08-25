@@ -15,7 +15,7 @@ requires no private infrastructure for local verification.
 ## Prepare and verify
 
 1. Run `ruff check .`, `ruff format --check .`, `mypy src`, and
-   `pytest --cov --cov-report=term-missing`.
+   `python -m pytest --cov --cov-report=term-missing`.
 2. Confirm CI passes on Python 3.11, 3.12, and 3.13.
 3. Run focused M3/M4/M5 and compatibility/security suites.
 4. Set `agent_reliability.__version__` to the intended version. Hatch reads

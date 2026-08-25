@@ -42,7 +42,7 @@ jobs:
           ruff check .
           ruff format --check .
           mypy src
-          pytest --cov --cov-report=term-missing
+          python -m pytest --cov --cov-report=term-missing
 
       - name: Build sdist and wheel
         run: python -m build
