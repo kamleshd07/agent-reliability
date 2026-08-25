@@ -1,80 +1,62 @@
 # Contributing
 
-Thank you for your interest. This project is pre-alpha and its domain
-model and semantics ([docs/DOMAIN_MODEL.md](docs/DOMAIN_MODEL.md),
-[docs/SLO_SEMANTICS.md](docs/SLO_SEMANTICS.md)) are still being
-validated — questions and critique on those documents are as valuable
-as code right now.
+Thank you for your interest. Agent Reliability is pre-GA. Core semantics are
+substantially complete; public APIs may receive limited refinement before
+`1.0.0`. Questions and precise critique remain welcome.
 
-## Branch naming
+## Development setup
 
-`<type>/<short-description>`, e.g. `feat/slo-window-boundaries`,
-`fix/burn-rate-division-by-zero`, `docs/clarify-unknown-policy`.
+Requires Python 3.11–3.13.
 
-## Commit expectations
+```bash
+python -m venv .venv
+# POSIX: source .venv/bin/activate
+# Windows PowerShell: .venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+```
 
-Commits should be small enough to review in isolation and should not
-mix unrelated concerns (e.g. a domain-semantics change and a formatting
-pass belong in separate commits).
+Branches use `<type>/<short-description>`, for example
+`fix/burn-rate-division-by-zero`. Keep commits reviewable and do not mix
+unrelated semantic and formatting changes.
 
 ## Before opening a PR
-
-Run locally:
 
 ```bash
 ruff check .
 ruff format --check .
 mypy src
-pytest
+pytest --cov --cov-report=term-missing
 python -m build
+python scripts/verify_release_artifacts.py
 ```
 
-All must pass. CI re-runs the same checks (see
-[.github/workflows/ci.yml](.github/workflows/ci.yml)).
+CI repeats these checks. New behavior needs the appropriate unit, property,
+contract, or integration tests; see [testing strategy](docs/TESTING_STRATEGY.md).
+Reliability mathematics changes require invariant/property coverage.
 
-## Testing requirements
+## Architecture and documentation
 
-New behavior needs tests in the correct category — see
-[docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) for the
-unit/property/contract/integration distinction. Reliability mathematics
-changes require property-based tests demonstrating the relevant
-invariants, not just example-based tests.
+Preserve the dependency direction and anti-goals in
+[architecture](docs/ARCHITECTURE.md) and
+[engineering principles](docs/ENGINEERING_PRINCIPLES.md). Do not add provider,
+agent-framework, storage, or transport dependencies to the domain.
 
-## ADR requirements
+Hard-to-reverse decisions require an ADR alongside the implementation; see the
+[ADR guide](docs/adr/README.md). Update documentation in the same PR whenever
+public behavior or semantics change.
 
-If your change makes a hard-to-reverse architectural decision (see
-[docs/adr/README.md](docs/adr/README.md) for the bar), include an ADR in
-the same PR. Don't retrofit an ADR to justify a decision already made
-elsewhere — write it before or alongside the implementation.
+## Compatibility
 
-## Breaking-change policy
+Before 1.0, public APIs may receive limited breaking refinement. See
+[compatibility](docs/COMPATIBILITY.md). Do not introduce convenience APIs that
+hide evaluator methodology, UNKNOWN policy, provenance, or SLO choices.
 
-During pre-alpha, any public API or telemetry contract may change; see
-[docs/COMPATIBILITY.md](docs/COMPATIBILITY.md). Once the project reaches
-a stable release, breaking changes require a major version bump, a
-documented migration path, and a deprecation window for anything they
-replace.
+## PR description checklist
 
-## Documentation requirements
-
-If a PR changes semantics described in `docs/`, update the relevant
-document in the same PR. Code and docs must not describe different
-behavior.
-
-## What a PR description should answer
-
-- What changed?
-- Why?
+- What changed and why?
 - What alternatives were considered?
-- What are the compatibility implications?
-- What are the security implications?
-- What are the performance implications?
-- How was this verified?
+- What are the compatibility, security, and performance implications?
+- How was it verified?
 
-## Scope discipline
-
-This project has explicit anti-goals (see
-[docs/ROADMAP.md](docs/ROADMAP.md) and the vision document's framing in
-[docs/VISION.md](docs/VISION.md)). PRs that expand scope toward a
-generic tracing platform, an agent framework, a prompt-management tool,
-or similar adjacent products will be redirected, not merged.
+Security vulnerabilities must use the private process in [SECURITY.md](SECURITY.md),
+not a public issue.

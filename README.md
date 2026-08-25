@@ -1,105 +1,175 @@
 # Agent Reliability
 
-**STATUS: PRE-ALPHA / UNDER ACTIVE DEVELOPMENT.** No public API is
-stable. See [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
+AI agents can finish successfully while still doing the wrong thing. Agent
+Reliability provides vendor-neutral Python primitives for measuring whether
+agents meet explicit reliability objectives.
 
-> "Agent Reliability" is a working name for this project, chosen so
-> that package/module naming can be changed later without contaminating
-> the core domain model. Architectural decisions in this repository do
-> not depend on the final name.
+It brings evaluations, SLOs, error budgets, burn rates, and measurement
+provenance to agent applications—and refuses to produce a misleading number
+when evaluation methodologies are incompatible.
+
+**Status: PRE-GA.** Public APIs may receive limited refinement before `1.0.0`.
+See [compatibility](docs/COMPATIBILITY.md).
 
 ## Why this exists
 
-AI agents are increasingly autonomous, but existing telemetry mostly
-tells operators *what happened* — which model was called, which tool
-ran, whether the HTTP request returned 200. It doesn't tell them whether
-the agent is still doing its job.
+Traces explain what an agent did. Reliability answers whether it consistently
+achieved a defined outcome. Agent Reliability connects one logical execution
+to an explicit evaluation method, then calculates exact local reliability
+against an SLO.
 
-## The reliability gap
+The OSS package works offline and without a hosted service. It does not
+automatically capture prompts, responses, tool arguments, credentials, or
+arbitrary application payloads. The base install has no runtime dependencies
+and sends nothing over the network.
 
-Traditional observability answers "what happened?" LLM tracing answers
-"what calls did the model and agent make?" Neither answers the question
-that actually matters for running agents in production:
-
-> Is this AI agent reliably accomplishing its intended job within
-> defined operational boundaries?
-
-## What "Agent SRE" means here
-
-This project applies established SRE ideas — SLOs, error budgets, burn
-rates — to autonomous agents, adapted carefully for the fact that agent
-outcomes are evaluated, not just executed, and that evaluations can be
-uncertain. See [docs/VISION.md](docs/VISION.md) for the full framing and
-[docs/SLO_SEMANTICS.md](docs/SLO_SEMANTICS.md) for the mathematics.
-
-## Core concepts
-
-| Concept | Question it answers |
-|---|---|
-| Telemetry | What occurred? |
-| Evaluation | Was some property of an execution satisfactory? |
-| Reliability Indicator (SLI) | A precisely defined, measurable indicator |
-| SLO | A target applied to an SLI over a window |
-| Error Budget | The permitted amount of unreliability an SLO implies |
-| Burn Rate | How fast that budget is being consumed |
-| Reliability State | The interpreted operational state of an agent |
-
-Full definitions: [docs/DOMAIN_MODEL.md](docs/DOMAIN_MODEL.md).
-
-## Project status
-
-This repository currently contains **milestone M0: repository and
-specification foundation** — architecture, domain model, telemetry
-contract approach, SLO mathematics, security model, and testing
-strategy are documented and reviewed. **No reliability business logic
-is implemented yet.** The package currently exports nothing but a
-version string.
-
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the full milestone sequence
-(M0 through M10) and what each one covers.
-
-## Architecture
-
-A layered, hexagonal (ports-and-adapters) design — domain logic has zero
-dependency on any vendor SDK, telemetry backend, or agent framework.
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and
-[docs/adr/0001-architecture-boundaries.md](docs/adr/0001-architecture-boundaries.md).
-
-## Development
-
-Requires Python >= 3.11.
+## 30-second example
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate          # or .venv\Scripts\activate on Windows
-pip install -e ".[dev]"
-
-ruff check .
-ruff format --check .
-mypy src
-pytest
-python -m build
+python -m pip install agent-reliability
 ```
 
-## Roadmap
+This standalone example instruments four agent-like calls, evaluates
+`task_success`, records attributable results, and applies a 75% SLO:
 
-See [docs/ROADMAP.md](docs/ROADMAP.md).
+<!-- readme-quickstart-start -->
+```python
+from fractions import Fraction
 
-## Contributing
+from agent_reliability.domain import ObjectiveDirection, Slo, UnknownPolicy
+from agent_reliability.evaluation import (
+    EqualityEvaluator,
+    EvaluationResult,
+    EvaluatorIdentity,
+)
+from agent_reliability.reliability import (
+    AggregationConflict,
+    ReliabilityObservation,
+    evaluate_reliability,
+)
+from agent_reliability.sdk import AgentReliability, EvaluatorRunner
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). This project is not yet seeking
-feature contributions beyond the current milestone's scope — issues and
-discussion on the domain model and semantics are especially welcome
-while those are still being validated.
+sdk = AgentReliability()
+runner = EvaluatorRunner()
+evaluator = EqualityEvaluator(EvaluatorIdentity("expected-answer", "1"), "approved")
+observations = []
+
+for actual in ("approved", "approved", "needs-review", "approved"):
+    with sdk.run(agent_id="approval-agent", name="Approval Agent", version="1") as run:
+        result = runner.evaluate(evaluator, actual)
+        if not isinstance(result, EvaluationResult):
+            raise RuntimeError("evaluation did not produce an observation")
+        run.record_evaluation(indicator="task_success", result=result)
+        observations.append(
+            ReliabilityObservation.from_evaluation(
+                indicator="task_success", result=result
+            )
+        )
+
+report = evaluate_reliability(
+    indicator="task_success",
+    observations=observations,
+    slo=Slo("task-success", Fraction(3, 4), ObjectiveDirection.AT_LEAST),
+    unknown_policy=UnknownPolicy.EXCLUDE,
+)
+if isinstance(report, AggregationConflict):
+    raise RuntimeError("incompatible measurement methodologies")
+
+print(f"Reliability: {float(report.ratio.pass_ratio):.2%}")
+print(f"SLO status: {report.slo_evaluation.status.value.upper()}")
+```
+<!-- readme-quickstart-end -->
+
+Output:
+
+```text
+Reliability: 75.00%
+SLO status: MET
+```
+
+This block runs in CI. The [canonical example](examples/basic_reliability.py)
+also shows the error budget. Follow the [5–10 minute quickstart](docs/QUICKSTART.md)
+for interpretation and next steps.
+
+## What it measures
+
+- An **indicator** says what is measured, such as `task_success`.
+- An **evaluator** says how it is judged and returns `PASS`, `FAIL`, or
+  `UNKNOWN`.
+- **Provenance** records evaluator name, behavior version, configuration, and
+  determinism.
+- An **SLI** is the observed ratio; an **SLO** is the desired target.
+- The **error budget** is permitted unreliability; **burn rate** compares an
+  observed bad-event rate with that allowance.
+
+`UNKNOWN` means evaluation completed but was indeterminate. An
+`EvaluationExecutionFailure` means the evaluator or its timestamping failed;
+it is not an agent failure and creates no observation.
+
+If evaluator v1 and v2 measured the same indicator, the engine returns an
+`AggregationConflict` instead of averaging them. A changed measurement method
+is not automatically comparable. See [Core concepts](docs/CONCEPTS.md).
+
+## Installation
+
+Python 3.11–3.13 is supported. The distribution and import names differ:
+
+```text
+pip install agent-reliability
+import agent_reliability
+```
+
+The only optional runtime extra is the OpenTelemetry API bridge:
+
+```bash
+python -m pip install "agent-reliability[otel]"
+```
+
+## Framework compatibility
+
+Any Python agent can use the explicit sync or async context manager. Wrap one
+logical task execution, evaluate the relevant output, and retain observations
+for the window your application chooses. No framework adapter, monkey patch,
+API key, storage layer, or network service is required. See
+[Integrations](docs/INTEGRATIONS.md) and the [async example](examples/async_agent.py).
+
+The local engine calculates one supplied collection at a time; it does not
+retain history or select rolling windows.
+
+## OpenTelemetry
+
+`OpenTelemetryRunContextBridge` activates the agent span in an existing host
+trace. Your application owns the `TracerProvider`, sampling, processors,
+propagation, exporter, collector, and backend. Agent Reliability configures
+none of them and exports nothing by itself. See the
+[OTel example](examples/opentelemetry_example.py) and
+[mapping reference](docs/OTEL_MAPPING.md).
+
+## Project status and scope
+
+M1–M5 established the domain, sync/async instrumentation, optional OTel
+context interoperability, evaluator provenance, and local aggregation. M6 adds
+the adoption path and installed-artifact verification. M7 defines the GA
+contract and release gates. The version remains pre-GA until a reviewed release
+candidate is cut.
+
+No remote ingestion, dashboard, LLM judge, persistence, auto-instrumentation,
+or framework-specific adapter is included. See the [roadmap](docs/ROADMAP.md).
+
+## Documentation
+
+- New developer: [Quickstart](docs/QUICKSTART.md) → [Concepts](docs/CONCEPTS.md)
+- Integrator: [Integration guide](docs/INTEGRATIONS.md)
+- Advanced user: [Evaluator framework](docs/EVALUATOR_FRAMEWORK.md) and
+  [local engine](docs/LOCAL_RELIABILITY_ENGINE.md)
+- Architecture reader or contributor: [documentation index](docs/README.md)
+
+## Development and contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and quality gates. Security
+vulnerabilities belong in the private process in [SECURITY.md](SECURITY.md),
+not a public issue.
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE). Chosen over MIT/BSD for its
-explicit patent grant (Section 3) and contribution-termination clause,
-which matter for infrastructure software with potential enterprise
-adoption and multiple corporate contributors; chosen over a copyleft
-license (e.g. GPL/AGPL) to keep the SDK freely embeddable in proprietary
-agent applications, which is a stated goal of the project. See
-[docs/adr/README.md](docs/adr/README.md) for the ADR process if you're
-looking for the rationale behind other significant decisions in this
-repository.
+Apache License 2.0. See [LICENSE](LICENSE).

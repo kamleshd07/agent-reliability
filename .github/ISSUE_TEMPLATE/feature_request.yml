@@ -1,0 +1,24 @@
+name: Feature request
+description: Propose an OSS reliability use case or improvement
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What developer or reliability problem cannot be solved today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed outcome
+      description: Describe the desired behavior, not only an API shape.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and semantic impact
+      description: What workarounds exist, and could this affect SLO, UNKNOWN, or provenance semantics?
