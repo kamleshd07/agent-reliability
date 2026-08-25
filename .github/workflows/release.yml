@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/project/agent-reliability/${{ github.ref_name }}
+      url: https://pypi.org/project/agent-reliability/
     permissions:
       id-token: write
     steps:
@@ -96,4 +96,5 @@ jobs:
           gh release create "${GITHUB_REF_NAME}" dist/* \
             --repo "${GITHUB_REPOSITORY}" \
             --title "${GITHUB_REF_NAME}" \
+            --prerelease \
             --generate-notes

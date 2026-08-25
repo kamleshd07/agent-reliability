@@ -6,6 +6,15 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+## [1.0.0rc1]
+
+This first public release candidate establishes the frozen 1.0 contracts for
+privacy-first agent instrumentation, synchronous and asynchronous run
+lifecycles, instrumentation failure isolation, optional OpenTelemetry
+interoperability, deterministic evaluation with provenance, exact SLO/error
+budget/burn-rate mathematics, provenance-safe local reliability aggregation,
+and a typed zero-base-dependency API.
+
 ### Changed
 
 - M7 freezes the 1.0 public and semantic contracts, defines SemVer and
