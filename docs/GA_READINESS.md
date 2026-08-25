@@ -56,9 +56,12 @@ engine. These are product evolution, not missing pieces of the frozen core.
 ## Release blockers
 
 1. ~~The repository's GitHub private vulnerability reporting setting has not
-   been verified.~~ **Resolved 2026-08-25.** Private vulnerability reporting
-   is enabled account-wide for public repositories, which covers this
-   repository.
+   been verified.~~ **Resolved 2026-08-25.** Confirmed directly on this
+   repository (Settings → Advanced Security → Private vulnerability
+   reporting shows "Disable," i.e. currently enabled), not merely inferred
+   from an account-wide default. The repository is also confirmed public
+   (Settings → Danger Zone), which the PyPI project metadata and the OSS
+   contribution workflow both assume.
 2. ~~M2 through M7 were a large uncommitted working tree based on
    `d099bdc450b387c6938f3db1010766825536aa87`, with no reviewed
    release-candidate commit or remote CI result.~~ **Resolved 2026-08-25.**
