@@ -6,6 +6,20 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-26
+
+Documentation-only patch release. Public APIs, reliability semantics, runtime
+behavior, supported Python versions, dependency metadata, and the stable 1.0
+contract are unchanged.
+
+### Fixed
+
+- Replaced repository-relative links in the package README with canonical
+  GitHub URLs so documentation and example links resolve correctly on PyPI
+  and other package indexes as well as GitHub.
+- Added a focused contract test that rejects package-index-unsafe relative
+  links while allowing absolute URLs and same-document anchors.
+
 ## [1.0.0]
 
 First General Availability release. The public contract frozen for `1.0.0rc1`
