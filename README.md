@@ -9,8 +9,8 @@ provenance to agent applications—and refuses to produce a misleading number
 when evaluation methodologies are incompatible.
 
 **Status: GA (`1.0.0`).** Public APIs documented as stable in
-[GA_CONTRACT.md](docs/GA_CONTRACT.md) follow Semantic Versioning.
-See [compatibility](docs/COMPATIBILITY.md).
+[GA_CONTRACT.md](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/GA_CONTRACT.md) follow Semantic Versioning.
+See [compatibility](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/COMPATIBILITY.md).
 
 ## Why this exists
 
@@ -88,8 +88,8 @@ Reliability: 75.00%
 SLO status: MET
 ```
 
-This block runs in CI. The [canonical example](examples/basic_reliability.py)
-also shows the error budget. Follow the [5–10 minute quickstart](docs/QUICKSTART.md)
+This block runs in CI. The [canonical example](https://github.com/kamleshd07/agent-reliability/blob/main/examples/basic_reliability.py)
+also shows the error budget. Follow the [5–10 minute quickstart](https://github.com/kamleshd07/agent-reliability/blob/main/docs/QUICKSTART.md)
 for interpretation and next steps.
 
 ## What it measures
@@ -109,7 +109,7 @@ it is not an agent failure and creates no observation.
 
 If evaluator v1 and v2 measured the same indicator, the engine returns an
 `AggregationConflict` instead of averaging them. A changed measurement method
-is not automatically comparable. See [Core concepts](docs/CONCEPTS.md).
+is not automatically comparable. See [Core concepts](https://github.com/kamleshd07/agent-reliability/blob/main/docs/CONCEPTS.md).
 
 ## Installation
 
@@ -132,7 +132,7 @@ Any Python agent can use the explicit sync or async context manager. Wrap one
 logical task execution, evaluate the relevant output, and retain observations
 for the window your application chooses. No framework adapter, monkey patch,
 API key, storage layer, or network service is required. See
-[Integrations](docs/INTEGRATIONS.md) and the [async example](examples/async_agent.py).
+[Integrations](https://github.com/kamleshd07/agent-reliability/blob/main/docs/INTEGRATIONS.md) and the [async example](https://github.com/kamleshd07/agent-reliability/blob/main/examples/async_agent.py).
 
 The local engine calculates one supplied collection at a time; it does not
 retain history or select rolling windows.
@@ -143,8 +143,8 @@ retain history or select rolling windows.
 trace. Your application owns the `TracerProvider`, sampling, processors,
 propagation, exporter, collector, and backend. Agent Reliability configures
 none of them and exports nothing by itself. See the
-[OTel example](examples/opentelemetry_example.py) and
-[mapping reference](docs/OTEL_MAPPING.md).
+[OTel example](https://github.com/kamleshd07/agent-reliability/blob/main/examples/opentelemetry_example.py) and
+[mapping reference](https://github.com/kamleshd07/agent-reliability/blob/main/docs/OTEL_MAPPING.md).
 
 ## Project status and scope
 
@@ -155,22 +155,22 @@ contract and release gates, released as `1.0.0` after `1.0.0rc1` was
 published and independently reinstalled from PyPI.
 
 No remote ingestion, dashboard, LLM judge, persistence, auto-instrumentation,
-or framework-specific adapter is included. See the [roadmap](docs/ROADMAP.md).
+or framework-specific adapter is included. See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).
 
 ## Documentation
 
-- New developer: [Quickstart](docs/QUICKSTART.md) → [Concepts](docs/CONCEPTS.md)
-- Integrator: [Integration guide](docs/INTEGRATIONS.md)
-- Advanced user: [Evaluator framework](docs/EVALUATOR_FRAMEWORK.md) and
-  [local engine](docs/LOCAL_RELIABILITY_ENGINE.md)
-- Architecture reader or contributor: [documentation index](docs/README.md)
+- New developer: [Quickstart](https://github.com/kamleshd07/agent-reliability/blob/main/docs/QUICKSTART.md) → [Concepts](https://github.com/kamleshd07/agent-reliability/blob/main/docs/CONCEPTS.md)
+- Integrator: [Integration guide](https://github.com/kamleshd07/agent-reliability/blob/main/docs/INTEGRATIONS.md)
+- Advanced user: [Evaluator framework](https://github.com/kamleshd07/agent-reliability/blob/main/docs/EVALUATOR_FRAMEWORK.md) and
+  [local engine](https://github.com/kamleshd07/agent-reliability/blob/main/docs/LOCAL_RELIABILITY_ENGINE.md)
+- Architecture reader or contributor: [documentation index](https://github.com/kamleshd07/agent-reliability/blob/main/docs/README.md)
 
 ## Development and contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and quality gates. Security
-vulnerabilities belong in the private process in [SECURITY.md](SECURITY.md),
+See [CONTRIBUTING.md](https://github.com/kamleshd07/agent-reliability/blob/main/CONTRIBUTING.md) for setup and quality gates. Security
+vulnerabilities belong in the private process in [SECURITY.md](https://github.com/kamleshd07/agent-reliability/blob/main/SECURITY.md),
 not a public issue.
 
 ## License
 
-Apache License 2.0. See [LICENSE](LICENSE).
+Apache License 2.0. See [LICENSE](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/LICENSE).
