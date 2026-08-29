@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest. Agent Reliability `1.1.0` is released; public
+Thank you for your interest. Agent Reliability `1.1.1` is released; public
 APIs documented as stable in [docs/GA_CONTRACT.md](docs/GA_CONTRACT.md)
 follow Semantic Versioning. Questions and precise critique remain welcome.
 

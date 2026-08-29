@@ -8,7 +8,7 @@ It brings evaluations, SLOs, error budgets, burn rates, and measurement
 provenance to agent applications—and refuses to produce a misleading number
 when evaluation methodologies are incompatible.
 
-**Status: GA (`1.1.0`).** Public APIs documented as stable in
+**Status: GA (`1.1.1`).** Public APIs documented as stable in
 [GA_CONTRACT.md](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/GA_CONTRACT.md) follow Semantic Versioning.
 See [compatibility](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/COMPATIBILITY.md).
 
@@ -161,7 +161,8 @@ the adoption path and installed-artifact verification. M7 defines the GA
 contract and release gates, released as `1.0.0` after `1.0.0rc1` was
 published and independently reinstalled from PyPI. M8 adds run-scoped
 measurement health and an application-owned policy extension boundary in
-`1.1.0`.
+`1.1.0`; M9 hardens that contract with adversarial coverage and real-world
+policy examples in `1.1.1`.
 
 No remote ingestion, dashboard, LLM judge, persistence, auto-instrumentation,
 or framework-specific adapter is included. See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).

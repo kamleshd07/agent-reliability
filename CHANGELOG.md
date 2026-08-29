@@ -6,6 +6,12 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-08-29
+
+Measurement Health hardening release. Public APIs, reliability and SLO
+semantics, runtime behavior, supported Python versions, and dependency
+metadata are unchanged from `1.1.0`.
+
 ### Hardened
 
 - Added a frozen 1.1 measurement-health API snapshot plus deterministic

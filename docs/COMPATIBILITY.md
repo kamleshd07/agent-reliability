@@ -1,6 +1,6 @@
 # Compatibility
 
-Agent Reliability `1.1.0` is released. The normative 1.0 contract is
+Agent Reliability `1.1.1` is released. The normative 1.0 contract is
 [GA_CONTRACT.md](GA_CONTRACT.md) and the release policy is
 [VERSIONING.md](VERSIONING.md).
 
@@ -35,5 +35,5 @@ M8 adds `agent_reliability.measurement` and additive `RunHandle` inspection
 and policy members. Existing 1.0 export sets, callable signatures, enum
 semantics, event payloads, and SLO/reliability calculations are unchanged.
 This public addition ships in 1.1.0 as a backward-compatible minor release.
-M9 adds tests, examples, documentation, and artifact checks only; the released
-1.1.0 public and semantic contract is unchanged.
+M9 adds tests, examples, documentation, and artifact checks only; the `1.1.1`
+release leaves the `1.1.0` public and semantic contract unchanged.
