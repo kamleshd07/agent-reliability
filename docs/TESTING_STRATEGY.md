@@ -7,6 +7,15 @@ deterministic evaluator/sink/clock/run-ID/context/diagnostics/bridge failure
 injection, policy ownership, async/nested isolation, provenance conflict, and
 planted-secret tests. Existing 1.0 compatibility tests remain unchanged.
 
+## M9 released-contract hardening
+
+M9 snapshots the exact installed 1.1 measurement API and exercises realistic
+individual and combined failures, failure ordering, deep and async nesting,
+64 synchronized mixed-health tasks, multiple evaluators, spoofing resistance,
+garbage collection, bounded repeated failures, OTel isolation, reliability
+quadrants, and three application-owned policy examples. It adds no production
+API or behavior.
+
 Testing is an architectural requirement, not an afterthought bolted onto
 finished code — this is why test categories and their directories exist
 before there is business logic to fill them.

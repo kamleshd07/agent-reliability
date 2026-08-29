@@ -35,3 +35,5 @@ M8 adds `agent_reliability.measurement` and additive `RunHandle` inspection
 and policy members. Existing 1.0 export sets, callable signatures, enum
 semantics, event payloads, and SLO/reliability calculations are unchanged.
 This public addition ships in 1.1.0 as a backward-compatible minor release.
+M9 adds tests, examples, documentation, and artifact checks only; the released
+1.1.0 public and semantic contract is unchanged.

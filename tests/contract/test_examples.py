@@ -71,3 +71,28 @@ def test_opentelemetry_example_when_extra_is_available() -> None:
     assert _run("opentelemetry_example.py") == (
         "Agent run is active inside the host-owned OTel context.\n"
     )
+
+
+def test_fail_open_policy_example() -> None:
+    assert _run("policy_fail_open.py") == (
+        "Measurement health: DEGRADED\n"
+        "Application decision: CONTINUE\n"
+        "This is application policy, not SDK policy.\n"
+    )
+
+
+def test_fail_closed_policy_example() -> None:
+    assert _run("policy_fail_closed.py") == (
+        "Measurement health: DEGRADED\n"
+        "Application decision: WITHHOLD\n"
+        "The application owns authorization; the SDK only reports health.\n"
+    )
+
+
+def test_bounded_degradation_policy_example() -> None:
+    assert _run("policy_bounded_degradation.py") == (
+        "HEALTHY -> FULL\n"
+        "DEGRADED -> READ_ONLY\n"
+        "UNAVAILABLE -> SENSITIVE_DISABLED\n"
+        "These capability choices belong to the application, not the SDK.\n"
+    )

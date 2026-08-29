@@ -141,6 +141,9 @@ def _verify_base(python: Path, wheel: Path, version: str) -> None:
         "basic_reliability.py": "Reliability: 75.00%",
         "async_agent.py": "Async reliability: 2/3 (MET)",
         "provenance_conflict.py": "evaluator_version_mismatch",
+        "policy_fail_open.py": "This is application policy, not SDK policy.",
+        "policy_fail_closed.py": "The application owns authorization",
+        "policy_bounded_degradation.py": "UNAVAILABLE -> SENSITIVE_DISABLED",
     }
     for example, marker in expected.items():
         output = _run(str(python), str(ROOT / "examples" / example))

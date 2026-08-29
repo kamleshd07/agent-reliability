@@ -94,3 +94,18 @@ Live run health is SDK-derived and cannot be reset by the agent. Constructed
 values are data, not attestations; do not trust a value supplied by acting
 agent content. See [ADR-0009](adr/0009-measurement-health-and-policy-boundary.md)
 for the complete failure matrix.
+
+## Failure scenarios
+
+| Scenario | Task-reliability meaning | Measurement health | SDK behavior | Possible application choice |
+|---|---|---|---|---|
+| Evaluator returns `UNKNOWN` | Completed evaluation is indeterminate | `HEALTHY` if collection succeeds | Records UNKNOWN normally | Include, exclude, or reinterpret only through the selected `UnknownPolicy` |
+| Evaluator crashes | No PASS/FAIL/UNKNOWN exists | `UNAVAILABLE` when the failure is associated with the run | Returns `EvaluationExecutionFailure`; body continues | Fail open, fail closed, or reduce capability explicitly |
+| Event sink/export delivery fails | Existing evaluation result is unchanged | `DEGRADED` for the run's local delivery path | Diagnoses structurally; application code continues | Continue while surfacing degraded evidence, or restrict capability |
+| Provenance conflicts | Incompatible methodologies cannot form one reliability number | `UNAVAILABLE` | Returns `AggregationConflict`, never a partial report | Separate cohorts or withhold the interpretation |
+| Instrumentation startup degrades | No valid run evidence scope was established | `UNAVAILABLE` | Returns a context-neutral degraded handle and executes the body | Decide explicitly whether the unmeasured operation may proceed |
+| Optional OTel bridge/exporter fails | Local reliability result is unchanged | No local health impact | Keeps local events and execution isolated from optional tracing | Handle external observability health separately |
+
+For complete runnable application mappings, see the
+[policy examples](MEASUREMENT_HEALTH_POLICY_EXAMPLES.md). These examples never
+turn the SDK into an authorization engine.

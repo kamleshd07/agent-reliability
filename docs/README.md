@@ -24,6 +24,7 @@
 - [Compatibility](COMPATIBILITY.md)
 - [Security model](SECURITY_MODEL.md)
 - [Measurement health](MEASUREMENT_HEALTH.md)
+- [Measurement-health policy examples](MEASUREMENT_HEALTH_POLICY_EXAMPLES.md)
 - [Public API review](PUBLIC_API_REVIEW.md)
 
 ## Architecture

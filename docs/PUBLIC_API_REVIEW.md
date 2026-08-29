@@ -74,3 +74,10 @@ application-chosen generic result type.
 
 No helper, accumulator, severity map, or mutable state is public. Frozen 1.0
 namespace `__all__` sets and function signatures are untouched.
+
+## M9 hardening review
+
+M9 adds **no public symbols** and changes no production module. The exact
+installed 1.1 exports, enum values, constructors, methods, properties, and
+high-value signatures are protected by `tests/compat/test_public_api_1_1.py`.
+Policy decisions in `examples/` remain application-local demonstration types.

@@ -111,6 +111,8 @@ Reliability answers “how often is the agent behaving correctly?” Measurement
 health answers “do we have enough trustworthy evidence to make that claim?”
 They remain independent, and applications—not the SDK—decide how degraded
 evidence affects an action. See the [measurement-health guide](https://github.com/kamleshd07/agent-reliability/blob/main/docs/MEASUREMENT_HEALTH.md).
+Runnable fail-open, fail-closed, and bounded-degradation examples are in the
+[application policy guide](https://github.com/kamleshd07/agent-reliability/blob/main/docs/MEASUREMENT_HEALTH_POLICY_EXAMPLES.md).
 
 If evaluator v1 and v2 measured the same indicator, the engine returns an
 `AggregationConflict` instead of averaging them. A changed measurement method

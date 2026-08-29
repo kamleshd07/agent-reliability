@@ -6,6 +6,15 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Hardened
+
+- Added a frozen 1.1 measurement-health API snapshot plus deterministic
+  combined-failure, ordering, nested-run, async-concurrency, multiple-evaluator,
+  privacy, retention, OTel, and reliability/SLO regression coverage.
+- Added offline, contract-tested fail-open, fail-closed, and
+  bounded-degradation application examples without introducing SDK
+  authorization semantics or new public symbols.
+
 ## [1.1.0] - 2026-08-29
 
 ### Added
