@@ -168,6 +168,13 @@ identifier enters the core or domain. See
 [ADR-0006](adr/0006-opentelemetry-interoperability-and-context-ownership.md)
 and [OTEL_MAPPING.md](OTEL_MAPPING.md).
 
+## M8 measurement health
+
+M8 adds the orthogonal `agent_reliability.measurement` namespace and run-local
+health tracking. Evaluator outcomes, reliability math, event schemas, and
+optional OTel ownership remain unchanged. See ADR-0009 and
+[MEASUREMENT_HEALTH.md](MEASUREMENT_HEALTH.md).
+
 ## Deferred architectural decisions (require an ADR before implementation)
 
 - Agent identity semantics (what makes two runs "the same agent" across

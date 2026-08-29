@@ -1,6 +1,6 @@
 # Compatibility
 
-Agent Reliability `1.0.0` is released. The normative 1.0 contract is
+Agent Reliability `1.1.0` is released. The normative 1.0 contract is
 [GA_CONTRACT.md](GA_CONTRACT.md) and the release policy is
 [VERSIONING.md](VERSIONING.md).
 
@@ -28,3 +28,10 @@ The supported and CI-tested matrix is Python 3.11, 3.12, and 3.13. See
 Telemetry compatibility is tracked separately because a mapping can break a
 consumer without changing Python imports. See [TELEMETRY_SPEC.md](TELEMETRY_SPEC.md)
 and [OTEL_MAPPING.md](OTEL_MAPPING.md).
+
+## Additive measurement-health extension
+
+M8 adds `agent_reliability.measurement` and additive `RunHandle` inspection
+and policy members. Existing 1.0 export sets, callable signatures, enum
+semantics, event payloads, and SLO/reliability calculations are unchanged.
+This public addition ships in 1.1.0 as a backward-compatible minor release.

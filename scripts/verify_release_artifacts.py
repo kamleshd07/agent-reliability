@@ -69,6 +69,9 @@ def _inspect_artifacts(wheel: Path, sdist: Path) -> str:
         raise AssertionError("base wheel unexpectedly declares a dependency")
     required_wheel = {
         "agent_reliability/__init__.py",
+        "agent_reliability/application/measurement_policy.py",
+        "agent_reliability/domain/measurement_health.py",
+        "agent_reliability/measurement/__init__.py",
         "agent_reliability/py.typed",
         f"agent_reliability-{version}.dist-info/licenses/LICENSE",
     }
@@ -114,10 +117,14 @@ def _probe(python: Path, expected_version: str, *, expect_otel: bool) -> None:
     probe = (
         "import importlib.resources, importlib.util, importlib.metadata; "
         "import agent_reliability; "
+        "import agent_reliability.measurement as measurement; "
         f"assert agent_reliability.__version__ == {expected_version!r}; "
         "assert importlib.metadata.version('agent-reliability') == "
         "agent_reliability.__version__; "
         "assert agent_reliability.__all__ == ['__version__']; "
+        "assert set(measurement.__all__) == "
+        "{'MeasurementHealth', 'MeasurementHealthReason', "
+        "'MeasurementHealthReport', 'MeasurementPolicy'}; "
         "assert importlib.resources.files('agent_reliability')"
         ".joinpath('py.typed').is_file(); "
         f"assert (importlib.util.find_spec('opentelemetry') is not None) is "

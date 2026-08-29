@@ -1,5 +1,12 @@
 # Testing Strategy
 
+## M8 measurement-health verification
+
+M8 adds construction/immutability tests, composition properties,
+deterministic evaluator/sink/clock/run-ID/context/diagnostics/bridge failure
+injection, policy ownership, async/nested isolation, provenance conflict, and
+planted-secret tests. Existing 1.0 compatibility tests remain unchanged.
+
 Testing is an architectural requirement, not an afterthought bolted onto
 finished code — this is why test categories and their directories exist
 before there is business logic to fill them.

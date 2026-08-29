@@ -11,11 +11,23 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from contextvars import ContextVar
+from typing import TypeVar
 
+from agent_reliability.application.measurement_policy import MeasurementPolicy
 from agent_reliability.domain import AgentIdentity, AgentRun, EvaluationOutcome
-from agent_reliability.evaluation import EvaluationResult
+from agent_reliability.domain.measurement_health import (
+    MeasurementHealthReason,
+    MeasurementHealthReport,
+)
+from agent_reliability.evaluation import (
+    EvaluationExecutionFailure,
+    EvaluationFailureStage,
+    EvaluationResult,
+)
 
 __all__ = ["RunHandle", "current_run"]
+
+PolicyResultT = TypeVar("PolicyResultT")
 
 
 class RunHandle:
@@ -36,6 +48,7 @@ class RunHandle:
         "__weakref__",
         "_agent",
         "_closed",
+        "_measurement_health_reasons",
         "_record_callback",
         "_record_evaluation_callback",
         "_run",
@@ -53,6 +66,7 @@ class RunHandle:
         self._record_callback = record_callback
         self._record_evaluation_callback = record_evaluation_callback
         self._closed = False
+        self._measurement_health_reasons: set[MeasurementHealthReason] = set()
 
     @classmethod
     def _degraded(
@@ -74,6 +88,9 @@ class RunHandle:
         handle._record_callback = record_callback
         handle._record_evaluation_callback = record_evaluation_callback
         handle._closed = False
+        handle._measurement_health_reasons = {
+            MeasurementHealthReason.RUN_INITIALIZATION_FAILURE
+        }
         return handle
 
     @property
@@ -88,6 +105,13 @@ class RunHandle:
     @property
     def agent(self) -> AgentIdentity:
         return self._agent
+
+    @property
+    def measurement_health(self) -> MeasurementHealthReport:
+        """A privacy-safe snapshot of this run's current evidence health."""
+        return MeasurementHealthReport.from_reasons(
+            frozenset(self._measurement_health_reasons)
+        )
 
     def record(self, *, indicator: str, outcome: EvaluationOutcome) -> None:
         """Record a reliability outcome against this run.
@@ -131,6 +155,31 @@ class RunHandle:
         if not isinstance(result, EvaluationResult):
             raise TypeError("result must be an EvaluationResult")
         self._record_evaluation_callback(self, indicator, result)
+
+    def record_evaluation_failure(self, *, failure: EvaluationExecutionFailure) -> None:
+        """Associate a failed evaluation attempt without inventing an outcome."""
+        if self._closed:
+            raise RuntimeError(
+                f"cannot record on a closed run (run_id={self.run_id!r})"
+            )
+        if not isinstance(failure, EvaluationExecutionFailure):
+            raise TypeError("failure must be an EvaluationExecutionFailure")
+        reason = (
+            MeasurementHealthReason.EVALUATION_TIMESTAMP_FAILURE
+            if failure.stage is EvaluationFailureStage.TIMESTAMP
+            else MeasurementHealthReason.EVALUATOR_EXECUTION_FAILURE
+        )
+        self._mark_measurement_health(reason)
+
+    def evaluate_measurement_policy(
+        self, policy: MeasurementPolicy[PolicyResultT]
+    ) -> PolicyResultT:
+        """Invoke application policy with a snapshot; policy errors propagate."""
+        return policy.evaluate(measurement_health=self.measurement_health)
+
+    def _mark_measurement_health(self, reason: MeasurementHealthReason) -> None:
+        """Monotonically record one bounded SDK-observed structural failure."""
+        self._measurement_health_reasons.add(reason)
 
     def _close(self) -> None:
         self._closed = True

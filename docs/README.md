@@ -23,6 +23,7 @@
 - [Telemetry specification](TELEMETRY_SPEC.md)
 - [Compatibility](COMPATIBILITY.md)
 - [Security model](SECURITY_MODEL.md)
+- [Measurement health](MEASUREMENT_HEALTH.md)
 - [Public API review](PUBLIC_API_REVIEW.md)
 
 ## Architecture

@@ -18,6 +18,11 @@ concepts remain explicitly marked as future work.
 | Error Budget | The permitted amount of unreliability implied by an SLO |
 | Burn Rate | How fast the error budget is being consumed |
 | Reliability State | The interpreted operational state of an agent |
+| Measurement Health | Is reliability evidence complete and trustworthy? |
+
+Measurement health is orthogonal to task evaluation and reliability. Its
+scoped three-state semantics are specified in
+[MEASUREMENT_HEALTH.md](MEASUREMENT_HEALTH.md) and ADR-0009.
 
 A concrete rule that falls out of this: **HTTP/transport success is not
 task success.** An agent call can return 200 and still have failed the

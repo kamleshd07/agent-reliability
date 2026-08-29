@@ -50,3 +50,27 @@ serialization contract, or extra conversion helper is justified for GA.
   available to the explicitly trusted custom-handler boundary.
 
 Neither change alters a public callable signature or reliability semantic.
+
+## M8 additive measurement-health API
+
+| Symbol | Module | Purpose and stability rationale |
+|---|---|---|
+| `MeasurementHealth` | `agent_reliability.measurement` | Stable evidence trust/completeness states; avoids string branching. |
+| `MeasurementHealthReason` | `agent_reliability.measurement` | Bounded privacy-safe structural causes. |
+| `MeasurementHealthReport` | `agent_reliability.measurement` | Immutable scoped snapshot and composition value. |
+| `MeasurementPolicy[T]` | `agent_reliability.measurement` | Generic application boundary; result semantics remain application-owned. |
+| `RunHandle.measurement_health` | `agent_reliability.sdk` | SDK-derived run-local snapshot. |
+| `RunHandle.record_evaluation_failure` | `agent_reliability.sdk` | Associates a no-result attempt without inventing UNKNOWN. |
+| `RunHandle.evaluate_measurement_policy` | `agent_reliability.sdk` | Explicit policy invocation; exceptions propagate. |
+| `ReliabilityReport.measurement_health` | `agent_reliability.reliability` | Orthogonal report visibility; healthy default preserves construction. |
+| `AggregationConflict.measurement_health` | `agent_reliability.reliability` | Marks incompatible evidence unavailable without weakening conflict. |
+
+The enum members are also stable: `HEALTHY`, `DEGRADED`, `UNAVAILABLE`, and
+the eight bounded `MeasurementHealthReason` members documented by ADR-0009.
+`MeasurementHealthReport.health`/`.reasons`, its canonical `from_reasons()`
+constructor, and monotonic `combine()` method are public value operations.
+`MeasurementPolicy.evaluate()` is the single protocol member and returns its
+application-chosen generic result type.
+
+No helper, accumulator, severity map, or mutable state is public. Frozen 1.0
+namespace `__all__` sets and function signatures are untouched.

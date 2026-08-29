@@ -6,6 +6,31 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-29
+
+### Added
+
+- First-class, vendor-neutral measurement health through the new
+  `agent_reliability.measurement` namespace, with immutable `HEALTHY`,
+  `DEGRADED`, and `UNAVAILABLE` states and bounded privacy-safe reason codes.
+- Run-local health tracking for initialization, evaluator, timestamp, and
+  event-delivery failures while preserving non-blocking instrumentation.
+- `RunHandle.record_evaluation_failure(...)`, keeping execution failure
+  distinct from `EvaluationOutcome.UNKNOWN`.
+- Generic `MeasurementPolicy[T]` with application-owned results; the SDK
+  defines no action criticality or authorization decisions.
+- Independent health visibility on reliability reports and provenance
+  conflicts without changing reliability mathematics.
+- ADR-0009, focused documentation, deterministic failure injection, property,
+  async/nesting, compatibility, and planted-secret tests.
+
+### Compatibility and security
+
+- Frozen 1.0 exports, callable signatures, event meanings, UNKNOWN semantics,
+  SLO mathematics, and degraded-mode execution behavior remain unchanged.
+- Health retains bounded structural enums, uses O(1) state per active run, and
+  adds no base runtime dependency or payload/exception leakage channel.
+
 ## [1.0.1] - 2026-08-26
 
 Documentation-only patch release. Public APIs, reliability semantics, runtime

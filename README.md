@@ -8,7 +8,7 @@ It brings evaluations, SLOs, error budgets, burn rates, and measurement
 provenance to agent applications—and refuses to produce a misleading number
 when evaluation methodologies are incompatible.
 
-**Status: GA (`1.0.0`).** Public APIs documented as stable in
+**Status: GA (`1.1.0`).** Public APIs documented as stable in
 [GA_CONTRACT.md](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/GA_CONTRACT.md) follow Semantic Versioning.
 See [compatibility](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/COMPATIBILITY.md).
 
@@ -107,6 +107,11 @@ for interpretation and next steps.
 `EvaluationExecutionFailure` means the evaluator or its timestamping failed;
 it is not an agent failure and creates no observation.
 
+Reliability answers “how often is the agent behaving correctly?” Measurement
+health answers “do we have enough trustworthy evidence to make that claim?”
+They remain independent, and applications—not the SDK—decide how degraded
+evidence affects an action. See the [measurement-health guide](https://github.com/kamleshd07/agent-reliability/blob/main/docs/MEASUREMENT_HEALTH.md).
+
 If evaluator v1 and v2 measured the same indicator, the engine returns an
 `AggregationConflict` instead of averaging them. A changed measurement method
 is not automatically comparable. See [Core concepts](https://github.com/kamleshd07/agent-reliability/blob/main/docs/CONCEPTS.md).
@@ -152,7 +157,9 @@ M1–M5 established the domain, sync/async instrumentation, optional OTel
 context interoperability, evaluator provenance, and local aggregation. M6 adds
 the adoption path and installed-artifact verification. M7 defines the GA
 contract and release gates, released as `1.0.0` after `1.0.0rc1` was
-published and independently reinstalled from PyPI.
+published and independently reinstalled from PyPI. M8 adds run-scoped
+measurement health and an application-owned policy extension boundary in
+`1.1.0`.
 
 No remote ingestion, dashboard, LLM judge, persistence, auto-instrumentation,
 or framework-specific adapter is included. See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).

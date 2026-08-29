@@ -1,5 +1,14 @@
 # Security Model
 
+## Measurement health
+
+Measurement health retains only a bounded set of structural enum reasons. It
+never retains exception objects/messages, tracebacks, prompts, outputs, tool
+data, credentials, PII, or arbitrary metadata. State is run-local and bounded.
+Live `RunHandle` health derives from SDK-observed failures; freely constructed
+values are not attestations and must not be trusted from agent content as
+authorization evidence. See ADR-0009.
+
 Status: threat model established at M0; mitigations are implemented
 incrementally as the corresponding functionality is built. M2 adds the
 first real runtime capture surface (an in-process instrumentation SDK).

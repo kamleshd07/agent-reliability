@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from agent_reliability.domain import (
     BurnRate,
@@ -11,6 +11,10 @@ from agent_reliability.domain import (
     EvaluationOutcome,
     RatioResult,
     SloEvaluation,
+)
+from agent_reliability.domain.measurement_health import (
+    MeasurementHealthReason,
+    MeasurementHealthReport,
 )
 from agent_reliability.evaluation import (
     EvaluationProvenance,
@@ -145,6 +149,13 @@ class AggregationConflict:
         ):
             raise TypeError("every reason must be an AggregationConflictReason")
 
+    @property
+    def measurement_health(self) -> MeasurementHealthReport:
+        """Incompatible evidence cannot support the requested interpretation."""
+        return MeasurementHealthReport.from_reasons(
+            frozenset({MeasurementHealthReason.INCOMPATIBLE_EVIDENCE})
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class ReliabilityReport:
@@ -156,6 +167,9 @@ class ReliabilityReport:
     slo_evaluation: SloEvaluation
     error_budget: ErrorBudget
     burn_rate: BurnRate | None = None
+    measurement_health: MeasurementHealthReport = field(
+        default_factory=MeasurementHealthReport
+    )
 
     def __post_init__(self) -> None:
         validate_indicator(self.indicator)
@@ -189,3 +203,5 @@ class ReliabilityReport:
             and self.burn_rate.ratio.unknown_policy != self.ratio.unknown_policy
         ):
             raise ValueError("burn_rate and report must use the same UNKNOWN policy")
+        if not isinstance(self.measurement_health, MeasurementHealthReport):
+            raise TypeError("measurement_health must be a MeasurementHealthReport")

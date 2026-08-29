@@ -8,6 +8,7 @@ from agent_reliability.evaluation import (
     EvaluationResult,
     EvaluatorIdentity,
 )
+from agent_reliability.measurement import MeasurementHealth, MeasurementHealthReport
 from agent_reliability.reliability import (
     AggregationConflict,
     ReliabilityObservation,
@@ -29,6 +30,12 @@ with sdk.run(agent_id="typed-agent", name="Typed Agent", version="1") as run:
     observation = ReliabilityObservation.from_evaluation(
         indicator="task_success", result=result
     )
+
+    class HealthyPolicy:
+        def evaluate(self, *, measurement_health: MeasurementHealthReport) -> bool:
+            return measurement_health.health is MeasurementHealth.HEALTHY
+
+    evidence_is_healthy: bool = run.evaluate_measurement_policy(HealthyPolicy())
 
 report = evaluate_reliability(
     indicator="task_success",

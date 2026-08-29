@@ -57,3 +57,4 @@ Compatibility Impact
 | [0006](0006-opentelemetry-interoperability-and-context-ownership.md) | OpenTelemetry interoperability and context ownership | Accepted |
 | [0007](0007-evaluator-architecture-and-provenance-semantics.md) | Evaluator architecture and provenance semantics | Accepted |
 | [0008](0008-reliability-aggregation-and-provenance-compatibility.md) | Reliability aggregation and provenance compatibility | Accepted |
+| [0009](0009-measurement-health-and-policy-boundary.md) | Measurement health and application policy boundary | Accepted |

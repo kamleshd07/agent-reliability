@@ -24,6 +24,7 @@ from agent_reliability.domain import (
     EvaluationOutcome,
     RunStatus,
 )
+from agent_reliability.domain.measurement_health import MeasurementHealthReason
 from agent_reliability.evaluation import EvaluationResult
 from agent_reliability.ports.clock import Clock
 from agent_reliability.ports.event_sink import EventSink
@@ -150,20 +151,38 @@ class AgentReliability:
                 )
             )
 
-    def _safe_emit(self, event: InstrumentationEvent, *, run_id: str | None) -> None:
+    def _safe_emit(
+        self,
+        event: InstrumentationEvent,
+        *,
+        run_id: str | None,
+        handle: RunHandle | None = None,
+    ) -> None:
         try:
             self._sink.emit(event)
         except Exception as exc:
+            if handle is not None:
+                handle._mark_measurement_health(
+                    MeasurementHealthReason.EVENT_DELIVERY_FAILURE
+                )
             self._report_diagnostic(
                 component="sink", operation="emit", run_id=run_id, exception=exc
             )
 
     def _safe_now(
-        self, *, component: DiagnosticComponent, run_id: str | None
+        self,
+        *,
+        component: DiagnosticComponent,
+        run_id: str | None,
+        handle: RunHandle | None = None,
     ) -> datetime | None:
         try:
             return self._clock.now()
         except Exception as exc:
+            if handle is not None:
+                handle._mark_measurement_health(
+                    MeasurementHealthReason.EVIDENCE_TIMESTAMP_FAILURE
+                )
             self._report_diagnostic(
                 component=component, operation="now", run_id=run_id, exception=exc
             )
@@ -175,7 +194,7 @@ class AgentReliability:
         run_id = handle.run_id
         if run_id is None:
             return
-        recorded_at = self._safe_now(component="clock", run_id=run_id)
+        recorded_at = self._safe_now(component="clock", run_id=run_id, handle=handle)
         if recorded_at is None:
             return
         event = EvaluationRecorded(
@@ -184,7 +203,7 @@ class AgentReliability:
             outcome=outcome,
             recorded_at=recorded_at,
         )
-        self._safe_emit(event, run_id=run_id)
+        self._safe_emit(event, run_id=run_id, handle=handle)
 
     def _safe_record_evaluation(
         self, handle: RunHandle, indicator: str, result: EvaluationResult
@@ -192,7 +211,7 @@ class AgentReliability:
         run_id = handle.run_id
         if run_id is None:
             return
-        recorded_at = self._safe_now(component="clock", run_id=run_id)
+        recorded_at = self._safe_now(component="clock", run_id=run_id, handle=handle)
         if recorded_at is None:
             return
         event = EvaluationRecorded(
@@ -203,7 +222,7 @@ class AgentReliability:
             provenance=result.provenance,
             reason_code=result.reason_code,
         )
-        self._safe_emit(event, run_id=run_id)
+        self._safe_emit(event, run_id=run_id, handle=handle)
 
 
 class RunSession:
@@ -320,7 +339,7 @@ class RunSession:
         self._handle = handle
         try:
             self._start_bridge(run)
-            self._client._safe_emit(started_event, run_id=run_id)
+            self._client._safe_emit(started_event, run_id=run_id, handle=handle)
         except BaseException:
             # Preserve interpreter/runtime control signals while undoing
             # both contexts established immediately before sink delivery.
@@ -452,7 +471,9 @@ class RunSession:
         try:
             run_id = handle.run_id
             assert run_id is not None
-            ended_at = self._client._safe_now(component="clock", run_id=run_id)
+            ended_at = self._client._safe_now(
+                component="clock", run_id=run_id, handle=handle
+            )
             if ended_at is None:
                 return
             event: InstrumentationEvent
@@ -466,7 +487,7 @@ class RunSession:
                     status=status,
                     exception_type=exc_type.__name__,
                 )
-            self._client._safe_emit(event, run_id=run_id)
+            self._client._safe_emit(event, run_id=run_id, handle=handle)
         except Exception as exc:
             self._client._report_diagnostic(
                 component="sdk",
