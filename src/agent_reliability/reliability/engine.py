@@ -25,7 +25,31 @@ from agent_reliability.reliability.model import (
     validate_indicator,
 )
 
-__all__ = ["evaluate_reliability"]
+__all__ = [
+    "AggregationConflictError",
+    "evaluate_reliability",
+    "evaluate_reliability_or_raise",
+]
+
+
+class AggregationConflictError(RuntimeError):
+    """Raised by ``evaluate_reliability_or_raise`` for an incompatible dataset.
+
+    Carries the original :class:`AggregationConflict` verbatim on
+    ``.conflict`` so a caller that wants full programmatic detail (or wants
+    to catch this and fall back to the explicit, non-raising
+    ``evaluate_reliability`` API) still has it. This exception is a
+    convenience for the common "just tell me if it worked" call site; it
+    does not resolve, hide, or silently retry the conflict — it surfaces the
+    same bounded reasons as an exception instead of a return value.
+    """
+
+    def __init__(self, conflict: AggregationConflict) -> None:
+        self.conflict = conflict
+        reasons = ", ".join(sorted(reason.value for reason in conflict.reasons))
+        super().__init__(
+            f"reliability observations are not one comparable cohort: {reasons}"
+        )
 
 
 @dataclass(slots=True)
@@ -154,3 +178,38 @@ def evaluate_reliability(
         error_budget=compute_error_budget(slo, ratio),
         burn_rate=burn_rate,
     )
+
+
+def evaluate_reliability_or_raise(
+    *,
+    indicator: str,
+    observations: Iterable[ReliabilityObservation],
+    slo: Slo,
+    unknown_policy: UnknownPolicy,
+    burn_rate_lookback: Iterable[ReliabilityObservation] | None = None,
+) -> ReliabilityReport:
+    """Convenience wrapper: ``evaluate_reliability`` that raises on conflict.
+
+    Identical arguments and identical aggregation behavior as
+    ``evaluate_reliability``. The only difference is the return type: a real
+    measurement incompatibility (:class:`AggregationConflict`) is raised as
+    :class:`AggregationConflictError` instead of being returned, which
+    removes the ``isinstance(result, AggregationConflict)`` check at call
+    sites that have no recovery path other than failing loudly.
+
+    This does **not** resolve, average, or otherwise weaken a genuine
+    conflict — it only changes how an unrecoverable one is surfaced. Call
+    sites that want to inspect or handle a conflict programmatically (for
+    example, to retry with a narrower observation set) should keep using
+    ``evaluate_reliability`` directly and check the return type explicitly.
+    """
+    result = evaluate_reliability(
+        indicator=indicator,
+        observations=observations,
+        slo=slo,
+        unknown_policy=unknown_policy,
+        burn_rate_lookback=burn_rate_lookback,
+    )
+    if isinstance(result, AggregationConflict):
+        raise AggregationConflictError(result)
+    return result
