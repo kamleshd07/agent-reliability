@@ -1,4 +1,8 @@
-"""Coverage for the M8 additive built-in evaluators.
+"""Coverage for the DX-1 (Developer Adoption) additive built-in evaluators.
+
+(The file keeps its original "m8" module name for historical git-blame
+continuity; see CHANGELOG.md for why this milestone is labeled "DX-1", not
+"M8", in release-facing docs.)
 
 Every evaluator here is exercised for: normal PASS, normal FAIL, legitimate
 UNKNOWN (where applicable), invalid configuration, wrong input type, empty
@@ -56,10 +60,31 @@ def test_contains_unicode_casefold() -> None:
     assert evaluator.evaluate("die straße ist lang").outcome is EvaluationOutcome.PASS
 
 
-def test_contains_empty_substring_always_passes() -> None:
-    evaluator = ContainsEvaluator(EvaluatorIdentity("contains", "1"), "")
-    assert evaluator.evaluate("anything").outcome is EvaluationOutcome.PASS
-    assert evaluator.evaluate("").outcome is EvaluationOutcome.PASS
+def test_contains_rejects_empty_substring_at_construction() -> None:
+    """Regression: substring="" used to make ContainsEvaluator PASS on every
+    input (Python's own "" in value is always True) — a silent, always-100%-
+    reliability misconfiguration. It must now fail fast at construction,
+    never be deferred to evaluate(), and never surface as UNKNOWN."""
+    with pytest.raises(ValueError, match="substring must not be empty"):
+        ContainsEvaluator(EvaluatorIdentity("contains", "1"), "")
+
+
+def test_contains_whitespace_only_substring_is_not_rejected() -> None:
+    """Whitespace can be a legitimate substring to check for; only the
+    truly empty string is invalid."""
+    evaluator = ContainsEvaluator(EvaluatorIdentity("contains", "1"), " ")
+    assert evaluator.evaluate("a b").outcome is EvaluationOutcome.PASS
+    assert evaluator.evaluate("ab").outcome is EvaluationOutcome.FAIL
+
+
+def test_contains_non_empty_substring_behavior_unchanged() -> None:
+    """Existing non-empty-substring PASS/FAIL semantics are unaffected by
+    the empty-substring rejection."""
+    evaluator = ContainsEvaluator(EvaluatorIdentity("contains", "1"), "refund")
+    assert evaluator.evaluate("your refund is approved").outcome is (
+        EvaluationOutcome.PASS
+    )
+    assert evaluator.evaluate("nothing to see here").outcome is EvaluationOutcome.FAIL
 
 
 def test_contains_rejects_wrong_input_type() -> None:
@@ -271,10 +296,29 @@ def test_tool_not_called_pass_and_fail() -> None:
 
 
 def test_tool_evaluators_reject_invalid_configuration() -> None:
-    with pytest.raises(ValueError, match="tool_name must be a non-empty str"):
+    with pytest.raises(ValueError, match="tool_name must be a non-blank str"):
         ToolCalledEvaluator(EvaluatorIdentity("tool-called", "1"), "")
-    with pytest.raises(ValueError, match="tool_name must be a non-empty str"):
+    with pytest.raises(ValueError, match="tool_name must be a non-blank str"):
         ToolNotCalledEvaluator(EvaluatorIdentity("tool-not-called", "1"), "")
+
+
+def test_tool_evaluators_reject_whitespace_only_tool_name() -> None:
+    """A tool named entirely by whitespace has no credible legitimate use
+    case and is far more likely to be a call-site bug; reject it at
+    construction like the empty-string case."""
+    with pytest.raises(ValueError, match="tool_name must be a non-blank str"):
+        ToolCalledEvaluator(EvaluatorIdentity("tool-called", "1"), "   ")
+    with pytest.raises(ValueError, match="tool_name must be a non-blank str"):
+        ToolNotCalledEvaluator(EvaluatorIdentity("tool-not-called", "1"), "\t\n")
+
+
+def test_tool_evaluators_do_not_normalize_a_non_blank_tool_name() -> None:
+    """A non-blank name with incidental surrounding whitespace is stored and
+    matched exactly, never silently stripped."""
+    evaluator = ToolCalledEvaluator(EvaluatorIdentity("tool-called", "1"), " tool ")
+    assert evaluator.tool_name == " tool "
+    assert evaluator.evaluate(frozenset({" tool "})).outcome is EvaluationOutcome.PASS
+    assert evaluator.evaluate(frozenset({"tool"})).outcome is EvaluationOutcome.FAIL
 
 
 def test_tool_evaluators_reject_wrong_input_type() -> None:

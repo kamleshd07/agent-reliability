@@ -102,11 +102,29 @@ class ContainsEvaluator:
     and ``substring`` are compared using ``str.casefold()`` (correct for
     Unicode, e.g. German ``"ß"``/``"ss"`` and Turkish dotless ``"i"``
     families are handled the way Python's own case-insensitive comparisons
-    are). An empty ``substring`` always passes, matching Python's own
-    ``"" in value`` semantics — this is not special-cased.
+    are).
+
+    ``substring=""`` is rejected at construction with ``ValueError``: Python's
+    own ``"" in value`` is always ``True``, so an empty substring would make
+    this evaluator PASS on every input — a silent, always-100%-reliability
+    misconfiguration, not a useful check. This is a fail-fast configuration
+    rejection, never deferred to ``evaluate()`` and never turned into
+    ``UNKNOWN``. A whitespace-only substring (e.g. ``" "``) is a legitimate
+    check and is **not** rejected — only the truly empty string is invalid.
 
     The value is not stored beyond the call: only ``identity``, ``substring``,
     and ``case_sensitive`` are retained as evaluator configuration.
+
+    Configuration-identity warning: changing ``substring`` or
+    ``case_sensitive`` after evaluators are already in use changes what this
+    evaluator judges, but does **not** by itself change
+    ``EvaluatorIdentity`` — cohort aggregation keys on ``EvaluatorIdentity``
+    (name, version, configuration_id), not on this dataclass's fields. If a
+    configuration change can change judgments, you **must** update
+    ``EvaluatorIdentity.version`` or ``configuration_id`` yourself; the SDK
+    will not detect or do this for you, and two instances with the same
+    identity but different ``substring``/``case_sensitive`` will silently
+    aggregate into the same reliability cohort.
     """
 
     identity: EvaluatorIdentity
@@ -116,6 +134,12 @@ class ContainsEvaluator:
     def __post_init__(self) -> None:
         if not isinstance(self.substring, str):
             raise TypeError("substring must be a str")
+        if self.substring == "":
+            raise ValueError(
+                "substring must not be empty: an empty substring always "
+                "matches ('' in value is always True in Python), which "
+                "would make this evaluator PASS unconditionally"
+            )
         if not isinstance(self.case_sensitive, bool):
             raise TypeError("case_sensitive must be a bool")
 
@@ -150,6 +174,16 @@ class RegexMatchEvaluator:
     configuration bug, not an indeterminate measurement. Only the pattern
     string, compiled pattern, mode, and flags are retained; the values passed
     to ``evaluate()`` are never stored.
+
+    Configuration-identity warning: changing ``pattern``, ``fullmatch``, or
+    ``flags`` changes what this evaluator judges, but does **not** by itself
+    change ``EvaluatorIdentity`` — cohort aggregation keys on
+    ``EvaluatorIdentity`` (name, version, configuration_id), not on this
+    dataclass's fields. If a configuration change can change judgments, you
+    **must** update ``EvaluatorIdentity.version`` or ``configuration_id``
+    yourself; the SDK will not detect or do this for you, and two instances
+    with the same identity but a different pattern/mode/flags will silently
+    aggregate into the same reliability cohort.
     """
 
     identity: EvaluatorIdentity
@@ -207,6 +241,16 @@ class LatencyThresholdEvaluator:
     existing ``MeasurementHealth`` mechanism (``RunHandle.measurement_health``
     / ``record_evaluation_failure``) alongside this evaluator, not instead of
     it.
+
+    Configuration-identity warning: changing ``threshold_seconds`` or
+    ``inclusive`` changes what this evaluator judges, but does **not** by
+    itself change ``EvaluatorIdentity`` — cohort aggregation keys on
+    ``EvaluatorIdentity`` (name, version, configuration_id), not on this
+    dataclass's fields. If a configuration change can change judgments, you
+    **must** update ``EvaluatorIdentity.version`` or ``configuration_id``
+    yourself; the SDK will not detect or do this for you, and two instances
+    with the same identity but a different threshold/inclusive will silently
+    aggregate into the same reliability cohort.
     """
 
     identity: EvaluatorIdentity
@@ -267,14 +311,32 @@ class ToolCalledEvaluator:
     raw framework tool/call objects, or anything beyond the name strings
     supplied. Only ``identity`` and ``tool_name`` are retained as evaluator
     state; the set passed to ``evaluate()`` is read and discarded.
+
+    ``tool_name`` must contain at least one non-whitespace character: a
+    blank-after-strip name (``""``, ``"   "``) is rejected at construction as
+    a configuration error, since there is no credible legitimate tool named
+    entirely by whitespace and it is far more likely to be a call-site bug.
+    A non-blank name is stored and matched exactly as given, with no
+    stripping or normalization — ``" tool "`` is a distinct name from
+    ``"tool"``.
+
+    Configuration-identity warning: changing ``tool_name`` changes what this
+    evaluator judges, but does **not** by itself change ``EvaluatorIdentity``
+    — cohort aggregation keys on ``EvaluatorIdentity`` (name, version,
+    configuration_id), not on this dataclass's fields. If a configuration
+    change can change judgments, you **must** update
+    ``EvaluatorIdentity.version`` or ``configuration_id`` yourself; the SDK
+    will not detect or do this for you, and two instances with the same
+    identity but a different ``tool_name`` will silently aggregate into the
+    same reliability cohort.
     """
 
     identity: EvaluatorIdentity
     tool_name: str
 
     def __post_init__(self) -> None:
-        if not isinstance(self.tool_name, str) or not self.tool_name:
-            raise ValueError("tool_name must be a non-empty str")
+        if not isinstance(self.tool_name, str) or not self.tool_name.strip():
+            raise ValueError("tool_name must be a non-blank str")
 
     @property
     def deterministic(self) -> bool:
@@ -294,14 +356,28 @@ class ToolNotCalledEvaluator:
     Same privacy boundary as ``ToolCalledEvaluator``: ``evaluate()`` accepts
     only a bounded ``frozenset[str]`` of tool-name identifiers, never
     arguments, results, or framework-specific tool objects.
+
+    Same ``tool_name`` blank-rejection and no-normalization rules as
+    ``ToolCalledEvaluator``: a blank-after-strip name is rejected at
+    construction; a non-blank name is matched exactly, with no stripping.
+
+    Configuration-identity warning: changing ``tool_name`` changes what this
+    evaluator judges, but does **not** by itself change ``EvaluatorIdentity``
+    — cohort aggregation keys on ``EvaluatorIdentity`` (name, version,
+    configuration_id), not on this dataclass's fields. If a configuration
+    change can change judgments, you **must** update
+    ``EvaluatorIdentity.version`` or ``configuration_id`` yourself; the SDK
+    will not detect or do this for you, and two instances with the same
+    identity but a different ``tool_name`` will silently aggregate into the
+    same reliability cohort.
     """
 
     identity: EvaluatorIdentity
     tool_name: str
 
     def __post_init__(self) -> None:
-        if not isinstance(self.tool_name, str) or not self.tool_name:
-            raise ValueError("tool_name must be a non-empty str")
+        if not isinstance(self.tool_name, str) or not self.tool_name.strip():
+            raise ValueError("tool_name must be a non-blank str")
 
     @property
     def deterministic(self) -> bool:
