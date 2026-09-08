@@ -1,4 +1,9 @@
-"""Coverage for the M8 evaluate_reliability_or_raise convenience API."""
+"""Coverage for the DX-1 evaluate_reliability_or_raise convenience API.
+
+(The file keeps its original "m8" module name for historical git-blame
+continuity; see CHANGELOG.md for why this milestone is labeled
+"DX-1 — Developer Adoption", not "M8", in release-facing docs.)
+"""
 
 from __future__ import annotations
 
@@ -13,7 +18,11 @@ from agent_reliability.domain import (
     Slo,
     UnknownPolicy,
 )
-from agent_reliability.evaluation import EvaluationProvenance, EvaluatorIdentity
+from agent_reliability.evaluation import (
+    ContainsEvaluator,
+    EvaluationProvenance,
+    EvaluatorIdentity,
+)
 from agent_reliability.reliability import (
     AggregationConflictError,
     ReliabilityObservation,
@@ -108,3 +117,83 @@ def test_or_raise_propagates_ordinary_argument_errors_unchanged() -> None:
             slo=object(),  # type: ignore[arg-type]
             unknown_policy=UnknownPolicy.EXCLUDE,
         )
+
+
+# ---------------------------------------------------------------------------
+# EvaluatorIdentity / cohort aggregation contract (documentation hardening
+# only — this is pre-existing, deliberate behavior; these tests demonstrate
+# it, they do not change it. See the "Configuration-identity warning" added
+# to each of the five new evaluators' docstrings in
+# agent_reliability/evaluation/builtins.py.)
+# ---------------------------------------------------------------------------
+
+
+def _observation_with_identity(
+    outcome: EvaluationOutcome, identity: EvaluatorIdentity
+) -> ReliabilityObservation:
+    return ReliabilityObservation(
+        indicator="task_success",
+        outcome=outcome,
+        provenance=EvaluationProvenance(
+            identity,
+            datetime(2026, 1, 1, tzinfo=UTC),
+            True,
+        ),
+    )
+
+
+def test_same_evaluator_identity_with_different_configuration_is_one_cohort() -> None:
+    """Documents the existing, unchanged contract: EvaluatorIdentity (name +
+    version [+ configuration_id]) is the cohort key. Two observations
+    produced by evaluator instances with the *same* EvaluatorIdentity but
+    different underlying configuration (here: simulated by different
+    ContainsEvaluator substrings feeding the same identity) still aggregate
+    into one comparable cohort with no AggregationConflict — because nothing
+    about ContainsEvaluator's ``substring``/``case_sensitive`` fields, or any
+    other evaluator's non-identity configuration, participates in the cohort
+    key at all.
+    """
+    shared_identity = EvaluatorIdentity("contains-refund", "1")
+    first_config = ContainsEvaluator(shared_identity, "refund")
+    second_config = ContainsEvaluator(shared_identity, "escalation")
+    assert first_config.identity == second_config.identity
+
+    observations = [
+        _observation_with_identity(EvaluationOutcome.PASS, shared_identity),
+        _observation_with_identity(EvaluationOutcome.FAIL, shared_identity),
+    ]
+    result = evaluate_reliability_or_raise(
+        indicator="task_success",
+        observations=observations,
+        slo=_SLO,
+        unknown_policy=UnknownPolicy.EXCLUDE,
+    )
+    assert isinstance(result, ReliabilityReport)
+    assert result.cohort is not None
+    assert result.cohort.evaluator_identity == shared_identity
+
+
+def test_different_configuration_id_does_separate_the_cohort() -> None:
+    """The existing identity mechanism already supports separating cohorts
+    via ``configuration_id`` (no new mechanism added here): two observations
+    that share evaluator name/version but declare a different
+    ``configuration_id`` are a genuine conflict, not silently merged."""
+    observations = [
+        _observation_with_identity(
+            EvaluationOutcome.PASS,
+            EvaluatorIdentity("contains-refund", "1", configuration_id="strict"),
+        ),
+        _observation_with_identity(
+            EvaluationOutcome.PASS,
+            EvaluatorIdentity("contains-refund", "1", configuration_id="lenient"),
+        ),
+    ]
+    with pytest.raises(AggregationConflictError) as excinfo:
+        evaluate_reliability_or_raise(
+            indicator="task_success",
+            observations=observations,
+            slo=_SLO,
+            unknown_policy=UnknownPolicy.EXCLUDE,
+        )
+    reasons = {reason.value for reason in excinfo.value.conflict.reasons}
+    assert "configuration_id_mismatch" in reasons
