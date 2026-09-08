@@ -1,4 +1,8 @@
-"""Adversarial privacy checks for the M8 built-in evaluators and reporting.
+"""Adversarial privacy checks for the DX-1 built-in evaluators and reporting.
+
+("DX-1 — Developer Adoption" is this milestone's release-facing label; the
+file keeps its original "m8" module name for historical git-blame continuity
+— see CHANGELOG.md for the naming note.)
 
 These duplicate a couple of assertions already made in the unit suite
 deliberately: this file is the place a security reviewer looks first, and it

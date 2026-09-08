@@ -1,1 +1,1 @@
-"""Tests for agent_reliability.testing (M8 assertion helper)."""
+"""Tests for agent_reliability.testing (DX-1 assertion helper)."""

@@ -12,6 +12,16 @@ the evaluator protocol, degraded-mode behavior, OTel behavior, and
 provenance semantics are unchanged. Base runtime dependency count remains
 zero.
 
+**Naming note:** this milestone is referred to as **"DX-1 — Developer
+Adoption"**, not "M8", in this and future release-facing documentation.
+`docs/ROADMAP.md` already has an unrelated, older, still-planned milestone
+named "M8 — Framework integrations" (separate adapter packages such as
+`agent-reliability-langchain`); this developer-adoption work is not that
+effort and does not renumber or otherwise change that roadmap entry. (Some
+in-repo test/module names and prior commit messages still say "m8"/"M8" for
+this milestone; those are not rewritten here — see the individual files'
+docstrings for a pointer back to this note.)
+
 ### Added
 
 - `agent_reliability.evaluation.EvaluationOutcome` as an additive re-export
@@ -46,6 +56,43 @@ zero.
   it would either require a new mandatory/optional dependency or a
   hand-rolled, non-compliant partial validator. Deferred pending a real
   design for that tradeoff.
+
+### Fixed
+
+Pre-merge remediation following independent review, before this branch
+merges. No public symbol was added or removed; no reliability/SLO/OTel/
+`UnknownPolicy`/`EvaluatorIdentity` semantic was changed.
+
+- `ContainsEvaluator(substring="")` is now rejected with `ValueError` at
+  construction time. It previously accepted an empty substring, which made
+  the evaluator PASS on every input (Python's own `"" in value` is always
+  `True`) — a silent, always-100%-reliability misconfiguration. A
+  whitespace-only substring (e.g. `" "`) is still accepted; only the truly
+  empty string is rejected.
+- `report_to_dict(...)` no longer emits rounded `*_float` convenience
+  fields (`pass_ratio_float`, `fail_ratio_float`, `target_float`,
+  `remaining_fraction_float`, `value_float`) alongside the exact
+  numerator/denominator representation. Only the exact representation
+  remains; `format_report`'s human-readable text output is unaffected.
+- `tests/compat/test_public_api_1_0.py` had been loosened from exact export
+  equality to a subset check applied globally, which silently removed
+  exact-lock protection from the five 1.0 namespaces this milestone did not
+  touch (`domain`, `sdk`, `ports`, `adapters`, `adapters.otel`). Those five
+  are exact-locked (`==`) again; only `evaluation` and `reliability` (the
+  two namespaces this milestone legitimately grew) keep a baseline-subset
+  (`<=`) check, with their full current export set separately exact-locked
+  in `tests/unit/test_package.py`.
+- `ToolCalledEvaluator`/`ToolNotCalledEvaluator` now also reject a
+  blank-after-strip `tool_name` (e.g. `"   "`) at construction, not just an
+  empty one; a non-blank name is still matched exactly, with no stripping.
+- Added an explicit, non-vague docstring warning to each of the five new
+  evaluators (`ContainsEvaluator`, `RegexMatchEvaluator`,
+  `LatencyThresholdEvaluator`, `ToolCalledEvaluator`,
+  `ToolNotCalledEvaluator`) stating that a configuration change which can
+  change judgments must be paired with a manual `EvaluatorIdentity.version`
+  or `configuration_id` bump — this pre-existing cohort-aggregation
+  behavior is unchanged, only documented and now covered by a regression
+  test.
 
 ## [1.1.1] - 2026-08-29
 

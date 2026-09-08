@@ -1,6 +1,7 @@
 """Built-in evaluators end to end: PASS, FAIL, a legitimate UNKNOWN, a report.
 
-Uses two M8 built-in evaluators against the same simulated agent:
+Uses two DX-1 (Developer Adoption) built-in evaluators against the same
+simulated agent:
 
 - ``ContainsEvaluator`` judges whether the response mentions "refund" — a
   simple, deterministic content check with no UNKNOWN case.

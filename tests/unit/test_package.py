@@ -20,7 +20,7 @@ def test_public_api_is_minimal() -> None:
 
 
 def test_m4_evaluation_public_api_is_explicit() -> None:
-    # M8 (developer adoption) deliberately added ContainsEvaluator,
+    # DX-1 (developer adoption) deliberately added ContainsEvaluator,
     # EvaluationOutcome (re-export), LatencyThresholdEvaluator,
     # RegexMatchEvaluator, ToolCalledEvaluator, and ToolNotCalledEvaluator.
     assert agent_reliability.evaluation.__all__ == [
@@ -44,7 +44,7 @@ def test_m4_evaluation_public_api_is_explicit() -> None:
 
 
 def test_m5_reliability_public_api_is_explicit() -> None:
-    # M8 (developer adoption) deliberately added evaluate_reliability_or_raise
+    # DX-1 (developer adoption) deliberately added evaluate_reliability_or_raise
     # and AggregationConflictError as an additive convenience API.
     assert agent_reliability.reliability.__all__ == [
         "AggregationConflict",
