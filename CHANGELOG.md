@@ -4,6 +4,19 @@ All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/); versioning
 follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
+## [1.2.1] - 2026-09-08
+
+Documentation-only patch release. No production code, public API, or
+runtime behavior changes.
+
+### Documentation
+
+- Reworked the public project description to focus on developer-facing
+  capabilities instead of internal milestone names.
+- Clarified the standalone/local-first usage model and zero mandatory
+  runtime dependency guarantee.
+- Improved first-run discoverability on PyPI/GitHub.
+
 ## [1.2.0] - 2026-09-08
 
 Developer-adoption additive release ("DX-1 — Developer Adoption").

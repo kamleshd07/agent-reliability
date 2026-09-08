@@ -8,7 +8,7 @@ It brings evaluations, SLOs, error budgets, burn rates, and measurement
 provenance to agent applications—and refuses to produce a misleading number
 when evaluation methodologies are incompatible.
 
-**Status: GA (`1.2.0`).** Public APIs documented as stable in
+**Status: GA (`1.2.1`).** Public APIs documented as stable in
 [GA_CONTRACT.md](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/GA_CONTRACT.md) follow Semantic Versioning.
 See [compatibility](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/COMPATIBILITY.md).
 
@@ -155,16 +155,23 @@ none of them and exports nothing by itself. See the
 
 ## Project status and scope
 
-M1–M5 established the domain, sync/async instrumentation, optional OTel
-context interoperability, evaluator provenance, and local aggregation. M6 adds
-the adoption path and installed-artifact verification. M7 defines the GA
-contract and release gates, released as `1.0.0` after `1.0.0rc1` was
-published and independently reinstalled from PyPI. M8 adds run-scoped
-measurement health and an application-owned policy extension boundary in
-`1.1.0`; M9 hardens that contract with adversarial coverage and real-world
-policy examples in `1.1.1`. DX-1 — Developer Adoption adds built-in
-evaluators, ergonomic re-exports, local reporting, and a framework-neutral
-SLO assertion helper in `1.2.0`, additive only.
+Agent Reliability is a stable, local-first Python SDK for measuring and
+testing the reliability of AI agents.
+
+The SDK provides sync and async agent instrumentation, deterministic
+evaluators, evaluator provenance, reliability aggregation, SLO and
+error-budget semantics, measurement-health tracking, optional
+OpenTelemetry interoperability, human-readable local reports,
+machine-readable reliability results, and framework-neutral SLO
+assertions for tests and CI.
+
+The SDK is designed to work standalone. It requires no hosted account,
+API key, or network service, and has zero mandatory runtime dependencies.
+
+**Current release: 1.2.1**
+
+The public API follows semantic versioning, with compatibility and
+installed-artifact verification included in the release process.
 
 No remote ingestion, dashboard, LLM judge, persistence, auto-instrumentation,
 or framework-specific adapter is included. See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).
