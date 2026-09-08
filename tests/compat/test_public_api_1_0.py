@@ -89,6 +89,16 @@ EXPECTED_EXPORTS = {
 
 
 def test_exact_public_exports_for_1_0() -> None:
+    """Every export present at 1.0 remains present and importable.
+
+    This is a floor, not a ceiling: SemVer minor releases (VERSIONING.md) may
+    add new names to a namespace's ``__all__`` without breaking this lock, so
+    the comparison is "1.0 baseline is a subset of the current namespace,"
+    not exact equality. A *removed* or *renamed* 1.0 export still fails this
+    test immediately. As of M8 (developer adoption), ``evaluation`` and
+    ``reliability`` legitimately export more than their 1.0 baseline; see
+    ``tests/unit/test_package.py`` for the exact current lists.
+    """
     modules = {
         "agent_reliability": agent_reliability,
         "domain": domain,
@@ -99,9 +109,11 @@ def test_exact_public_exports_for_1_0() -> None:
         "adapters": adapters,
         "adapters.otel": otel,
     }
-    assert {name: set(module.__all__) for name, module in modules.items()} == (
-        EXPECTED_EXPORTS
-    )
+    current_exports = {name: set(module.__all__) for name, module in modules.items()}
+    for name, expected in EXPECTED_EXPORTS.items():
+        assert expected <= current_exports[name], (
+            f"1.0 export(s) missing from {name}: {expected - current_exports[name]}"
+        )
 
 
 def test_stable_enum_names_and_values() -> None:
