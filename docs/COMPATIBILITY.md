@@ -1,6 +1,6 @@
 # Compatibility
 
-Agent Reliability `1.1.1` is released. The normative 1.0 contract is
+Agent Reliability `1.2.0` is released. The normative 1.0 contract is
 [GA_CONTRACT.md](GA_CONTRACT.md) and the release policy is
 [VERSIONING.md](VERSIONING.md).
 
@@ -37,3 +37,16 @@ semantics, event payloads, and SLO/reliability calculations are unchanged.
 This public addition ships in 1.1.0 as a backward-compatible minor release.
 M9 adds tests, examples, documentation, and artifact checks only; the `1.1.1`
 release leaves the `1.1.0` public and semantic contract unchanged.
+
+## Additive developer-adoption extension
+
+DX-1 — Developer Adoption adds built-in evaluators and an `EvaluationOutcome`
+re-export to `agent_reliability.evaluation`, `AggregationConflictError`/
+`evaluate_reliability_or_raise` to `agent_reliability.reliability`, and two
+new stable namespaces, `agent_reliability.reporting` and
+`agent_reliability.testing`. Existing 1.0/1.1 export sets, callable
+signatures, enum semantics, event payloads, and SLO/reliability calculations
+are unchanged. This ships in `1.2.0` as a backward-compatible minor release;
+base runtime dependencies remain zero. See
+[GA_CONTRACT.md](GA_CONTRACT.md#developer-adoption-additive-api-120) for the
+normative inventory.

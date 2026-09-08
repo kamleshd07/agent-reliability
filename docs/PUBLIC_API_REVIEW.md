@@ -81,3 +81,29 @@ M9 adds **no public symbols** and changes no production module. The exact
 installed 1.1 exports, enum values, constructors, methods, properties, and
 high-value signatures are protected by `tests/compat/test_public_api_1_1.py`.
 Policy decisions in `examples/` remain application-local demonstration types.
+
+## DX-1 — Developer Adoption additive API (1.2.0)
+
+The full normative inventory and semantics live in
+[GA_CONTRACT.md](GA_CONTRACT.md#developer-adoption-additive-api-120); this
+entry records the review outcome.
+
+| Symbol | Module | Purpose and stability rationale |
+|---|---|---|
+| `EvaluationOutcome` | `agent_reliability.evaluation` | Additive re-export; identical object to `agent_reliability.domain.EvaluationOutcome`. |
+| `ContainsEvaluator` | `agent_reliability.evaluation` | Deterministic substring evaluator; rejects an empty substring at construction. |
+| `RegexMatchEvaluator` | `agent_reliability.evaluation` | Stdlib `re` only; fails fast on a malformed pattern at construction. |
+| `LatencyThresholdEvaluator` | `agent_reliability.evaluation` | Explicit developer-supplied duration; a missing measurement is `UNKNOWN`, never `FAIL`. |
+| `ToolCalledEvaluator` / `ToolNotCalledEvaluator` | `agent_reliability.evaluation` | Bounded `frozenset[str]` of tool names only; never arguments or results. |
+| `AggregationConflictError` | `agent_reliability.reliability` | Raised by the new convenience wrapper; the explicit non-raising API is unchanged. |
+| `evaluate_reliability_or_raise` | `agent_reliability.reliability` | Convenience wrapper around `evaluate_reliability(...)` for fail-loud call sites. |
+| `format_report` | `agent_reliability.reporting` (new namespace) | Human-readable rendering of an existing `ReliabilityReport`; no recomputation. |
+| `report_to_dict` | `agent_reliability.reporting` (new namespace) | JSON-compatible exact rendering; no `*_float` convenience fields. |
+| `assert_slo_met` | `agent_reliability.testing` (new namespace) | Framework-neutral assertion helper; zero runtime dependency, no pytest plugin. |
+
+No existing 1.0/1.1 symbol was renamed, removed, or given a changed
+signature or semantic. `tests/compat/test_public_api_1_0.py` exact-locks the
+five untouched 1.0 namespaces (`domain`, `sdk`, `ports`, `adapters`,
+`adapters.otel`); `tests/unit/test_package.py` exact-locks the full current
+`evaluation`/`reliability`/`reporting`/`testing` export sets. Base runtime
+dependencies remain zero.

@@ -239,7 +239,7 @@ are internal. Direct imports are unsupported.
 `agent_reliability.experimental` exports nothing in 1.0. No experimental
 Python functionality is invented for GA.
 
-## Developer-adoption additive API (unreleased)
+## Developer-adoption additive API (1.2.0)
 
 The following are additive to the namespaces above and to two brand-new
 stable namespaces; nothing above is removed, renamed, or given a changed
@@ -277,5 +277,5 @@ OTel behavior. `format_report`/`report_to_dict` never recompute a value the
 M1/M5 engine already produced. `assert_slo_met` never introduces a new
 UNKNOWN/failure policy; it only surfaces `SloStatus`/`AggregationConflict`
 values the engine already computed. A deliberate `JsonSchemaEvaluator`
-deferral is recorded in `CHANGELOG.md` under `[Unreleased]`.
+deferral is recorded in `CHANGELOG.md` under `[1.2.0]`.
 

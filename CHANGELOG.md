@@ -4,9 +4,9 @@ All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/); versioning
 follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
-## [Unreleased]
+## [1.2.0] - 2026-09-08
 
-Developer-adoption additive changes (not yet released; no version bump).
+Developer-adoption additive release ("DX-1 — Developer Adoption").
 Existing public APIs, reliability/SLO semantics, `UnknownPolicy` behavior,
 the evaluator protocol, degraded-mode behavior, OTel behavior, and
 provenance semantics are unchanged. Base runtime dependency count remains
