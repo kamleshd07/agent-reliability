@@ -11,7 +11,18 @@ license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.11"
 authors = [{ name = "Agent Reliability contributors" }]
-keywords = ["ai-agents", "reliability", "slo", "evaluation", "opentelemetry"]
+keywords = [
+    "ai-agents",
+    "agent-reliability",
+    "llm",
+    "reliability",
+    "slo",
+    "evaluation",
+    "observability",
+    "opentelemetry",
+    "testing",
+    "sre",
+]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
