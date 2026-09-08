@@ -14,7 +14,12 @@ import agent_reliability.ports as ports
 import agent_reliability.reliability as reliability
 import agent_reliability.sdk as sdk
 
-EXPECTED_EXPORTS = {
+# Exact-locked: these five 1.0 namespaces were not touched by the DX-1
+# (Developer Adoption) milestone. An unreviewed export addition here is very
+# likely an accident (e.g. an internal helper leaking through `__all__`), so
+# equality (`==`), not a subset check, is the right regression lock — see
+# ``test_exact_lock_for_unchanged_1_0_namespaces`` below.
+UNCHANGED_SINCE_1_0_EXPORTS = {
     "agent_reliability": {"__version__"},
     "domain": {
         "AgentIdentity",
@@ -45,26 +50,6 @@ EXPECTED_EXPORTS = {
         "SdkDiagnostic",
         "current_run",
     },
-    "evaluation": {
-        "AsyncEvaluator",
-        "EqualityEvaluator",
-        "EvaluationDecision",
-        "EvaluationExecutionFailure",
-        "EvaluationFailureStage",
-        "EvaluationProvenance",
-        "EvaluationResult",
-        "EvaluatorIdentity",
-        "PredicateEvaluator",
-        "SyncEvaluator",
-    },
-    "reliability": {
-        "AggregationConflict",
-        "AggregationConflictReason",
-        "ReliabilityCohort",
-        "ReliabilityObservation",
-        "ReliabilityReport",
-        "evaluate_reliability",
-    },
     "ports": {
         "Clock",
         "EvaluationRecorded",
@@ -87,32 +72,90 @@ EXPECTED_EXPORTS = {
     "adapters.otel": {"OpenTelemetryRunContextBridge"},
 }
 
+# Baseline-subset only: these two namespaces legitimately *grew* during the
+# DX-1 (Developer Adoption) milestone (new built-in evaluators; the
+# evaluate_reliability_or_raise/AggregationConflictError convenience API).
+# A subset check (`<=`) here would silently stop protecting against a
+# *removed* or *renamed* 1.0 export in every namespace if applied globally —
+# which is exactly the regression this file fixes — so it is scoped to only
+# these two grown namespaces, and their current, exact, non-1.0 export set is
+# separately exact-locked (not left uncovered) by
+# ``tests/unit/test_package.py::test_m4_evaluation_public_api_is_explicit``
+# and ``test_m5_reliability_public_api_is_explicit``, which assert the full
+# current ``__all__`` list with ``==``.
+GROWN_SINCE_1_0_BASELINE_EXPORTS = {
+    "evaluation": {
+        "AsyncEvaluator",
+        "EqualityEvaluator",
+        "EvaluationDecision",
+        "EvaluationExecutionFailure",
+        "EvaluationFailureStage",
+        "EvaluationProvenance",
+        "EvaluationResult",
+        "EvaluatorIdentity",
+        "PredicateEvaluator",
+        "SyncEvaluator",
+    },
+    "reliability": {
+        "AggregationConflict",
+        "AggregationConflictReason",
+        "ReliabilityCohort",
+        "ReliabilityObservation",
+        "ReliabilityReport",
+        "evaluate_reliability",
+    },
+}
 
-def test_exact_public_exports_for_1_0() -> None:
-    """Every export present at 1.0 remains present and importable.
 
-    This is a floor, not a ceiling: SemVer minor releases (VERSIONING.md) may
-    add new names to a namespace's ``__all__`` without breaking this lock, so
-    the comparison is "1.0 baseline is a subset of the current namespace,"
-    not exact equality. A *removed* or *renamed* 1.0 export still fails this
-    test immediately. As of M8 (developer adoption), ``evaluation`` and
-    ``reliability`` legitimately export more than their 1.0 baseline; see
-    ``tests/unit/test_package.py`` for the exact current lists.
+def test_exact_lock_for_unchanged_1_0_namespaces() -> None:
+    """Exact-lock (``==``) the five 1.0 namespaces DX-1 did not touch.
+
+    Unlike ``evaluation``/``reliability`` (see
+    ``test_1_0_baseline_is_a_subset_of_grown_namespaces`` below), nothing in
+    this milestone added, removed, or renamed exports here. Exact equality
+    means any *accidental* future export addition to one of these namespaces
+    — not just a removal/rename — fails CI immediately, rather than silently
+    passing under a permissive subset check.
     """
     modules = {
         "agent_reliability": agent_reliability,
         "domain": domain,
         "sdk": sdk,
-        "evaluation": evaluation,
-        "reliability": reliability,
         "ports": ports,
         "adapters": adapters,
         "adapters.otel": otel,
     }
-    current_exports = {name: set(module.__all__) for name, module in modules.items()}
-    for name, expected in EXPECTED_EXPORTS.items():
-        assert expected <= current_exports[name], (
-            f"1.0 export(s) missing from {name}: {expected - current_exports[name]}"
+    for name, expected in UNCHANGED_SINCE_1_0_EXPORTS.items():
+        actual = set(modules[name].__all__)
+        assert actual == expected, (
+            f"unchanged-since-1.0 namespace {name} drifted: "
+            f"added={actual - expected} removed={expected - actual}"
+        )
+
+
+def test_1_0_baseline_is_a_subset_of_grown_namespaces() -> None:
+    """Every export present at 1.0 remains present and importable in the two
+    namespaces DX-1 legitimately grew.
+
+    This is a floor, not a ceiling, for exactly these two namespaces: SemVer
+    minor releases (VERSIONING.md) may add new names to their ``__all__``
+    without breaking this lock, so the comparison is "1.0 baseline is a
+    subset of the current namespace," not exact equality. A *removed* or
+    *renamed* 1.0 export still fails this test immediately. The current,
+    exact export set (baseline plus DX-1 additions) is separately
+    exact-locked in ``tests/unit/test_package.py`` — see that file's
+    ``test_m4_evaluation_public_api_is_explicit`` and
+    ``test_m5_reliability_public_api_is_explicit`` — so nothing here is left
+    uncovered by an exact check.
+    """
+    modules = {
+        "evaluation": evaluation,
+        "reliability": reliability,
+    }
+    for name, expected in GROWN_SINCE_1_0_BASELINE_EXPORTS.items():
+        current = set(modules[name].__all__)
+        assert expected <= current, (
+            f"1.0 export(s) missing from {name}: {expected - current}"
         )
 
 

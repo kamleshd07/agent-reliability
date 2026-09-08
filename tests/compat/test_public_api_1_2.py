@@ -1,9 +1,15 @@
-"""Regression snapshot for the unreleased M8 (developer-adoption) additions.
+"""Regression snapshot for the unreleased DX-1 (Developer Adoption) additions.
+
+Note on naming: this milestone is labeled "DX-1 — Developer Adoption" in
+release-facing docs/CHANGELOG language, not "M8" — ``docs/ROADMAP.md``
+already uses "M8" for a separate, older, still-planned "Framework
+integrations" milestone, and earlier released docs additionally used "M8" for
+the unrelated 1.1.0 measurement-health work. See ``CHANGELOG.md``.
 
 These names are not yet part of a tagged release. This file exists so that,
 once they do ship, this becomes the same kind of frozen historical record as
 ``test_public_api_1_0.py``/``test_public_api_1_1.py`` — and so that, in the
-meantime, any accidental signature/behavior drift while M8 is still being
+meantime, any accidental signature/behavior drift while DX-1 is still being
 built is caught immediately.
 """
 
