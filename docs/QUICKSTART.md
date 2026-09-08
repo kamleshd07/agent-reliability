@@ -70,10 +70,37 @@ Agent Reliability activates its run span inside the current trace. Your host
 application owns the `TracerProvider`, sampling, processors, exporter, and
 collector. The integration sends nothing by itself.
 
-## 8. Where to go next
+## 8. Try a built-in evaluator, then assert an SLO in tests
+
+`agent_reliability.evaluation` ships evaluators beyond the equality check
+above: `ContainsEvaluator`, `RegexMatchEvaluator`,
+`LatencyThresholdEvaluator`, and `ToolCalledEvaluator`/`ToolNotCalledEvaluator`.
+Run [`examples/builtin_evaluators_quickstart.py`](../examples/builtin_evaluators_quickstart.py)
+to see one produce `PASS`, `FAIL`, and a legitimate `UNKNOWN` (evaluation
+completed but was indeterminate — never a crash, and never silently `FAIL`),
+then a local report via `agent_reliability.reporting.format_report`. Full
+reference: [Evaluate](EVALUATE.md).
+
+Once you have a report, assert its SLO directly in a test or script with
+zero extra dependency:
+
+```python
+from agent_reliability.testing import assert_slo_met
+
+assert_slo_met(report)  # raises AssertionError unless the SLO is MET
+```
+
+Run [`examples/slo_assertion.py`](../examples/slo_assertion.py) to see both
+a `MET` and a `BREACHED` outcome. Full reference:
+[Test reliability](TEST_RELIABILITY.md).
+
+## 9. Where to go next
 
 - Learn the terminology in [Concepts](CONCEPTS.md).
 - Adapt the boundaries in [Integrations](INTEGRATIONS.md).
-- Try [async usage](../examples/async_agent.py) and the
-  [provenance-conflict example](../examples/provenance_conflict.py).
+- Try [async usage](../examples/async_agent.py), the
+  [provenance-conflict example](../examples/provenance_conflict.py), and the
+  privacy-bounded [tool-call evaluators](../examples/tool_call_evaluators.py).
+- Present a report for a human or a program in
+  [Measure reliability locally](MEASURE_RELIABILITY_LOCALLY.md).
 - Consult the [documentation index](README.md) for exact semantics.

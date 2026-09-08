@@ -89,6 +89,42 @@ def test_fail_closed_policy_example() -> None:
     )
 
 
+def test_builtin_evaluators_quickstart_example() -> None:
+    assert _run("builtin_evaluators_quickstart.py") == (
+        "Indicator: latency_sla\n"
+        "Observations: pass=2 fail=1 unknown=1 considered=3 "
+        "(unknown_policy=exclude)\n"
+        "Reliability: 66.67%\n"
+        "SLO: latency-sla target=50.00% direction=at_least status=MET\n"
+        "Error budget: status=measured remaining=33.33%\n"
+        "Measurement health: HEALTHY\n"
+    )
+
+
+def test_slo_assertion_example() -> None:
+    assert _run("slo_assertion.py") == (
+        "Indicator: task_success\n"
+        "Observations: pass=3 fail=1 unknown=0 considered=4 "
+        "(unknown_policy=exclude)\n"
+        "Reliability: 75.00%\n"
+        "SLO: task-success target=50.00% direction=at_least status=MET\n"
+        "Error budget: status=measured remaining=50.00%\n"
+        "Measurement health: HEALTHY\n"
+        "SLO assertion passed for the lenient target.\n"
+        "SLO assertion failed for the strict target: SLO 'task-success' on "
+        "indicator 'task_success' was not met (status=BREACHED, "
+        "observed_reliability=75.00%, target=99.00%, direction=at_least, "
+        "pass=3, fail=1, unknown=0, unknown_policy=exclude)\n"
+    )
+
+
+def test_tool_call_evaluators_example() -> None:
+    assert _run("tool_call_evaluators.py") == (
+        "small refund (should self-issue): pass\n"
+        "large refund (should escalate, not self-issue): pass\n"
+    )
+
+
 def test_bounded_degradation_policy_example() -> None:
     assert _run("policy_bounded_degradation.py") == (
         "HEALTHY -> FULL\n"

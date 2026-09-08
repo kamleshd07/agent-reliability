@@ -6,6 +6,47 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+Developer-adoption additive changes (not yet released; no version bump).
+Existing public APIs, reliability/SLO semantics, `UnknownPolicy` behavior,
+the evaluator protocol, degraded-mode behavior, OTel behavior, and
+provenance semantics are unchanged. Base runtime dependency count remains
+zero.
+
+### Added
+
+- `agent_reliability.evaluation.EvaluationOutcome` as an additive re-export
+  of `agent_reliability.domain.EvaluationOutcome` (same object; fixes an
+  ImportError-on-first-try friction point — every sibling evaluation type
+  already lived in `agent_reliability.evaluation`).
+- `agent_reliability.reliability.evaluate_reliability_or_raise(...)` and
+  `AggregationConflictError`: a convenience wrapper around
+  `evaluate_reliability(...)` that raises instead of returning
+  `AggregationConflict`, for call sites with no recovery path other than
+  failing loudly. The explicit, non-raising API is unchanged.
+- Built-in evaluators in `agent_reliability.evaluation`: `ContainsEvaluator`,
+  `RegexMatchEvaluator` (stdlib `re` only, fails fast on a malformed pattern
+  at construction time), `LatencyThresholdEvaluator` (explicit
+  developer-supplied duration; a missing measurement is `UNKNOWN`, never
+  `FAIL`), and `ToolCalledEvaluator`/`ToolNotCalledEvaluator` (operate only
+  on a bounded `frozenset[str]` of tool names, never arguments or results).
+- New `agent_reliability.reporting` namespace: `format_report(...)` (human-
+  readable text) and `report_to_dict(...)` (JSON-compatible primitive
+  structures) render an existing `ReliabilityReport` without recomputing any
+  of its values.
+- New `agent_reliability.testing` namespace: `assert_slo_met(...)`, a
+  framework-neutral assertion helper (zero runtime dependency, no pytest
+  plugin) usable from `pytest`, `unittest`, or plain scripts.
+- Three new runnable, contract-tested examples:
+  `examples/builtin_evaluators_quickstart.py`, `examples/slo_assertion.py`,
+  and `examples/tool_call_evaluators.py`.
+- New task-first docs: `docs/EVALUATE.md`,
+  `docs/MEASURE_RELIABILITY_LOCALLY.md`, `docs/TEST_RELIABILITY.md`, linked
+  from `docs/README.md` and `docs/QUICKSTART.md`.
+- `jsonschema`-backed `JsonSchemaEvaluator` was deliberately **not** added:
+  it would either require a new mandatory/optional dependency or a
+  hand-rolled, non-compliant partial validator. Deferred pending a real
+  design for that tradeoff.
+
 ## [1.1.1] - 2026-08-29
 
 Measurement Health hardening release. Public APIs, reliability and SLO

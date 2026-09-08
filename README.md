@@ -170,7 +170,10 @@ or framework-specific adapter is included. See the [roadmap](https://github.com/
 ## Documentation
 
 - New developer: [Quickstart](https://github.com/kamleshd07/agent-reliability/blob/main/docs/QUICKSTART.md) → [Concepts](https://github.com/kamleshd07/agent-reliability/blob/main/docs/CONCEPTS.md)
-- Integrator: [Integration guide](https://github.com/kamleshd07/agent-reliability/blob/main/docs/INTEGRATIONS.md)
+- Integrator: [Integration guide](https://github.com/kamleshd07/agent-reliability/blob/main/docs/INTEGRATIONS.md) →
+  [Evaluate](https://github.com/kamleshd07/agent-reliability/blob/main/docs/EVALUATE.md) →
+  [Measure reliability locally](https://github.com/kamleshd07/agent-reliability/blob/main/docs/MEASURE_RELIABILITY_LOCALLY.md) →
+  [Test reliability](https://github.com/kamleshd07/agent-reliability/blob/main/docs/TEST_RELIABILITY.md)
 - Advanced user: [Evaluator framework](https://github.com/kamleshd07/agent-reliability/blob/main/docs/EVALUATOR_FRAMEWORK.md) and
   [local engine](https://github.com/kamleshd07/agent-reliability/blob/main/docs/LOCAL_RELIABILITY_ENGINE.md)
 - Architecture reader or contributor: [documentation index](https://github.com/kamleshd07/agent-reliability/blob/main/docs/README.md)
