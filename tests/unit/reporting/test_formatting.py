@@ -96,7 +96,6 @@ def test_report_to_dict_no_data_uses_null_not_zero() -> None:
     report = _report([])
     payload = report_to_dict(report)
     assert payload["reliability"]["pass_ratio"] is None
-    assert payload["reliability"]["pass_ratio_float"] is None
     assert payload["error_budget"]["remaining_fraction"] is None
 
 
@@ -126,6 +125,30 @@ def test_report_to_dict_shape_is_exactly_bounded() -> None:
     assert set(payload["measurement_health"].keys()) == {"health", "reasons"}
     for value in payload.values():
         assert isinstance(value, dict | list | str | int | float | bool | type(None))
+
+
+def _all_keys(value: object) -> set[str]:
+    """Recursively collect every dict key nested anywhere in ``value``."""
+    keys: set[str] = set()
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            keys.add(key)
+            keys |= _all_keys(nested)
+    elif isinstance(value, list):
+        for item in value:
+            keys |= _all_keys(item)
+    return keys
+
+
+def test_report_to_dict_never_emits_a_rounded_float_sibling_key() -> None:
+    """Regression for the removed *_float convenience fields: report_to_dict
+    must expose only the exact numerator/denominator representation for
+    ratio/fraction-shaped values, never a lossy rounded float sibling, on
+    every code path (empty report, populated report, and burn rate)."""
+    for report in (_report([]), _report_with_burn_rate()):
+        payload = report_to_dict(report)
+        float_keys = {key for key in _all_keys(payload) if key.endswith("_float")}
+        assert float_keys == set()
 
 
 def test_report_to_dict_exact_fraction_is_lossless() -> None:
@@ -173,4 +196,4 @@ def test_report_to_dict_includes_burn_rate_when_present() -> None:
     payload = report_to_dict(report)
     assert payload["burn_rate"] is not None
     assert payload["burn_rate"]["status"] == report.burn_rate.status.value  # type: ignore[union-attr]
-    assert set(payload["burn_rate"].keys()) == {"status", "value", "value_float"}
+    assert set(payload["burn_rate"].keys()) == {"status", "value"}

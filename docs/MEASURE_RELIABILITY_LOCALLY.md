@@ -46,13 +46,15 @@ print(json.dumps(payload, indent=2))
 ```
 
 The result is JSON-compatible primitive structures only (`dict`/`list`/
-`str`/`int`/`float`/`bool`/`None`) with a fixed, exhaustive key set: no
-arbitrary or unbounded payload data is ever included, because
-`ReliabilityReport` itself has no open-ended payload field. Exact
-`fractions.Fraction` values are represented losslessly as
-`{"numerator": int, "denominator": int}`, with a rounded `*_float` copy
-alongside for callers that only want a display number. This is not a
-proprietary wire protocol — it is a plain dict you own once returned.
+`str`/`int`/`bool`/`None`) with a fixed, exhaustive key set: no arbitrary or
+unbounded payload data is ever included, because `ReliabilityReport` itself
+has no open-ended payload field. Exact `fractions.Fraction` values are
+represented losslessly as `{"numerator": int, "denominator": int}` — no
+rounded `float` sibling is included, so there is exactly one machine-readable
+number for each ratio/fraction-shaped value, and it is always exact. A caller
+that wants a display number computes `numerator / denominator` itself. This
+is not a proprietary wire protocol — it is a plain dict you own once
+returned.
 
 ## Next
 

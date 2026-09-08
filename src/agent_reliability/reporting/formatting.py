@@ -105,13 +105,15 @@ def report_to_dict(report: ReliabilityReport) -> dict[str, Any]:
     """Render ``report`` as JSON-compatible primitive structures.
 
     The return value is safe to pass to ``json.dumps`` and contains only
-    ``dict``/``list``/``str``/``int``/``float``/``bool``/``None`` values, no
+    ``dict``/``list``/``str``/``int``/``bool``/``None`` values, no
     proprietary wire envelope, and no networking. Fraction-valued fields are
     represented losslessly as a ``{"numerator": int, "denominator": int}``
     pair rather than a lossy ``float`` (the canonical engine uses exact
-    ``fractions.Fraction`` arithmetic; this function preserves that when it
-    matters and additionally exposes a rounded ``float`` copy for callers
-    that only want a display number).
+    ``fractions.Fraction`` arithmetic; this function preserves that exactly
+    and does not also emit a rounded ``float`` sibling — a caller that wants
+    a display number can compute ``numerator / denominator`` itself, the
+    same way this module's own ``format_report`` does for its human-readable
+    text output).
 
     The shape below is exhaustive and stable for a given report; it never
     grows an extra key for unexpected report content because
@@ -148,11 +150,6 @@ def report_to_dict(report: ReliabilityReport) -> dict[str, Any]:
         burn_rate_dict = {
             "status": report.burn_rate.status.value,
             "value": _fraction_to_dict(report.burn_rate.value),
-            "value_float": (
-                None
-                if report.burn_rate.value is None
-                else float(report.burn_rate.value)
-            ),
         }
 
     return {
@@ -169,18 +166,11 @@ def report_to_dict(report: ReliabilityReport) -> dict[str, Any]:
         "unknown_policy": ratio.unknown_policy.value,
         "reliability": {
             "pass_ratio": _fraction_to_dict(ratio.pass_ratio),
-            "pass_ratio_float": (
-                None if ratio.pass_ratio is None else float(ratio.pass_ratio)
-            ),
             "fail_ratio": _fraction_to_dict(ratio.fail_ratio),
-            "fail_ratio_float": (
-                None if ratio.fail_ratio is None else float(ratio.fail_ratio)
-            ),
         },
         "slo": {
             "name": slo.name,
             "target": _fraction_to_dict(slo.target),
-            "target_float": float(slo.target),
             "direction": slo.direction.value,
             "status": report.slo_evaluation.status.value,
         },
@@ -191,11 +181,6 @@ def report_to_dict(report: ReliabilityReport) -> dict[str, Any]:
             "observed_bad_events": budget.observed_bad_events,
             "consumption_ratio": _fraction_to_dict(budget.consumption_ratio),
             "remaining_fraction": _fraction_to_dict(budget.remaining_fraction),
-            "remaining_fraction_float": (
-                None
-                if budget.remaining_fraction is None
-                else float(budget.remaining_fraction)
-            ),
         },
         "burn_rate": burn_rate_dict,
         "measurement_health": {
