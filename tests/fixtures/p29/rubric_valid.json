@@ -1,0 +1,788 @@
+{
+  "schema": "gentlity.fixture.rubric-valid/1",
+  "cases": [
+    {
+      "id": "answer-correctness-basic",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ]
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "reference-like rubric, defaults materialized"
+    },
+    {
+      "id": "groundedness-citations",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-groundedness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "groundedness",
+        "inputs_required": [
+          "answer",
+          "context"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "supported_by_context"
+          ],
+          "fail": [
+            "unsupported_claim",
+            "contradicted_by_context"
+          ],
+          "unknown": [
+            "context_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ],
+        "require_citations": true
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "require_citations with context required"
+    },
+    {
+      "id": "instruction-adherence",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-instruction-adherence",
+        "rubric_version": "2026-10.r1",
+        "dimension": "instruction-adherence",
+        "inputs_required": [
+          "answer",
+          "instructions"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "instructions_followed"
+          ],
+          "fail": [
+            "instruction_violated"
+          ],
+          "unknown": [
+            "instructions_missing",
+            "instructions_ambiguous",
+            "low_confidence"
+          ]
+        }
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "optional inputs omitted"
+    },
+    {
+      "id": "safety-policy",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-safety-policy",
+        "rubric_version": "2026-10.r1",
+        "dimension": "safety-policy",
+        "inputs_required": [
+          "answer",
+          "policy"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "no_policy_violation_found"
+          ],
+          "fail": [
+            "policy_violation"
+          ],
+          "unknown": [
+            "policy_missing",
+            "policy_not_applicable",
+            "low_confidence"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ]
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "safety rubric"
+    },
+    {
+      "id": "task-completion-evidence",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-task-completion-evidence",
+        "rubric_version": "2026-10.r1",
+        "dimension": "task-completion-evidence",
+        "inputs_required": [
+          "answer",
+          "task_evidence"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "completion_evidence_present"
+          ],
+          "fail": [
+            "completion_evidence_contradicts",
+            "completion_not_attempted"
+          ],
+          "unknown": [
+            "evidence_insufficient",
+            "low_confidence"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ]
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "task evidence rubric"
+    },
+    {
+      "id": "rubric-id-max-64",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "p"
+          ],
+          "fail": [
+            "f"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "low_confidence"
+          ]
+        }
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "rubric_id of 64 chars"
+    },
+    {
+      "id": "rubric-id-one-char",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "a",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "p"
+          ],
+          "fail": [
+            "f"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "low_confidence"
+          ]
+        }
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "rubric_id of 1 char"
+    },
+    {
+      "id": "rubric-version-128",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "r",
+        "rubric_version": "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "p"
+          ],
+          "fail": [
+            "f"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "low_confidence"
+          ]
+        }
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "rubric_version of 128 chars (upper bound)"
+    },
+    {
+      "id": "rubric-version-1",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "a",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ]
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "rubric_version of 1 char"
+    },
+    {
+      "id": "criteria-12-total-6000",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c0",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c1",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c2",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c3",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c4",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c5",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c6",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c7",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c8",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c9",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c10",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          },
+          {
+            "id": "c11",
+            "text": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ]
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "12 criteria x 500 chars = 6000 total (upper bounds)"
+    },
+    {
+      "id": "criteria-newline-allowed",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "line one\nline two"
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ]
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "newline is the only allowed control character"
+    },
+    {
+      "id": "eight-codes-per-list",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "f0",
+            "f1",
+            "f2",
+            "f3",
+            "f4",
+            "f5",
+            "f6",
+            "f7"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ]
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "8 codes in a list"
+    },
+    {
+      "id": "description-300",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ],
+        "description": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "description at its bound"
+    },
+    {
+      "id": "min-confidence-high",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ],
+        "min_confidence": "high"
+      },
+      "expected": {
+        "valid": true,
+        "min_confidence": "high"
+      },
+      "note": "explicit min_confidence"
+    },
+    {
+      "id": "missing-input-codes-explicit",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ],
+        "missing_input_codes": {
+          "reference": "judge_abstained"
+        }
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "explicit missing_input_codes value must be an unknown code"
+    },
+    {
+      "id": "seven-required-roles",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference",
+          "question",
+          "context",
+          "instructions",
+          "policy",
+          "task_evidence"
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "Criterion one."
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [],
+        "missing_input_codes": {
+          "reference": "judge_abstained",
+          "question": "judge_abstained",
+          "context": "judge_abstained",
+          "instructions": "judge_abstained",
+          "policy": "judge_abstained",
+          "task_evidence": "judge_abstained"
+        }
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "all seven roles required (upper bound of inputs_required)"
+    },
+    {
+      "id": "criterion-id-32",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "text": "x"
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ]
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "criterion id at its 32-char bound"
+    },
+    {
+      "id": "criterion-id-forms",
+      "input": {
+        "schema": "gentlity.rubric/1",
+        "rubric_id": "judge-answer-correctness",
+        "rubric_version": "2026-10.r1",
+        "dimension": "answer-correctness",
+        "inputs_required": [
+          "answer",
+          "reference"
+        ],
+        "criteria": [
+          {
+            "id": "a",
+            "text": "x"
+          },
+          {
+            "id": "a1-b_c",
+            "text": "y"
+          }
+        ],
+        "reason_codes": {
+          "pass": [
+            "consistent_with_reference"
+          ],
+          "fail": [
+            "contradicts_reference",
+            "missing_required_facts"
+          ],
+          "unknown": [
+            "reference_insufficient",
+            "judge_abstained",
+            "low_confidence",
+            "judge_disagreement"
+          ]
+        },
+        "inputs_optional": [
+          "question"
+        ]
+      },
+      "expected": {
+        "valid": true
+      },
+      "note": "single-char and internal-underscore/hyphen criterion ids"
+    }
+  ]
+}

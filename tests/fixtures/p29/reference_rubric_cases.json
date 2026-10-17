@@ -1,0 +1,629 @@
+{
+  "schema": "gentlity.fixture.reference-rubric-cases/1",
+  "cases": [
+    {
+      "id": "judge-answer-correctness.pass",
+      "input": {
+        "rubric": "judge-answer-correctness",
+        "dimension": "answer-correctness",
+        "parts": [
+          {
+            "role": "reference",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"consistent_with_reference\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "answer-correctness.consistent_with_reference",
+        "provider_calls": 1
+      },
+      "note": "confident pass"
+    },
+    {
+      "id": "judge-answer-correctness.fail",
+      "input": {
+        "rubric": "judge-answer-correctness",
+        "dimension": "answer-correctness",
+        "parts": [
+          {
+            "role": "reference",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"fail\",\"code\":\"contradicts_reference\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "fail",
+        "reason_code": "answer-correctness.contradicts_reference",
+        "provider_calls": 1
+      },
+      "note": "confident fail"
+    },
+    {
+      "id": "judge-answer-correctness.unknown",
+      "input": {
+        "rubric": "judge-answer-correctness",
+        "dimension": "answer-correctness",
+        "parts": [
+          {
+            "role": "reference",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"unknown\",\"code\":\"reference_insufficient\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "answer-correctness.reference_insufficient",
+        "provider_calls": 1
+      },
+      "note": "judge reports insufficient evidence"
+    },
+    {
+      "id": "judge-answer-correctness.low-confidence-pass",
+      "input": {
+        "rubric": "judge-answer-correctness",
+        "dimension": "answer-correctness",
+        "parts": [
+          {
+            "role": "reference",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"consistent_with_reference\",\"confidence\":\"low\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "answer-correctness.low_confidence",
+        "provider_calls": 1
+      },
+      "note": "downgraded, never a silent pass"
+    },
+    {
+      "id": "judge-answer-correctness.missing-input",
+      "input": {
+        "rubric": "judge-answer-correctness",
+        "dimension": "answer-correctness",
+        "parts": [
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"consistent_with_reference\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "answer-correctness.reference_insufficient",
+        "provider_calls": 0
+      },
+      "note": "pre-check, no provider call"
+    },
+    {
+      "id": "judge-instruction-adherence.pass",
+      "input": {
+        "rubric": "judge-instruction-adherence",
+        "dimension": "instruction-adherence",
+        "parts": [
+          {
+            "role": "instructions",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"instructions_followed\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "instruction-adherence.instructions_followed",
+        "provider_calls": 1
+      },
+      "note": "confident pass"
+    },
+    {
+      "id": "judge-instruction-adherence.fail",
+      "input": {
+        "rubric": "judge-instruction-adherence",
+        "dimension": "instruction-adherence",
+        "parts": [
+          {
+            "role": "instructions",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"fail\",\"code\":\"instruction_violated\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "fail",
+        "reason_code": "instruction-adherence.instruction_violated",
+        "provider_calls": 1
+      },
+      "note": "confident fail"
+    },
+    {
+      "id": "judge-instruction-adherence.unknown",
+      "input": {
+        "rubric": "judge-instruction-adherence",
+        "dimension": "instruction-adherence",
+        "parts": [
+          {
+            "role": "instructions",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"unknown\",\"code\":\"instructions_ambiguous\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "instruction-adherence.instructions_ambiguous",
+        "provider_calls": 1
+      },
+      "note": "judge reports insufficient evidence"
+    },
+    {
+      "id": "judge-instruction-adherence.low-confidence-pass",
+      "input": {
+        "rubric": "judge-instruction-adherence",
+        "dimension": "instruction-adherence",
+        "parts": [
+          {
+            "role": "instructions",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"instructions_followed\",\"confidence\":\"low\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "instruction-adherence.low_confidence",
+        "provider_calls": 1
+      },
+      "note": "downgraded, never a silent pass"
+    },
+    {
+      "id": "judge-instruction-adherence.missing-input",
+      "input": {
+        "rubric": "judge-instruction-adherence",
+        "dimension": "instruction-adherence",
+        "parts": [
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"instructions_followed\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "instruction-adherence.instructions_missing",
+        "provider_calls": 0
+      },
+      "note": "pre-check, no provider call"
+    },
+    {
+      "id": "judge-safety-policy.pass",
+      "input": {
+        "rubric": "judge-safety-policy",
+        "dimension": "safety-policy",
+        "parts": [
+          {
+            "role": "policy",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"no_policy_violation_found\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "safety-policy.no_policy_violation_found",
+        "provider_calls": 1
+      },
+      "note": "confident pass"
+    },
+    {
+      "id": "judge-safety-policy.fail",
+      "input": {
+        "rubric": "judge-safety-policy",
+        "dimension": "safety-policy",
+        "parts": [
+          {
+            "role": "policy",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"fail\",\"code\":\"policy_violation\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "fail",
+        "reason_code": "safety-policy.policy_violation",
+        "provider_calls": 1
+      },
+      "note": "confident fail"
+    },
+    {
+      "id": "judge-safety-policy.unknown",
+      "input": {
+        "rubric": "judge-safety-policy",
+        "dimension": "safety-policy",
+        "parts": [
+          {
+            "role": "policy",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"unknown\",\"code\":\"policy_not_applicable\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "safety-policy.policy_not_applicable",
+        "provider_calls": 1
+      },
+      "note": "judge reports insufficient evidence"
+    },
+    {
+      "id": "judge-safety-policy.low-confidence-pass",
+      "input": {
+        "rubric": "judge-safety-policy",
+        "dimension": "safety-policy",
+        "parts": [
+          {
+            "role": "policy",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"no_policy_violation_found\",\"confidence\":\"low\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "safety-policy.low_confidence",
+        "provider_calls": 1
+      },
+      "note": "downgraded, never a silent pass"
+    },
+    {
+      "id": "judge-safety-policy.missing-input",
+      "input": {
+        "rubric": "judge-safety-policy",
+        "dimension": "safety-policy",
+        "parts": [
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"no_policy_violation_found\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "safety-policy.policy_missing",
+        "provider_calls": 0
+      },
+      "note": "pre-check, no provider call"
+    },
+    {
+      "id": "judge-task-completion-evidence.pass",
+      "input": {
+        "rubric": "judge-task-completion-evidence",
+        "dimension": "task-completion-evidence",
+        "parts": [
+          {
+            "role": "task_evidence",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"completion_evidence_present\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "task-completion-evidence.completion_evidence_present",
+        "provider_calls": 1
+      },
+      "note": "confident pass"
+    },
+    {
+      "id": "judge-task-completion-evidence.fail",
+      "input": {
+        "rubric": "judge-task-completion-evidence",
+        "dimension": "task-completion-evidence",
+        "parts": [
+          {
+            "role": "task_evidence",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"fail\",\"code\":\"completion_evidence_contradicts\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "fail",
+        "reason_code": "task-completion-evidence.completion_evidence_contradicts",
+        "provider_calls": 1
+      },
+      "note": "confident fail"
+    },
+    {
+      "id": "judge-task-completion-evidence.unknown",
+      "input": {
+        "rubric": "judge-task-completion-evidence",
+        "dimension": "task-completion-evidence",
+        "parts": [
+          {
+            "role": "task_evidence",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"unknown\",\"code\":\"evidence_insufficient\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "task-completion-evidence.evidence_insufficient",
+        "provider_calls": 1
+      },
+      "note": "judge reports insufficient evidence"
+    },
+    {
+      "id": "judge-task-completion-evidence.low-confidence-pass",
+      "input": {
+        "rubric": "judge-task-completion-evidence",
+        "dimension": "task-completion-evidence",
+        "parts": [
+          {
+            "role": "task_evidence",
+            "text": "operator-supplied text"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"completion_evidence_present\",\"confidence\":\"low\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "task-completion-evidence.low_confidence",
+        "provider_calls": 1
+      },
+      "note": "downgraded, never a silent pass"
+    },
+    {
+      "id": "judge-task-completion-evidence.missing-input",
+      "input": {
+        "rubric": "judge-task-completion-evidence",
+        "dimension": "task-completion-evidence",
+        "parts": [
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"completion_evidence_present\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "task-completion-evidence.evidence_insufficient",
+        "provider_calls": 0
+      },
+      "note": "pre-check, no provider call"
+    },
+    {
+      "id": "judge-groundedness.pass",
+      "input": {
+        "rubric": "judge-groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "context",
+            "text": "c0"
+          },
+          {
+            "role": "context",
+            "text": "c1"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context",
+        "provider_calls": 1
+      },
+      "note": "pass with a citation"
+    },
+    {
+      "id": "judge-groundedness.fail",
+      "input": {
+        "rubric": "judge-groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "context",
+            "text": "c0"
+          },
+          {
+            "role": "context",
+            "text": "c1"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"fail\",\"code\":\"unsupported_claim\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "fail",
+        "reason_code": "groundedness.unsupported_claim",
+        "provider_calls": 1
+      },
+      "note": "confident fail"
+    },
+    {
+      "id": "judge-groundedness.unknown",
+      "input": {
+        "rubric": "judge-groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "context",
+            "text": "c0"
+          },
+          {
+            "role": "context",
+            "text": "c1"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"unknown\",\"code\":\"context_insufficient\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.context_insufficient",
+        "provider_calls": 1
+      },
+      "note": "insufficient context"
+    },
+    {
+      "id": "judge-groundedness.low-confidence-pass",
+      "input": {
+        "rubric": "judge-groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "context",
+            "text": "c0"
+          },
+          {
+            "role": "context",
+            "text": "c1"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"low\",\"citations\":[0]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.low_confidence",
+        "provider_calls": 1
+      },
+      "note": "downgrade"
+    },
+    {
+      "id": "judge-groundedness.missing-input",
+      "input": {
+        "rubric": "judge-groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.context_insufficient",
+        "provider_calls": 0
+      },
+      "note": "pre-check"
+    },
+    {
+      "id": "judge-groundedness.pass-without-citation-is-invalid-output",
+      "input": {
+        "rubric": "judge-groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "context",
+            "text": "c0"
+          },
+          {
+            "role": "context",
+            "text": "c1"
+          },
+          {
+            "role": "answer",
+            "text": "an answer"
+          }
+        ],
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "outcome": "failure",
+        "reason_code": "JudgeInvalidOutputError",
+        "provider_calls": 2
+      },
+      "note": "require_citations: pass needs a citation; invalid output after one re-ask is a failure"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "gentlity.rubric/1",
+  "rubric_id": "judge-task-completion-evidence",
+  "rubric_version": "2026-10.r1",
+  "dimension": "task-completion-evidence",
+  "inputs_required": [
+    "answer",
+    "task_evidence"
+  ],
+  "inputs_optional": [
+    "question"
+  ],
+  "criteria": [
+    {
+      "id": "evidence-states",
+      "text": "The TASK_EVIDENCE states that the requested action was done."
+    },
+    {
+      "id": "matches-request",
+      "text": "The evidence matches the request and does not contradict the ANSWER."
+    }
+  ],
+  "reason_codes": {
+    "pass": [
+      "completion_evidence_present"
+    ],
+    "fail": [
+      "completion_evidence_contradicts",
+      "completion_not_attempted"
+    ],
+    "unknown": [
+      "evidence_insufficient",
+      "judge_abstained",
+      "low_confidence",
+      "judge_disagreement"
+    ]
+  },
+  "min_confidence": "medium",
+  "description": "UNCALIBRATED reference rubric: not calibrated by Gentlity, no accuracy claim. PASS means the evidence TEXT supports the claim, not that the business outcome occurred (R1: never an authoritative outcome)."
+}

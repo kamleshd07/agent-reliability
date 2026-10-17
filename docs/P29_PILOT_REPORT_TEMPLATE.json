@@ -1,0 +1,66 @@
+{
+  "schema": "gentlity.p29-pilot-report/1",
+  "pilot_authorized": false,
+  "safeguards": {
+    "SG-1": {
+      "status": "NOT_SATISFIED",
+      "fields": {
+        "expected_evaluations_per_hour": null,
+        "tokens_per_evaluation_measured": null,
+        "budget_per_window": null,
+        "max_pending": null,
+        "max_concurrency": null,
+        "r13_r14_incidents": null
+      },
+      "evidence": [],
+      "signoff": {"role": null, "name": null, "date": null}
+    },
+    "SG-2": {
+      "status": "NOT_SATISFIED",
+      "fields": {"note_restated_in_report": null},
+      "evidence": [],
+      "signoff": {"role": null, "name": null, "date": null}
+    },
+    "SG-3": {
+      "status": "NOT_SATISFIED",
+      "fields": {
+        "indicator_windows": [],
+        "dashboards_inspected": null
+      },
+      "evidence": [],
+      "signoff": {"role": null, "name": null, "date": null}
+    },
+    "SG-4": {
+      "status": "NOT_SATISFIED",
+      "fields": {
+        "judge_shares_scope_with_deterministic": null,
+        "separate_scope_feasible": null,
+        "decision": null,
+        "readings_kept_on_deterministic_indicators": null
+      },
+      "evidence": [],
+      "signoff": {"role": null, "name": null, "date": null}
+    },
+    "SG-5": {
+      "status": "NOT_SATISFIED",
+      "fields": {
+        "counters_wired": null,
+        "alert_rule_ids": null,
+        "firing_test_date": null,
+        "firing_test_result": null
+      },
+      "evidence": [],
+      "signoff": {"role": null, "name": null, "date": null}
+    },
+    "SG-6": {
+      "status": "NOT_SATISFIED",
+      "fields": {
+        "gate_id": null,
+        "on_no_data": null,
+        "partial_outage_not_covered_stated": null
+      },
+      "evidence": [],
+      "signoff": {"role": null, "name": null, "date": null}
+    }
+  }
+}

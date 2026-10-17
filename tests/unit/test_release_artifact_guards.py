@@ -139,6 +139,10 @@ def test_internal_or_repository_only_files_are_rejected_in_the_wheel(name: str) 
 def test_the_public_milestone_documents_are_allowed() -> None:
     _guards()._assert_no_internal_files(
         set(),
-        {PREFIX + "docs/P29_PILOT_RUNBOOK.md", PREFIX + "docs/P29_PILOT_SAFEGUARDS.md"},
+        {
+            PREFIX + "docs/P29_PILOT_REPORT_TEMPLATE.json",
+            PREFIX + "docs/P29_PILOT_RUNBOOK.md",
+            PREFIX + "docs/P29_PILOT_SAFEGUARDS.md",
+        },
         PREFIX,
     )

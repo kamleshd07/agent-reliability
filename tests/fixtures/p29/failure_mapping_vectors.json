@@ -1,0 +1,749 @@
+{
+  "schema": "gentlity.fixture.failure-mapping-vectors/1",
+  "rubrics": {
+    "gr-cit": {
+      "schema": "gentlity.rubric/1",
+      "rubric_id": "judge-groundedness",
+      "rubric_version": "2026-10.r1",
+      "dimension": "groundedness",
+      "inputs_required": [
+        "answer",
+        "context"
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "text": "Criterion one."
+        }
+      ],
+      "reason_codes": {
+        "pass": [
+          "supported_by_context"
+        ],
+        "fail": [
+          "unsupported_claim",
+          "contradicted_by_context"
+        ],
+        "unknown": [
+          "context_insufficient",
+          "judge_abstained",
+          "low_confidence",
+          "judge_disagreement"
+        ]
+      },
+      "inputs_optional": [
+        "question"
+      ],
+      "require_citations": true
+    }
+  },
+  "requests": {
+    "basic": {
+      "dimension": "groundedness",
+      "parts": [
+        {
+          "role": "question",
+          "text": "Q?"
+        },
+        {
+          "role": "context",
+          "text": "ctx zero"
+        },
+        {
+          "role": "context",
+          "text": "ctx one"
+        },
+        {
+          "role": "answer",
+          "text": "An answer."
+        }
+      ]
+    },
+    "no-context": {
+      "dimension": "groundedness",
+      "parts": [
+        {
+          "role": "question",
+          "text": "Q?"
+        },
+        {
+          "role": "context",
+          "text": ""
+        },
+        {
+          "role": "answer",
+          "text": "An answer."
+        }
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "timeout-twice",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "timeout"
+          },
+          {
+            "raise": "timeout"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeTimeoutError",
+        "provider_calls": 2
+      },
+      "note": "R05: retried once (max_attempts 2) then failure"
+    },
+    {
+      "id": "timeout-then-valid",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "timeout"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context",
+        "provider_calls": 2
+      },
+      "note": "transient failure retried"
+    },
+    {
+      "id": "builtin-timeouterror",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "builtin_timeout"
+          },
+          {
+            "raise": "builtin_timeout"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeTimeoutError",
+        "provider_calls": 2
+      },
+      "note": "TimeoutError is a timeout and is retried"
+    },
+    {
+      "id": "unavailable-twice",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "unavailable"
+          },
+          {
+            "raise": "unavailable"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeProviderUnavailableError",
+        "provider_calls": 2
+      },
+      "note": "R06"
+    },
+    {
+      "id": "rate-limited-twice",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "rate_limited"
+          },
+          {
+            "raise": "rate_limited"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeProviderRateLimitedError",
+        "provider_calls": 2
+      },
+      "note": "R07"
+    },
+    {
+      "id": "rate-limited-retry-after-then-valid",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "rate_limited",
+            "retry_after_seconds": 0.0
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context",
+        "provider_calls": 2
+      },
+      "note": "retry_after honoured (here zero)"
+    },
+    {
+      "id": "refused-not-retried",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "refused"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeProviderRefusedError",
+        "provider_calls": 1
+      },
+      "note": "R08: never retried"
+    },
+    {
+      "id": "filtered-finish",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "x",
+            "finish": "filtered"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeProviderRefusedError",
+        "provider_calls": 1
+      },
+      "note": "finish FILTERED is a refusal, never FAIL"
+    },
+    {
+      "id": "provider-error-not-retried",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "provider"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeProviderError",
+        "provider_calls": 1
+      },
+      "note": "R09: generic provider error never retried"
+    },
+    {
+      "id": "generic-exception",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "generic"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeProviderError",
+        "provider_calls": 1
+      },
+      "note": "any other Exception becomes JudgeProviderError"
+    },
+    {
+      "id": "foreign-judge-error",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "budget_exceeded_from_provider"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeProviderError",
+        "provider_calls": 1
+      },
+      "note": "a provider may not claim a non-provider class"
+    },
+    {
+      "id": "invalid-then-valid-repair",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "not json"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context",
+        "provider_calls": 2
+      },
+      "note": "one re-ask (repair_attempts 1)"
+    },
+    {
+      "id": "invalid-twice",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "not json"
+          },
+          {
+            "reply": "not json"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeInvalidOutputError",
+        "provider_calls": 2
+      },
+      "note": "R10: never UNKNOWN"
+    },
+    {
+      "id": "invalid-no-repair",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {
+          "repair_attempts": 0
+        },
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "not json"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeInvalidOutputError",
+        "provider_calls": 1
+      },
+      "note": "repair_attempts 0"
+    },
+    {
+      "id": "truncated-then-truncated",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "{",
+            "finish": "length"
+          },
+          {
+            "reply": "{",
+            "finish": "length"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeInvalidOutputError",
+        "provider_calls": 2
+      },
+      "note": "LENGTH never parsed; re-asked once"
+    },
+    {
+      "id": "oversize-reply",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply_chars": 4097
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeOutputTooLargeError",
+        "provider_calls": 1
+      },
+      "note": "R11: not retried"
+    },
+    {
+      "id": "oversize-reply-at-bound-is-parsed",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context",
+        "provider_calls": 1
+      },
+      "note": "reply of exactly max_reply_chars is accepted"
+    },
+    {
+      "id": "max-attempts-1",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {
+          "max_attempts": 1
+        },
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "timeout"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeTimeoutError",
+        "provider_calls": 1
+      },
+      "note": "no retry"
+    },
+    {
+      "id": "max-attempts-3",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {
+          "max_attempts": 3
+        },
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "raise": "timeout"
+          },
+          {
+            "raise": "timeout"
+          },
+          {
+            "raise": "timeout"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeTimeoutError",
+        "provider_calls": 3
+      },
+      "note": "three attempts then failure"
+    },
+    {
+      "id": "invalid-timeout-valid-independent-counters",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "not json"
+          },
+          {
+            "raise": "timeout"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context",
+        "provider_calls": 3
+      },
+      "note": "repair and retry budgets are independent"
+    },
+    {
+      "id": "input-limit",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {
+          "max_input_chars": 10
+        },
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeInputLimitError",
+        "provider_calls": 0
+      },
+      "note": "R12: rejected before any provider call, never truncated"
+    },
+    {
+      "id": "precheck-missing-context",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "no-context",
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "unknown",
+        "reason_code": "groundedness.context_insufficient",
+        "provider_calls": 0
+      },
+      "note": "R04: no provider call"
+    },
+    {
+      "id": "repeats-2-agree",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 2,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context",
+        "provider_calls": 2
+      },
+      "note": "provider calls multiply exactly"
+    },
+    {
+      "id": "repeats-2-disagree",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 2,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"fail\",\"code\":\"unsupported_claim\",\"confidence\":\"high\",\"citations\":[]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "unknown",
+        "reason_code": "groundedness.judge_disagreement",
+        "provider_calls": 2
+      },
+      "note": "R03"
+    },
+    {
+      "id": "repeats-3-calls",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 3,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          },
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context",
+        "provider_calls": 3
+      },
+      "note": "three calls"
+    },
+    {
+      "id": "repeats-2-second-fails",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 2,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          },
+          {
+            "raise": "unavailable"
+          },
+          {
+            "raise": "unavailable"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "failure",
+        "exception_type": "JudgeProviderUnavailableError",
+        "provider_calls": 3
+      },
+      "note": "no partial credit: any JudgeError fails the evaluation"
+    },
+    {
+      "id": "low-confidence-downgrade",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"low\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "unknown",
+        "reason_code": "groundedness.low_confidence",
+        "provider_calls": 1
+      },
+      "note": "R03: confidence below min_confidence"
+    },
+    {
+      "id": "provider-says-unknown",
+      "input": {
+        "rubric": "gr-cit",
+        "limits": {},
+        "repeats": 1,
+        "request": "basic",
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"unknown\",\"code\":\"context_insufficient\",\"confidence\":\"high\",\"citations\":[]}"
+          }
+        ]
+      },
+      "expected": {
+        "kind": "result",
+        "outcome": "unknown",
+        "reason_code": "groundedness.context_insufficient",
+        "provider_calls": 1
+      },
+      "note": "R16: insufficient evidence is unknown"
+    }
+  ]
+}
