@@ -11,6 +11,15 @@ nothing here is released or published). The core installation still has no runti
 dependencies, and existing public APIs, reliability/SLO semantics and the
 `EventSink` contract are unchanged. See [docs/HTTP_EXPORTER.md](docs/HTTP_EXPORTER.md).
 
+### Added (P29, experimental, unreleased)
+
+- `agent_reliability.experimental.judge`: an EXPERIMENTAL adapter for model-backed (LLM-judge)
+  evaluators that call a provider you supply (ADR-0010). Raw judged content stays on your side:
+  only typed members (outcome, reason code, provenance, failure class, health) reach the P28
+  exporter; no new wire field and no new core dependency. Reference rubrics are uncalibrated
+  examples; no accuracy or calibration claim is made. Pilot safeguards are described in
+  `docs/P29_PILOT_SAFEGUARDS.md` (all not satisfied until a pilot exists).
+
 ### Added
 
 - Optional `agent-reliability[http]` extra (`httpx>=0.28.1,<1`) and the

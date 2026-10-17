@@ -1,0 +1,59 @@
+"""Platform-terminated TLS scenarios (local, disposable).
+
+A connect-timeout scenario (listener with a full accept queue) was attempted and could not
+be reproduced on this macOS loopback (connect() was not delayed): NOT EXERCISED.
+"""
+
+from __future__ import annotations
+
+import glob
+
+from tests.harness import Harness, PlatformServer, TlsMaterial, wait_until
+from tests.sdkutil import D, committed, count, make_sink, run_once
+
+
+def _tls_server(harness: Harness, tls: TlsMaterial) -> PlatformServer:
+    cert = next(
+        p for p in glob.glob(str(tls.directory / "localhost-*.crt")) if "expired" not in p
+    )
+    return PlatformServer(
+        harness.database_url, harness.key, ssl_files=(cert, cert[:-4] + ".key")
+    )
+
+
+def test_platform_terminated_tls_delivers_with_a_trusted_ca(
+    harness: Harness, tenant, tls: TlsMaterial
+) -> None:
+    server = _tls_server(harness, tls)
+    try:
+        sink = make_sink(
+            server.endpoint.replace("127.0.0.1", "localhost"),
+            tenant.credential().token,
+            tenant,
+            ca_bundle=tls.ca_pem,
+        )
+        run_once(sink, tenant)
+        assert wait_until(lambda: sink.status.queue_depth == 0, 30)
+        snapshot = sink.close(10)
+        assert committed(snapshot) == len(tenant.events()) >= 3
+        assert snapshot.exhausted_may_have_committed == 0
+    finally:
+        server.stop()
+
+
+def test_platform_terminated_tls_with_an_untrusted_ca_pauses_and_writes_nothing(
+    harness: Harness, tenant, tls: TlsMaterial
+) -> None:
+    server = _tls_server(harness, tls)
+    try:
+        sink = make_sink(
+            server.endpoint.replace("127.0.0.1", "localhost"),
+            tenant.credential().token,
+            tenant,
+        )  # system trust store: the test CA is not in it
+        run_once(sink, tenant)
+        assert wait_until(lambda: count(sink.status, D.ENDPOINT_PAUSED) > 0, 30)
+        sink.close(1)
+        assert tenant.events() == []
+    finally:
+        server.stop()

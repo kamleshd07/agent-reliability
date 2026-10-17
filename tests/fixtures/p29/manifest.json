@@ -1,0 +1,42 @@
+{
+  "calibration_known_confusion.json": {
+    "sha256": "be5d3ff5c1c38d05a8390e7b76e7647295b6eda5a65ab8e5faa1050d248d5e9f",
+    "fixture_format_version": 1
+  },
+  "failure_mapping_vectors.json": {
+    "sha256": "132d1b1727903bf86c636327b8c96da6d060aa01e14ea693932e2619e3611f4a",
+    "fixture_format_version": 1
+  },
+  "judge_output_vectors.json": {
+    "sha256": "b468cb6322740c05fd605239551c6378918ef02ad18d6340ea44a585f6282963",
+    "fixture_format_version": 1
+  },
+  "mapping_vectors.json": {
+    "sha256": "ff3342df5f54defc323622fa8edb8a9b0f9353287dd08e2cfddaff0b7822c8bf",
+    "fixture_format_version": 1
+  },
+  "privacy_planted.json": {
+    "sha256": "8b2c3f415128a9ea4d8ed6ef21d9f0eae4b2d58f2cbaa12676249c4eb42e1747",
+    "fixture_format_version": 1
+  },
+  "prompt_golden_jp1.json": {
+    "sha256": "e70b80f2e8b1d715652e9cbde3cfe735a02e3085cbceb235a53c8183ec74ae4e",
+    "fixture_format_version": 1
+  },
+  "reference_rubric_cases.json": {
+    "sha256": "89706dac9b2ccb4cfe3b5bf485502f7870ef0ebf9d369adbeeaa93dbfce81b4e",
+    "fixture_format_version": 1
+  },
+  "rubric_invalid.json": {
+    "sha256": "80f07084d003b4af04175942a65698303cd3e535da8033e1e1500608ad36d522",
+    "fixture_format_version": 1
+  },
+  "rubric_valid.json": {
+    "sha256": "b63f091af8b87d6c9e2e6c12fd8685625a971e0fea9a990377f325516d2a9eb0",
+    "fixture_format_version": 1
+  },
+  "wire_expectation_vectors.json": {
+    "sha256": "9769ac6f631035315d1faecb3148ee018452777d07dd097e8ef06a4d720b4049",
+    "fixture_format_version": 1
+  }
+}

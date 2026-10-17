@@ -1,0 +1,578 @@
+{
+  "schema": "gentlity.fixture.wire-expectation-vectors/1",
+  "note": "Expected platform payload members (schema v2) for SDK values; volatile ids and timestamps are not listed. Validated against the platform V2 models by an env-gated cross-repo test without modifying the platform.",
+  "cases": [
+    {
+      "id": "judge-fail-contract-section-11",
+      "input": {
+        "rubric": "judge-answer-correctness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "answer-correctness",
+        "dimension": "answer-correctness",
+        "parts": [
+          {
+            "role": "reference",
+            "text": "The refund window is 30 days."
+          },
+          {
+            "role": "answer",
+            "text": "The refund window is 90 days."
+          }
+        ],
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"fail\",\"code\":\"contradicts_reference\",\"confidence\":\"high\",\"citations\":[]}"
+          }
+        ]
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_outcome",
+            "indicator": "answer-correctness",
+            "outcome": "fail",
+            "provenance": {
+              "name": "judge-answer-correctness",
+              "version": "2026-10.r1",
+              "configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct0",
+              "deterministic": false
+            },
+            "reason_code": "answer-correctness.contradicts_reference"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "healthy",
+            "reasons": []
+          }
+        ]
+      },
+      "note": "contract section 11 example: judge FAIL"
+    },
+    {
+      "id": "judge-pass",
+      "input": {
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "context",
+            "text": "Refunds within 30 days."
+          },
+          {
+            "role": "answer",
+            "text": "Refunds within 30 days."
+          }
+        ],
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_outcome",
+            "indicator": "groundedness",
+            "outcome": "pass",
+            "provenance": {
+              "name": "judge-groundedness",
+              "version": "2026-10.r1",
+              "configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1",
+              "deterministic": false
+            },
+            "reason_code": "groundedness.supported_by_context"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "healthy",
+            "reasons": []
+          }
+        ]
+      },
+      "note": "confident pass"
+    },
+    {
+      "id": "judge-unknown-low-confidence",
+      "input": {
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "context",
+            "text": "Refunds within 30 days."
+          },
+          {
+            "role": "answer",
+            "text": "Refunds within 30 days."
+          }
+        ],
+        "script": [
+          {
+            "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"low\",\"citations\":[0]}"
+          }
+        ]
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_outcome",
+            "indicator": "groundedness",
+            "outcome": "unknown",
+            "provenance": {
+              "name": "judge-groundedness",
+              "version": "2026-10.r1",
+              "configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1",
+              "deterministic": false
+            },
+            "reason_code": "groundedness.low_confidence"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "healthy",
+            "reasons": []
+          }
+        ]
+      },
+      "note": "UNKNOWN is an outcome, run health unchanged"
+    },
+    {
+      "id": "precheck-unknown-no-provider-call",
+      "input": {
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "answer",
+            "text": "a"
+          }
+        ],
+        "script": []
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_outcome",
+            "indicator": "groundedness",
+            "outcome": "unknown",
+            "provenance": {
+              "name": "judge-groundedness",
+              "version": "2026-10.r1",
+              "configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1",
+              "deterministic": false
+            },
+            "reason_code": "groundedness.context_insufficient"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "healthy",
+            "reasons": []
+          }
+        ]
+      },
+      "note": "pre-check UNKNOWN"
+    },
+    {
+      "id": "provider-outage-contract-section-11",
+      "input": {
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "context",
+            "text": "Refunds within 30 days."
+          },
+          {
+            "role": "answer",
+            "text": "Refunds within 30 days."
+          }
+        ],
+        "script": [
+          {
+            "raise": "unavailable"
+          },
+          {
+            "raise": "unavailable"
+          }
+        ]
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeProviderUnavailableError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "contract section 11 example: provider outage"
+    },
+    {
+      "id": "invalid-output-is-a-failure-not-unknown",
+      "input": {
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness",
+        "dimension": "groundedness",
+        "parts": [
+          {
+            "role": "context",
+            "text": "Refunds within 30 days."
+          },
+          {
+            "role": "answer",
+            "text": "Refunds within 30 days."
+          }
+        ],
+        "script": [
+          {
+            "reply": "junk"
+          },
+          {
+            "reply": "junk"
+          }
+        ]
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeInvalidOutputError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "R10"
+    },
+    {
+      "id": "failure-class-JudgeTimeoutError",
+      "input": {
+        "direct_failure": "JudgeTimeoutError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeTimeoutError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    },
+    {
+      "id": "failure-class-JudgeProviderUnavailableError",
+      "input": {
+        "direct_failure": "JudgeProviderUnavailableError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeProviderUnavailableError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    },
+    {
+      "id": "failure-class-JudgeProviderRateLimitedError",
+      "input": {
+        "direct_failure": "JudgeProviderRateLimitedError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeProviderRateLimitedError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    },
+    {
+      "id": "failure-class-JudgeProviderRefusedError",
+      "input": {
+        "direct_failure": "JudgeProviderRefusedError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeProviderRefusedError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    },
+    {
+      "id": "failure-class-JudgeProviderError",
+      "input": {
+        "direct_failure": "JudgeProviderError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeProviderError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    },
+    {
+      "id": "failure-class-JudgeInvalidOutputError",
+      "input": {
+        "direct_failure": "JudgeInvalidOutputError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeInvalidOutputError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    },
+    {
+      "id": "failure-class-JudgeOutputTooLargeError",
+      "input": {
+        "direct_failure": "JudgeOutputTooLargeError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeOutputTooLargeError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    },
+    {
+      "id": "failure-class-JudgeInputLimitError",
+      "input": {
+        "direct_failure": "JudgeInputLimitError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeInputLimitError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    },
+    {
+      "id": "failure-class-JudgeBudgetExceededError",
+      "input": {
+        "direct_failure": "JudgeBudgetExceededError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeBudgetExceededError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    },
+    {
+      "id": "failure-class-JudgeOverloadedError",
+      "input": {
+        "direct_failure": "JudgeOverloadedError",
+        "rubric": "judge-groundedness",
+        "model_label": "local-llama3-8b-q4",
+        "indicator": "groundedness"
+      },
+      "expected": {
+        "payloads": [
+          {
+            "kind": "evaluation_execution_failure",
+            "indicator": "groundedness",
+            "stage": "evaluation",
+            "exception_type": "JudgeOverloadedError",
+            "evaluator_name": "judge-groundedness",
+            "evaluator_version": "2026-10.r1",
+            "evaluator_configuration_id": "local-llama3-8b-q4.jp1.mc-medium.rp1.ct1"
+          },
+          {
+            "kind": "measurement_health",
+            "health": "unavailable",
+            "reasons": [
+              "evaluator_execution_failure"
+            ]
+          }
+        ]
+      },
+      "note": "every P29 failure class travels as exception_type text"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "gentlity.rubric/1",
+  "rubric_id": "judge-groundedness",
+  "rubric_version": "2026-10.r1",
+  "dimension": "groundedness",
+  "inputs_required": [
+    "answer",
+    "context"
+  ],
+  "inputs_optional": [
+    "question"
+  ],
+  "criteria": [
+    {
+      "id": "supported",
+      "text": "Each material claim in the ANSWER is supported by at least one context block."
+    },
+    {
+      "id": "not-contradicted",
+      "text": "No claim in the ANSWER is contradicted by a context block."
+    },
+    {
+      "id": "cited",
+      "text": "Cite the index of each context block that supports the verdict."
+    }
+  ],
+  "reason_codes": {
+    "pass": [
+      "supported_by_context"
+    ],
+    "fail": [
+      "unsupported_claim",
+      "contradicted_by_context"
+    ],
+    "unknown": [
+      "context_insufficient",
+      "judge_abstained",
+      "low_confidence",
+      "judge_disagreement"
+    ]
+  },
+  "min_confidence": "medium",
+  "description": "UNCALIBRATED reference rubric: not calibrated by Gentlity, no accuracy claim. PASS means every material claim is supported by the supplied context blocks; not that the context is true.",
+  "require_citations": true
+}

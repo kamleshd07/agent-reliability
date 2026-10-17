@@ -59,12 +59,27 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = ["src/agent_reliability"]
 
-# Internal agent instructions and the internal P28 review/execution reports are not part
-# of the distributed source (public documentation, licence and packaging inputs stay).
-# Other milestones (e.g. P29) decide their own sdist contents when they are released.
-# Owner decision F-9 (2026-10-17): CLAUDE.md, AGENTS.md and docs/P28_* are excluded.
+# Internal agent instructions, internal milestone review/execution reports and local-path
+# evidence artifacts are not part of the distributed source. Public documentation, the
+# licence, source files and everything the test suite reads from a source checkout stay
+# (P29_PILOT_RUNBOOK.md is deliberately kept: tests read it). Owner decision F-9
+# (2026-10-17) covers CLAUDE.md, AGENTS.md and docs/P28_*; the P29 entries are the same
+# rule applied to P29's internal reports.
 [tool.hatch.build.targets.sdist]
-exclude = ["/CLAUDE.md", "/AGENTS.md", "/docs/P28_*"]
+exclude = [
+    "/CLAUDE.md",
+    "/AGENTS.md",
+    "/docs/P28_*",
+    "/docs/P29_ACCEPTANCE_MATRIX.md",
+    "/docs/P29_IMPLEMENTATION_LOG.md",
+    "/docs/P29_INDEPENDENT_REVIEW.md",
+    "/docs/P29_P28_RECONCILIATION.md",
+    "/docs/P29_REVIEW_REMEDIATION_REPORT.md",
+    "/docs/P29_TARGETED_VERIFICATION.md",
+    "/docs/P29_TEST_EVIDENCE.md",
+    "/docs/P29_WORKSPACE_BASELINE*",
+    "/docs/evidence",
+]
 
 [tool.hatch.version]
 path = "src/agent_reliability/__init__.py"

@@ -75,6 +75,19 @@ def _inspect_artifacts(wheel: Path, sdist: Path) -> str:
         "agent_reliability/measurement/__init__.py",
         "agent_reliability/py.typed",
         f"agent_reliability-{version}.dist-info/licenses/LICENSE",
+        "agent_reliability/experimental/judge/__init__.py",
+        "agent_reliability/experimental/judge/schemas/calibration-case.schema.json",
+        "agent_reliability/experimental/judge/schemas/calibration-report.schema.json",
+        *(
+            f"agent_reliability/experimental/judge/rubrics/{name}.json"
+            for name in (
+                "judge-answer-correctness",
+                "judge-groundedness",
+                "judge-instruction-adherence",
+                "judge-safety-policy",
+                "judge-task-completion-evidence",
+            )
+        ),
     }
     if not required_wheel <= wheel_names:
         raise AssertionError(f"wheel missing: {sorted(required_wheel - wheel_names)}")
@@ -118,6 +131,7 @@ def _inspect_artifacts(wheel: Path, sdist: Path) -> str:
 
 
 _ALLOWED_PUBLIC_MILESTONE_DOCS = {
+    "docs/P29_PILOT_REPORT_TEMPLATE.json",
     "docs/P29_PILOT_RUNBOOK.md",
     "docs/P29_PILOT_SAFEGUARDS.md",
 }
@@ -257,6 +271,15 @@ def _verify_base(python: Path, wheel: Path, version: str) -> None:
         "import importlib.util; "
         "from agent_reliability.sdk import AgentReliability; "
         "assert importlib.util.find_spec('httpx') is None",
+    )
+    _run(
+        str(python),
+        "-c",
+        "from agent_reliability.experimental.judge import "
+        "REFERENCE_RUBRIC_IDS, load_reference_rubric; "
+        "assert len(REFERENCE_RUBRIC_IDS) == 5; "
+        "assert all(load_reference_rubric(i).rubric_id == i "
+        "for i in REFERENCE_RUBRIC_IDS)",
     )
     expected = {
         "basic_reliability.py": "Reliability: 75.00%",

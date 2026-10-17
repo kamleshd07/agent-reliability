@@ -1,0 +1,1134 @@
+{
+  "schema": "gentlity.fixture.judge-output-vectors/1",
+  "rubrics": {
+    "gr-cit": {
+      "schema": "gentlity.rubric/1",
+      "rubric_id": "judge-groundedness",
+      "rubric_version": "2026-10.r1",
+      "dimension": "groundedness",
+      "inputs_required": [
+        "answer",
+        "context"
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "text": "Criterion one."
+        }
+      ],
+      "reason_codes": {
+        "pass": [
+          "supported_by_context"
+        ],
+        "fail": [
+          "unsupported_claim",
+          "contradicted_by_context"
+        ],
+        "unknown": [
+          "context_insufficient",
+          "judge_abstained",
+          "low_confidence",
+          "judge_disagreement"
+        ]
+      },
+      "inputs_optional": [
+        "question"
+      ],
+      "require_citations": true
+    },
+    "ac": {
+      "schema": "gentlity.rubric/1",
+      "rubric_id": "judge-answer-correctness",
+      "rubric_version": "2026-10.r1",
+      "dimension": "answer-correctness",
+      "inputs_required": [
+        "answer",
+        "reference"
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "text": "Criterion one."
+        }
+      ],
+      "reason_codes": {
+        "pass": [
+          "consistent_with_reference"
+        ],
+        "fail": [
+          "contradicts_reference",
+          "missing_required_facts"
+        ],
+        "unknown": [
+          "reference_insufficient",
+          "judge_abstained",
+          "low_confidence",
+          "judge_disagreement"
+        ]
+      },
+      "inputs_optional": [
+        "question"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "plain-pass",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": null
+        }
+      },
+      "note": "valid confident pass with a citation"
+    },
+    {
+      "id": "fail-no-citations",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"fail\",\"code\":\"unsupported_claim\",\"confidence\":\"medium\",\"citations\":[]}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "fail",
+          "code": "unsupported_claim",
+          "confidence": "medium",
+          "citations": [],
+          "reason": null
+        }
+      },
+      "note": "fail needs no citation"
+    },
+    {
+      "id": "unknown",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"unknown\",\"code\":\"context_insufficient\",\"confidence\":\"low\",\"citations\":[]}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "unknown",
+          "code": "context_insufficient",
+          "confidence": "low",
+          "citations": [],
+          "reason": null
+        }
+      },
+      "note": "unknown verdict"
+    },
+    {
+      "id": "fenced-json",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "```json\n{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}\n```"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": null
+        }
+      },
+      "note": "one wrapping fence tolerated"
+    },
+    {
+      "id": "fenced-plain",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "```\n{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}\n```"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": null
+        }
+      },
+      "note": "one wrapping fence without language tolerated"
+    },
+    {
+      "id": "surrounding-whitespace",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": " \t\n{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}\r\n \n"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": null
+        }
+      },
+      "note": "ASCII whitespace stripped"
+    },
+    {
+      "id": "fenced-with-whitespace",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "\n  ```json\n{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}\n```  \n"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": null
+        }
+      },
+      "note": "whitespace around a fence"
+    },
+    {
+      "id": "with-reason",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"Claim is supported.\"}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": "Claim is supported."
+        }
+      },
+      "note": "optional reason"
+    },
+    {
+      "id": "reason-300",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\"}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+        }
+      },
+      "note": "reason at bound"
+    },
+    {
+      "id": "reason-newline",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"a\\nb\"}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": "a\nb"
+        }
+      },
+      "note": "newline allowed in reason"
+    },
+    {
+      "id": "citations-both",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0,1]}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0,
+            1
+          ],
+          "reason": null
+        }
+      },
+      "note": "two distinct citations"
+    },
+    {
+      "id": "citations-any-order",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[1,0]}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            1,
+            0
+          ],
+          "reason": null
+        }
+      },
+      "note": "order is preserved, not required sorted"
+    },
+    {
+      "id": "member-order-irrelevant",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"citations\":[0],\"confidence\":\"high\",\"code\":\"supported_by_context\",\"verdict\":\"pass\",\"schema\":\"gentlity.judge-output/1\"}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": null
+        }
+      },
+      "note": "member order is irrelevant"
+    },
+    {
+      "id": "unknown-nocitation-required-rubric",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"unknown\",\"code\":\"judge_abstained\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "unknown",
+          "code": "judge_abstained",
+          "confidence": "high",
+          "citations": [],
+          "reason": null
+        }
+      },
+      "note": "citations only required for pass"
+    },
+    {
+      "id": "answer-correctness-pass",
+      "input": {
+        "rubric": "ac",
+        "context_count": 0,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"consistent_with_reference\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "consistent_with_reference",
+          "confidence": "high",
+          "citations": [],
+          "reason": null
+        }
+      },
+      "note": "rubric without citation requirement"
+    },
+    {
+      "id": "empty-reply",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": ""
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "empty text"
+    },
+    {
+      "id": "whitespace-only",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "  \n"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "only whitespace"
+    },
+    {
+      "id": "prose",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "The answer is supported."
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "not JSON"
+    },
+    {
+      "id": "array-top-level",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "[{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}]"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "must be exactly one object"
+    },
+    {
+      "id": "string-top-level",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "\"pass\""
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "not an object"
+    },
+    {
+      "id": "trailing-text",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]} thanks"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "no trailing text"
+    },
+    {
+      "id": "two-objects",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "exactly one object"
+    },
+    {
+      "id": "leading-text",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "Here: {\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "no leading text"
+    },
+    {
+      "id": "duplicate-member",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"verdict\":\"fail\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "duplicate member names rejected"
+    },
+    {
+      "id": "nan-token",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[NaN]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "NaN token rejected"
+    },
+    {
+      "id": "infinity-token",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[Infinity]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "Infinity token rejected"
+    },
+    {
+      "id": "depth-9",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "[[[[[[[[[1]]]]]]]]]"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "nesting depth 9 exceeds 8"
+    },
+    {
+      "id": "depth-9-in-member",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[],\"x\":[[[[[[[[]]]]]]]]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "depth 9 including the root object"
+    },
+    {
+      "id": "trailing-comma",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "syntax"
+    },
+    {
+      "id": "single-quotes",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{'schema':'gentlity.judge-output/1','verdict':'pass','code':'supported_by_context','confidence':'high','citations':[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "syntax"
+    },
+    {
+      "id": "double-fence",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "```\n```json\n{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}\n```\n```"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "only one fence is removed"
+    },
+    {
+      "id": "fence-trailing-text",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "```json\n{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}\n```\nHope this helps"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "text after the closing fence"
+    },
+    {
+      "id": "fence-language-other",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "```python\n{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}\n```"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "only no-language or json fences"
+    },
+    {
+      "id": "fence-unclosed",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "```json\n{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_json"
+      },
+      "note": "unclosed fence"
+    },
+    {
+      "id": "missing-confidence",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "missing member"
+    },
+    {
+      "id": "missing-citations",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "citations always present"
+    },
+    {
+      "id": "extra-member",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"score\":0.9}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "unknown members rejected"
+    },
+    {
+      "id": "wrong-schema-literal",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/2\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "schema literal"
+    },
+    {
+      "id": "verdict-uppercase",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"PASS\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "verdict vocabulary is lowercase"
+    },
+    {
+      "id": "verdict-number",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":1,\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "type"
+    },
+    {
+      "id": "verdict-other",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"partial\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "closed verdict set"
+    },
+    {
+      "id": "confidence-other",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"very high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "closed confidence set"
+    },
+    {
+      "id": "confidence-numeric",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":0.9,\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "no numeric confidence"
+    },
+    {
+      "id": "code-not-string",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":1,\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "type"
+    },
+    {
+      "id": "citations-not-array",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":\"0\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "type"
+    },
+    {
+      "id": "code-not-in-rubric",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"made_up\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_code"
+      },
+      "note": "code outside the closed set"
+    },
+    {
+      "id": "code-from-other-verdict",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"unsupported_claim\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_code"
+      },
+      "note": "verdict/code mismatch: a fail code under pass"
+    },
+    {
+      "id": "code-case",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"Supported_By_Context\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_code"
+      },
+      "note": "exact match only"
+    },
+    {
+      "id": "citation-out-of-range",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[2]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_citations"
+      },
+      "note": "index must be < context_count"
+    },
+    {
+      "id": "citation-negative",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[-1]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_citations"
+      },
+      "note": "non-negative"
+    },
+    {
+      "id": "citation-bool",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[true]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_citations"
+      },
+      "note": "bool is not an integer"
+    },
+    {
+      "id": "citation-float",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0.0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_citations"
+      },
+      "note": "floats rejected"
+    },
+    {
+      "id": "citation-string",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[\"0\"]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_citations"
+      },
+      "note": "strings rejected"
+    },
+    {
+      "id": "citations-duplicate",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0,0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_citations"
+      },
+      "note": "distinct"
+    },
+    {
+      "id": "pass-without-citation",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_citations"
+      },
+      "note": "require_citations: pass needs at least one"
+    },
+    {
+      "id": "citation-with-no-context",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 0,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"fail\",\"code\":\"unsupported_claim\",\"confidence\":\"high\",\"citations\":[0]}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_citations"
+      },
+      "note": "no context blocks were sent"
+    },
+    {
+      "id": "reason-301",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_reason"
+      },
+      "note": "reason above 300"
+    },
+    {
+      "id": "reason-tab",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"a\\tb\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_reason"
+      },
+      "note": "control character other than newline"
+    },
+    {
+      "id": "reason-del",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"a\\u007fb\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_reason"
+      },
+      "note": "DEL control character"
+    },
+    {
+      "id": "reason-not-string",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":7}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_schema"
+      },
+      "note": "type"
+    },
+    {
+      "id": "reason-c0-boundary-1f",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"a\\u001fb\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_reason"
+      },
+      "note": "U+001F is a control character"
+    },
+    {
+      "id": "reason-c0-boundary-20-ok",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"a b\"}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": "a b"
+        }
+      },
+      "note": "U+0020 is not a control character"
+    },
+    {
+      "id": "reason-del-7f",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"ab\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_reason"
+      },
+      "note": "U+007F"
+    },
+    {
+      "id": "reason-c1-lower-80",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"ab\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_reason"
+      },
+      "note": "U+0080 is the lower C1 boundary"
+    },
+    {
+      "id": "reason-c1-upper-9f",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"ab\"}"
+      },
+      "expected": {
+        "ok": false,
+        "failure": "JudgeInvalidOutputError",
+        "error_class": "invalid_reason"
+      },
+      "note": "U+009F is the upper C1 boundary"
+    },
+    {
+      "id": "reason-just-above-c1-a0-ok",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"a b\"}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": "a b"
+        }
+      },
+      "note": "U+00A0 (no-break space) is not a control character"
+    },
+    {
+      "id": "reason-just-below-del-7e-ok",
+      "input": {
+        "rubric": "gr-cit",
+        "context_count": 2,
+        "reply": "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass\",\"code\":\"supported_by_context\",\"confidence\":\"high\",\"citations\":[0],\"reason\":\"a~b\"}"
+      },
+      "expected": {
+        "ok": true,
+        "document": {
+          "verdict": "pass",
+          "code": "supported_by_context",
+          "confidence": "high",
+          "citations": [
+            0
+          ],
+          "reason": "a~b"
+        }
+      },
+      "note": "U+007E is not a control character"
+    }
+  ]
+}

@@ -1,0 +1,474 @@
+{
+  "schema": "gentlity.fixture.mapping-vectors/1",
+  "cases": [
+    {
+      "id": "pass-high",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context"
+      },
+      "note": "confident pass"
+    },
+    {
+      "id": "pass-medium-at-min",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context"
+      },
+      "note": "confidence equal to the minimum is enough"
+    },
+    {
+      "id": "pass-low-below-min",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "low"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.low_confidence"
+      },
+      "note": "downgrade, never a silent pass"
+    },
+    {
+      "id": "fail-low-below-min",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "fail",
+            "code": "unsupported_claim",
+            "confidence": "low"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.low_confidence"
+      },
+      "note": "downgrade applies to fail too"
+    },
+    {
+      "id": "pass-medium-min-high",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "high",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.low_confidence"
+      },
+      "note": "min_confidence high"
+    },
+    {
+      "id": "pass-low-min-low",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "low",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "low"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context"
+      },
+      "note": "min_confidence low accepts all"
+    },
+    {
+      "id": "fail-high",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "fail",
+            "code": "unsupported_claim",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "fail",
+        "reason_code": "groundedness.unsupported_claim"
+      },
+      "note": "confident fail"
+    },
+    {
+      "id": "fail-other-code",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "fail",
+            "code": "contradicted_by_context",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "fail",
+        "reason_code": "groundedness.contradicted_by_context"
+      },
+      "note": "second fail code"
+    },
+    {
+      "id": "unknown-high",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "unknown",
+            "code": "context_insufficient",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.context_insufficient"
+      },
+      "note": "unknown keeps the judge's own code"
+    },
+    {
+      "id": "unknown-low-keeps-code",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "high",
+        "results": [
+          {
+            "verdict": "unknown",
+            "code": "judge_abstained",
+            "confidence": "low"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.judge_abstained"
+      },
+      "note": "unknown below min_confidence is not relabelled"
+    },
+    {
+      "id": "repeats-2-pass-pass",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          },
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context"
+      },
+      "note": "all agree"
+    },
+    {
+      "id": "repeats-2-fail-fail-codes-differ",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "fail",
+            "code": "unsupported_claim",
+            "confidence": "high"
+          },
+          {
+            "verdict": "fail",
+            "code": "contradicted_by_context",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "fail",
+        "reason_code": "groundedness.unsupported_claim"
+      },
+      "note": "same outcome, first call's code stands"
+    },
+    {
+      "id": "repeats-2-pass-fail",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          },
+          {
+            "verdict": "fail",
+            "code": "unsupported_claim",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.judge_disagreement"
+      },
+      "note": "pass versus fail"
+    },
+    {
+      "id": "repeats-2-pass-unknown",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          },
+          {
+            "verdict": "unknown",
+            "code": "context_insufficient",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.context_insufficient"
+      },
+      "note": "one unknown: first unknown code"
+    },
+    {
+      "id": "repeats-2-unknown-pass",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "unknown",
+            "code": "judge_abstained",
+            "confidence": "high"
+          },
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.judge_abstained"
+      },
+      "note": "order independent of position"
+    },
+    {
+      "id": "repeats-2-unknown-unknown",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "unknown",
+            "code": "judge_abstained",
+            "confidence": "high"
+          },
+          {
+            "verdict": "unknown",
+            "code": "context_insufficient",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.judge_abstained"
+      },
+      "note": "first unknown code"
+    },
+    {
+      "id": "repeats-2-pass-pass-low",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          },
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "low"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.low_confidence"
+      },
+      "note": "a downgraded call counts as unknown"
+    },
+    {
+      "id": "repeats-2-fail-low-pass-high",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "fail",
+            "code": "unsupported_claim",
+            "confidence": "low"
+          },
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.low_confidence"
+      },
+      "note": "downgrade happens before aggregation"
+    },
+    {
+      "id": "repeats-3-all-pass",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          },
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          },
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "pass",
+        "reason_code": "groundedness.supported_by_context"
+      },
+      "note": "three agree"
+    },
+    {
+      "id": "repeats-3-two-pass-one-fail",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          },
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          },
+          {
+            "verdict": "fail",
+            "code": "unsupported_claim",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.judge_disagreement"
+      },
+      "note": "any pass/fail split"
+    },
+    {
+      "id": "repeats-3-pass-fail-unknown",
+      "input": {
+        "dimension": "groundedness",
+        "min_confidence": "medium",
+        "results": [
+          {
+            "verdict": "pass",
+            "code": "supported_by_context",
+            "confidence": "high"
+          },
+          {
+            "verdict": "fail",
+            "code": "unsupported_claim",
+            "confidence": "high"
+          },
+          {
+            "verdict": "unknown",
+            "code": "context_insufficient",
+            "confidence": "high"
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "unknown",
+        "reason_code": "groundedness.judge_disagreement"
+      },
+      "note": "disagreement outranks unknown"
+    }
+  ]
+}

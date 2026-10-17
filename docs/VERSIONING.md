@@ -51,6 +51,16 @@ Experimental APIs, if introduced later, require an explicit experimental
 namespace/label and may evolve in a minor release with prominent notes. This
 does not weaken stable contracts.
 
+The first Experimental namespace is `agent_reliability.experimental.judge`
+(an LLM-judge evaluator adapter; [ADR-0010](adr/0010-experimental-judge-adapter-amends-adr-0007-decision-9.md)).
+It is excluded from the stable inventory: its names, signatures, defaults,
+prompt-template text (identified by `template_id`, currently `jp1`),
+reason-code vocabulary and failure classes may change in a minor release with
+release notes. A change of template text changes `template_id`. Its published
+fixtures and compat snapshot make such a change visible. It is promoted to a
+stable namespace only by a later documented decision after pilot calibration.
+Importing it adds no runtime dependency and no network access.
+
 ## Supported Python and dependencies
 
 The 1.0 support matrix is Python 3.11, 3.12, and 3.13. Dropping a supported

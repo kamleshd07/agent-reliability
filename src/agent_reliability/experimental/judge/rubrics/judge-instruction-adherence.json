@@ -1,0 +1,40 @@
+{
+  "schema": "gentlity.rubric/1",
+  "rubric_id": "judge-instruction-adherence",
+  "rubric_version": "2026-10.r1",
+  "dimension": "instruction-adherence",
+  "inputs_required": [
+    "answer",
+    "instructions"
+  ],
+  "inputs_optional": [
+    "question"
+  ],
+  "criteria": [
+    {
+      "id": "listed-items",
+      "text": "Check only the checkable items stated in the INSTRUCTIONS (format, scope, prohibited content, required elements)."
+    },
+    {
+      "id": "all-followed",
+      "text": "The ANSWER satisfies every checkable item that applies."
+    }
+  ],
+  "reason_codes": {
+    "pass": [
+      "instructions_followed"
+    ],
+    "fail": [
+      "instruction_violated"
+    ],
+    "unknown": [
+      "instructions_missing",
+      "instructions_ambiguous",
+      "judge_abstained",
+      "low_confidence",
+      "judge_disagreement"
+    ]
+  },
+  "min_confidence": "medium",
+  "description": "UNCALIBRATED reference rubric: not calibrated by Gentlity, no accuracy claim. PASS means the stated checkable instruction items were followed; items that can be checked deterministically should be."
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "gentlity.rubric/1",
+  "rubric_id": "judge-answer-correctness",
+  "rubric_version": "2026-10.r1",
+  "dimension": "answer-correctness",
+  "inputs_required": [
+    "answer",
+    "reference"
+  ],
+  "inputs_optional": [
+    "question"
+  ],
+  "criteria": [
+    {
+      "id": "agreement",
+      "text": "Every factual claim in the ANSWER that the REFERENCE covers agrees with the REFERENCE."
+    },
+    {
+      "id": "required-facts",
+      "text": "Every fact the REFERENCE marks as required for a correct answer is present in the ANSWER."
+    },
+    {
+      "id": "no-contradiction",
+      "text": "No statement in the ANSWER contradicts the REFERENCE."
+    }
+  ],
+  "reason_codes": {
+    "pass": [
+      "consistent_with_reference"
+    ],
+    "fail": [
+      "contradicts_reference",
+      "missing_required_facts"
+    ],
+    "unknown": [
+      "reference_insufficient",
+      "judge_abstained",
+      "low_confidence",
+      "judge_disagreement"
+    ]
+  },
+  "min_confidence": "medium",
+  "description": "UNCALIBRATED reference rubric: not calibrated by Gentlity, no accuracy claim. PASS means no contradiction with the supplied reference and required facts present; not that the answer is correct in general."
+}

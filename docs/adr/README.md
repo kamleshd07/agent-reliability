@@ -55,6 +55,7 @@ Compatibility Impact
 | [0004](0004-instrumentation-failure-isolation.md) | Instrumentation failure isolation | Superseded by ADR-0005 |
 | [0005](0005-instrumentation-initialization-degraded-mode.md) | Instrumentation initialization failures degrade instead of raising | Accepted |
 | [0006](0006-opentelemetry-interoperability-and-context-ownership.md) | OpenTelemetry interoperability and context ownership | Accepted |
-| [0007](0007-evaluator-architecture-and-provenance-semantics.md) | Evaluator architecture and provenance semantics | Accepted |
+| [0007](0007-evaluator-architecture-and-provenance-semantics.md) | Evaluator architecture and provenance semantics | Accepted (decision 9 amended by ADR-0010) |
 | [0008](0008-reliability-aggregation-and-provenance-compatibility.md) | Reliability aggregation and provenance compatibility | Accepted |
 | [0009](0009-measurement-health-and-policy-boundary.md) | Measurement health and application policy boundary | Accepted |
+| [0010](0010-experimental-judge-adapter-amends-adr-0007-decision-9.md) | Experimental LLM-judge adapter namespace (amends ADR-0007 decision 9) | Accepted (owner-approved 2026-10-16, unsigned; number provisional) |

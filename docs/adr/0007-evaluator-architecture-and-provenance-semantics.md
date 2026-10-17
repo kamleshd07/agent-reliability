@@ -2,7 +2,11 @@
 
 ## Status
 
-Accepted
+Accepted. Decision 9 is amended, for an experimental adapter namespace only, by
+[ADR-0010](0010-experimental-judge-adapter-amends-adr-0007-decision-9.md);
+decisions 1-8, 10 and 11 are unchanged. The text below is left as originally
+written, not edited, so the historical record of the M4 decision stays intact
+(same practice as ADR-0004).
 
 ## Context
 

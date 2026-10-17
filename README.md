@@ -173,8 +173,16 @@ API key, or network service, and has zero mandatory runtime dependencies.
 The public API follows semantic versioning, with compatibility and
 installed-artifact verification included in the release process.
 
-No remote ingestion, dashboard, LLM judge, persistence, auto-instrumentation,
-or framework-specific adapter is included. See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).
+The released 1.2.1 package includes no remote ingestion, dashboard, LLM judge, persistence,
+auto-instrumentation, or framework-specific adapter (an unreleased experimental LLM-judge
+adapter is described below). See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).
+
+### LLM-judge evaluators (experimental, unreleased)
+
+`agent_reliability.experimental.judge` is an Experimental, unreleased adapter for model-backed evaluators that call a provider you
+supply. It adds no dependency and sends raw content only to your provider. The reference rubrics are uncalibrated examples. See
+[Evaluate](https://github.com/kamleshd07/agent-reliability/blob/main/docs/EVALUATE.md).
+A sync judge's timeout is best effort unless the provider is wrapped in `ExecutorSyncProvider`; the provider's own client timeout is the real bound (see the same page).
 
 ## Documentation
 
