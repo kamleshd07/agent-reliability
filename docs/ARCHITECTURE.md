@@ -194,3 +194,18 @@ optional OTel ownership remain unchanged. See ADR-0009 and
 ADR-0001 ([docs/adr/0001-architecture-boundaries.md](adr/0001-architecture-boundaries.md))
 records only the layering and dependency-direction decision made at M0.
 The items above are explicitly not decided yet.
+
+## Language-neutral public HTTP contracts
+
+Gentlity public ingestion and control-plane APIs are defined by the platform's
+published OpenAPI, referenced JSON Schemas and normative protocol documentation,
+not by this Python package's dataclasses, exceptions, enum internals or
+serialization defaults. The SDK must validate and emit the documented wire
+types and versions, authenticate through standard HTTP, classify responses by
+HTTP status/header and stable error code, and obey documented idempotency,
+retry, rate-limit, `Retry-After`, timeout and compatibility rules.
+
+Shared conformance assets must be data-only and reusable by Python, Go, Java and
+TypeScript. The SDK and platform execute the same positive, negative, boundary,
+request/response and digest fixtures. Schema-v1 canonical digest bytes and
+goldens are frozen across upgrades; SDK behavior cannot redefine them.

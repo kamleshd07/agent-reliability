@@ -57,7 +57,8 @@ def test_exact_measurement_signatures_for_1_1() -> None:
         "(self, *, measurement_health: 'MeasurementHealthReport') -> 'PolicyResultT_co'"
     )
     assert str(inspect.signature(RunHandle.record_evaluation_failure)) == (
-        "(self, *, failure: 'EvaluationExecutionFailure') -> 'None'"
+        "(self, *, failure: 'EvaluationExecutionFailure', "
+        "indicator: 'str | None' = None) -> 'None'"
     )
     assert str(inspect.signature(RunHandle.evaluate_measurement_policy)) == (
         "(self, policy: 'MeasurementPolicy[PolicyResultT]') -> 'PolicyResultT'"

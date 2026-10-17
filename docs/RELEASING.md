@@ -41,6 +41,8 @@ validation. Do not claim the final release date during the RC.
 
 1. Merge the reviewed release commit; require all branch-protection checks.
 2. Create an annotated `v<version>` tag from that exact commit and push it.
+   The release workflow refuses a tag whose commit is not reachable from
+   `origin/main`, and one that does not equal `agent_reliability.__version__`.
 3. Build artifacts once in the trusted release workflow; do not rebuild them
    separately for each destination.
 4. Publish through PyPI Trusted Publishing with environment protection and

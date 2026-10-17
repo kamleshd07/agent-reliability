@@ -9,8 +9,11 @@ surprising default for production embedding (docs/SDK_DESIGN.md).
 from __future__ import annotations
 
 import threading
+from typing import Any
 
-from agent_reliability.ports.event_sink import EventSink
+from agent_reliability.domain.measurement_health import MeasurementHealthReport
+from agent_reliability.evaluation import EvaluationExecutionFailure
+from agent_reliability.ports.event_sink import EventSink, HealthEvidenceSink
 from agent_reliability.ports.events import InstrumentationEvent
 
 __all__ = ["CompositeEventSink", "InMemoryEventSink", "NoOpEventSink"]
@@ -80,3 +83,28 @@ class CompositeEventSink:
                     first_error = exc
         if first_error is not None:
             raise first_error
+
+    def _capability(self, method: str, *args: Any, **kwargs: Any) -> None:
+        first_error: Exception | None = None
+        for sink in self._sinks:
+            if isinstance(sink, HealthEvidenceSink):
+                try:
+                    getattr(sink, method)(*args, **kwargs)
+                except Exception as exc:
+                    if first_error is None:
+                        first_error = exc
+        if first_error is not None:
+            raise first_error
+
+    def submit_evaluation_failure(
+        self, failure: EvaluationExecutionFailure, **kwargs: Any
+    ) -> None:
+        self._capability("submit_evaluation_failure", failure, **kwargs)
+
+    def submit_measurement_health(
+        self, report: MeasurementHealthReport, **kwargs: Any
+    ) -> None:
+        self._capability("submit_measurement_health", report, **kwargs)
+
+    def release_run(self, run_id: str) -> None:
+        self._capability("release_run", run_id)

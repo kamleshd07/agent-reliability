@@ -4,6 +4,83 @@ All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/); versioning
 follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
+## [Unreleased]
+
+P28 HTTP evidence exporter (additive; no release date or version assigned, and
+nothing here is released or published). The core installation still has no runtime
+dependencies, and existing public APIs, reliability/SLO semantics and the
+`EventSink` contract are unchanged. See [docs/HTTP_EXPORTER.md](docs/HTTP_EXPORTER.md).
+
+### Added
+
+- Optional `agent-reliability[http]` extra (`httpx>=0.28.1,<1`) and the
+  `agent_reliability.adapters.http_event_sink` module with `HTTPEventSink`
+  (thread-safe, two daemon delivery workers) and `AsyncHTTPEventSink`. Both export
+  evidence to one complete platform POST URL using a machine credential obtained
+  from a caller-supplied provider, always as wire schema version 2 with the asserted
+  producer identity and a canonical digest that preserves the schema-v1 bytes.
+- Delivery and diagnostics types: `DeliveryStatusSnapshot`, `DeliveryDisposition`,
+  `DeliveryRecordStatus`, `ConfigurationError`, `ConfigurationFailedError`,
+  `EventDeliveryRejected`, `ExporterClosed`. `emit` only admits to bounded memory;
+  commitment is reported solely from a validated acknowledgement (`201`/`200`), and
+  records that may have committed are flagged.
+- Reliability behavior: bounded queues with a closure reserve, per-run ordering,
+  bounded retries with full jitter, sticky uncertainty for requests that may have
+  left the process, sink-wide `429`/`Retry-After` handling, bounded `flush`/`close`,
+  and explicit pauses with `resume_auth()`, `resume_schema()`, `resume_deployment()`
+  and `resume_endpoint()` for authentication, compatibility, unknown Deployment and
+  endpoint problems. Held evidence is never silently dropped.
+- Optional `HealthEvidenceSink` capability (`agent_reliability.ports.event_sink`),
+  fanned out by the composite sink, plus an optional `indicator=` argument on
+  `RunHandle.record_evaluation_failure(...)`, so evaluation failures and final
+  measurement health reach exporters. Existing `EventSink` implementations stay valid.
+- Run lifecycle integration: when the configured sink supports the optional
+  capability, `AgentReliability` now submits the final measurement-health report and
+  releases the exporter's run binding when a run finishes; `CompositeEventSink` fans the
+  capability out and isolates each child. Sinks that do not implement it are
+  unaffected.
+- Security posture: certificate and hostname verification are always on; redirects
+  are never followed; plaintext HTTP is accepted only for literal loopback
+  (`127.0.0.0/8`, `[::1]`); ambient proxy/CA/cookie/netrc configuration is ignored;
+  explicit `proxy` and `ca_bundle` options; credentials, URLs and evidence never
+  appear in diagnostics.
+- Data-only P28 contract fixtures (`tests/fixtures/p28/`), `scripts/verify_p28_fixtures.py`
+  and a Node reference check (`scripts/verify_p28_reference.mjs`).
+
+### Fixed
+
+- Before this exporter is released, its TLS handling was corrected: with the real
+  `httpx`/`httpcore` stack a certificate-verification failure is visible only through
+  the exception's `__context__`, which the first implementation did not follow, so
+  repeated verification failures exhausted retries instead of pausing the endpoint. The
+  classifier now walks `__cause__` and `__context__` (bounded, cycle-safe) and
+  recognizes a verification failure only for an attempt that had not yet sent a
+  request. The third consecutive verification failure pauses endpoint delivery and
+  holds the evidence for `resume_endpoint()`; other network failures keep their ordinary
+  classification and neither count nor reset the streak (any completed HTTP exchange
+  or `resume_endpoint()` resets it). Through an explicit `proxy`, the tunnel-opening
+  CONNECT request no longer counts as having sent the evidence request. A response body
+  trickled past 30 seconds is abandoned and retried instead of pinning a worker.
+
+### Changed
+
+- Documentation: the exporter is classified INTERNAL under `docs/GA_CONTRACT.md` (no
+  compatibility promise beyond that policy; the documented consumer entry points are named in
+  `docs/HTTP_EXPORTER.md`).
+- The source distribution no longer includes `CLAUDE.md`, `AGENTS.md` or the internal
+  `docs/P28_*` review/execution reports. `verify_release_artifacts.py` now also fails if either
+  artifact contains private-key material (PEM/PGP blocks, key-like file names), local developer
+  paths (Unix, macOS temp and Windows forms), or internal instruction/report files, and it is
+  covered by planted-case tests. Public documentation, the licence and all packaging inputs remain.
+- Idle exporter workers no longer build a full status snapshot every 10 ms (idle cost
+  with 900 history rows fell from about 2.7% to about 0.4% of one core).
+- CI and release workflows and `CONTRIBUTING.md` install the `http` extra so the
+  exporter tests and type checks run.
+- Release validation (`scripts/verify_release_artifacts.py`) also fails if either
+  artifact contains private-key material. The real-TLS regression tests generate
+  disposable certificates at test time (development-only dependency `cryptography`
+  in the `dev` extra); no key is stored in the repository or shipped.
+
 ## [1.2.1] - 2026-09-08
 
 Documentation-only patch release. No production code, public API, or

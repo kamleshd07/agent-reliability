@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import subprocess
 import tarfile
 import tempfile
@@ -105,12 +106,125 @@ def _inspect_artifacts(wheel: Path, sdist: Path) -> str:
         "dist",
         "htmlcov",
     }
+    _assert_no_internal_files(wheel_names, sdist_names, prefix)
     for name in sdist_names:
         parts = set(Path(name).parts)
         if parts & forbidden_parts or Path(name).name.startswith(".coverage"):
             raise AssertionError(f"sdist contains local/generated path: {name}")
+    _assert_no_private_keys(wheel, sdist)
+    _assert_no_local_paths(wheel, sdist)
     print(f"artifact metadata and contents: ok ({version})")
     return version
+
+
+_ALLOWED_PUBLIC_MILESTONE_DOCS = {
+    "docs/P29_PILOT_RUNBOOK.md",
+    "docs/P29_PILOT_SAFEGUARDS.md",
+}
+_INTERNAL_NAME = re.compile(r"(^|/)(CLAUDE|AGENTS)\.md$")
+_MILESTONE_DOC = re.compile(r"^docs/P\d\d_")
+
+
+def _assert_no_internal_files(
+    wheel_names: set[str], sdist_names: set[str], prefix: str
+) -> None:
+    """Agent instructions, internal milestone reports and evidence never ship.
+
+    Any ``docs/P<nn>_*`` file in the sdist must be on the explicit public allowlist
+    (an allowlist, so a new internal report cannot slip through by name).
+    """
+
+    leaked: list[str] = []
+    for name in sorted(sdist_names):
+        relative = name[len(prefix) :] if name.startswith(prefix) else name
+        if (
+            _INTERNAL_NAME.search(relative)
+            or relative.startswith("docs/evidence/")
+            or (
+                _MILESTONE_DOC.match(relative)
+                and relative not in _ALLOWED_PUBLIC_MILESTONE_DOCS
+            )
+        ):
+            leaked.append(f"sdist:{name}")
+    for name in sorted(wheel_names):
+        if _INTERNAL_NAME.search(name) or name.startswith(("docs/", "tests/")):
+            leaked.append(f"wheel:{name}")
+    if leaked:
+        raise AssertionError(f"internal files in artifacts: {leaked}")
+
+
+_KEY_SUFFIXES = (".key", ".pem", ".p12", ".pfx", ".jks")
+# Assembled so this script never contains the literal marker it searches for.
+_PRIVATE_KEY_MARKER = b"PRIVATE" + b" KEY"  # PEM, PGP and OpenSSH blocks
+
+
+# Local developer paths must not ship (assembled so this script never matches itself).
+_LOCAL_PATH_MARKERS = (
+    b"/Us" + b"ers/",
+    b"/private" + b"/tmp/",
+    b"/var/fol" + b"ders/",
+    b"/ho" + b"me/",
+)
+# Windows user paths, matched case-insensitively, plain and JSON-escaped.
+_WINDOWS_PATH_MARKERS = (
+    b"c:\\us" + b"ers\\",
+    b"c:\\\\us" + b"ers\\\\",
+    b"c:/us" + b"ers/",
+)
+
+
+def _has_local_path(data: bytes) -> bool:
+    lowered = data.lower()
+    return any(marker in data for marker in _LOCAL_PATH_MARKERS) or any(
+        marker in lowered for marker in _WINDOWS_PATH_MARKERS
+    )
+
+
+def _assert_no_local_paths(wheel: Path, sdist: Path) -> None:
+    """No file in either artifact may embed a local developer path."""
+
+    offenders: list[str] = []
+    with zipfile.ZipFile(wheel) as archive:
+        for info in archive.infolist():
+            data = archive.read(info)
+            if _has_local_path(data):
+                offenders.append(f"wheel:{info.filename}")
+    with tarfile.open(sdist, "r:gz") as archive:
+        for member in archive.getmembers():
+            if not member.isfile():
+                continue
+            handle = archive.extractfile(member)
+            if handle is None:
+                continue
+            data = handle.read()
+            if _has_local_path(data):
+                offenders.append(f"sdist:{member.name}")
+    if offenders:
+        raise AssertionError(f"local developer paths in artifacts: {offenders}")
+
+
+def _assert_no_private_keys(wheel: Path, sdist: Path) -> None:
+    """No private-key file or PEM private-key block may ship in either artifact."""
+
+    offenders: list[str] = []
+    with zipfile.ZipFile(wheel) as archive:
+        for info in archive.infolist():
+            if info.filename.lower().endswith(
+                _KEY_SUFFIXES
+            ) or _PRIVATE_KEY_MARKER in archive.read(info):
+                offenders.append(f"wheel:{info.filename}")
+    with tarfile.open(sdist, "r:gz") as archive:
+        for member in archive.getmembers():
+            if not member.isfile():
+                continue
+            if member.name.lower().endswith(_KEY_SUFFIXES):
+                offenders.append(f"sdist:{member.name}")
+                continue
+            handle = archive.extractfile(member)
+            if handle is not None and _PRIVATE_KEY_MARKER in handle.read():
+                offenders.append(f"sdist:{member.name}")
+    if offenders:
+        raise AssertionError(f"private key material in artifacts: {offenders}")
 
 
 def _probe(python: Path, expected_version: str, *, expect_otel: bool) -> None:
@@ -137,6 +251,13 @@ def _probe(python: Path, expected_version: str, *, expect_otel: bool) -> None:
 def _verify_base(python: Path, wheel: Path, version: str) -> None:
     _run(str(python), "-m", "pip", "install", "--no-deps", str(wheel))
     _probe(python, version, expect_otel=False)
+    _run(
+        str(python),
+        "-c",
+        "import importlib.util; "
+        "from agent_reliability.sdk import AgentReliability; "
+        "assert importlib.util.find_spec('httpx') is None",
+    )
     expected = {
         "basic_reliability.py": "Reliability: 75.00%",
         "async_agent.py": "Async reliability: 2/3 (MET)",
@@ -185,6 +306,43 @@ def _verify_typing(python: Path, wheel: Path) -> None:
     print("installed-wheel downstream strict mypy: ok")
 
 
+def _verify_http(python: Path, wheel: Path, version: str) -> None:
+    _run(str(python), "-m", "pip", "install", f"{wheel}[http]")
+    _probe(python, version, expect_otel=False)
+    probe = """
+import json
+from datetime import UTC, datetime
+from uuid import UUID
+import httpx
+from agent_reliability.adapters.http_event_sink import HTTPEventSink
+from agent_reliability.domain import AgentIdentity
+from agent_reliability.ports.events import RunStarted
+
+def handler(request):
+    event = json.loads(request.content)
+    return httpx.Response(201, json={
+        "event_id": event["event_id"],
+        "run_id": "00000000-0000-4000-8000-000000000007",
+        "status": "accepted", "durability": "committed",
+    })
+
+agent = AgentIdentity("agent", "Agent", "1", "test")
+sink = HTTPEventSink(
+    endpoint="https://example.com/api/v1/evidence/runs",
+    credential_provider=lambda: "artifact-test-token",
+    deployment_id=UUID("00000000-0000-4000-8000-000000000007"),
+    expected_agent=agent, _transport=httpx.MockTransport(handler),
+)
+try:
+    sink.emit(RunStarted("run-1", None, agent, datetime.now(UTC)))
+    assert sink.flush(2).counts_by_disposition["committed"] == 1
+finally:
+    sink.close(0)
+print("HTTP-extra installed-wheel mocked delivery: ok")
+"""
+    print(_run(str(python), "-c", probe), end="")
+
+
 def verify(
     wheel: Path,
     sdist: Path,
@@ -197,6 +355,7 @@ def verify(
         root = Path(temporary)
         _verify_base(_create_environment(root / "base"), wheel, version)
         _verify_sdist(_create_environment(root / "sdist"), sdist, version)
+        _verify_http(_create_environment(root / "http"), wheel, version)
         if include_otel:
             _verify_otel(_create_environment(root / "otel"), wheel, version)
         if include_typing:

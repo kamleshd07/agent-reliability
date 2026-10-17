@@ -1,0 +1,226 @@
+{
+ "fixture_format_version": 1,
+ "wire_version": 2,
+ "kind": "schema-v2 canonical digest vectors - SPECIFICATION ONLY",
+ "status": "NORMATIVE-SPECIFICATION VECTORS, NOT CROSS-CHECKED AGAINST ANY PLATFORM IMPLEMENTATION. No schema-v2 implementation exists (PC-2 is unimplemented). These vectors were produced only by package-independent reference implementation A from the draft algorithm in P28 Contract 15.2a, whose adoption is part of Decision D12 and needs an explicit owner compatibility decision (permanent rule section 3, last sentence). A future PC-2 implementation must reproduce them byte for byte; any disagreement is a defect in that implementation or requires a specification revision BEFORE schema v2 ships.",
+ "algorithm": "schema-v1 algorithm with these differences: schema_version is 2; a ninth top-level member `producer_identity` is an object with exactly the members agent_id, environment and version (all required non-null strings, sorted like any object); the discriminator `kind` is still excluded; nothing else changes",
+ "provenance": {
+  "generated_by": "package-independent reference implementation A (same module as the v1 vectors, function canonical_v2)",
+  "cross_checked_against": "none (no implementation exists)",
+  "second_independent_derivation": "re-derived by reference implementation B (script reading only this JSON, different code path: stdlib datetime and json module)",
+  "platform_repo_head": "d606293ee9ce0b2641a928fbb99f2b7ab6fe6d0c",
+  "vector_count": 5
+ },
+ "vectors": [
+  {
+   "id": "v2-lifecycle-started",
+   "note": "minimal v2 envelope",
+   "wire_input": {
+    "schema_version": 2,
+    "source": "agent-reliability",
+    "event_id": "evt_v2",
+    "producer_run_id": "run-v2",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    },
+    "producer_identity": {
+     "agent_id": "support-agent",
+     "environment": "production",
+     "version": "1.4.0"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v2\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_identity\":{\"agent_id\":\"support-agent\",\"environment\":\"production\",\"version\":\"1.4.0\"},\"producer_run_id\":\"run-v2\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":2,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "ada7ef4bd7d7f31830fe237e97758006dbdb8d91e8b3b3f017c9370a98287d0b"
+  },
+  {
+   "id": "v2-lifecycle-offset",
+   "note": "offset and short fraction",
+   "wire_input": {
+    "schema_version": 2,
+    "source": "agent-reliability",
+    "event_id": "evt_v2",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T05:35:07.5+05:30",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T05:35:07.5+05:30"
+    },
+    "producer_identity": {
+     "agent_id": "support-agent",
+     "environment": "production",
+     "version": "1.4.0"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v2\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07.500000+00:00\",\"status\":\"completed\"},\"producer_identity\":{\"agent_id\":\"support-agent\",\"environment\":\"production\",\"version\":\"1.4.0\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.500000+00:00\",\"schema_version\":2,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "945f060005bcb6c549f17c030bc90b4a171ad55fb1ccf9034cc8342943f20292"
+  },
+  {
+   "id": "v2-health-empty",
+   "note": "empty reason set",
+   "wire_input": {
+    "schema_version": 2,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "measurement_health",
+     "measurement_id": "meas-1",
+     "health": "healthy",
+     "reasons": [],
+     "observed_at": "2026-07-01T00:05:03+00:00"
+    },
+    "producer_identity": {
+     "agent_id": "support-agent",
+     "environment": "production",
+     "version": "1.4.0"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"health\":\"healthy\",\"measurement_id\":\"meas-1\",\"observed_at\":\"2026-07-01T00:05:03+00:00\",\"reasons\":\"\"},\"producer_identity\":{\"agent_id\":\"support-agent\",\"environment\":\"production\",\"version\":\"1.4.0\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":2,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "f15c1cd64bf1bb44d5687170414422c47f02c4ac5a173c823a8d2f32934d6fd4"
+  },
+  {
+   "id": "v2-outcome-unicode",
+   "note": "supplementary scalar",
+   "wire_input": {
+    "schema_version": 2,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "grin \ud83d\ude00",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    },
+    "producer_identity": {
+     "agent_id": "support-agent",
+     "environment": "production",
+     "version": "1.4.0"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"grin \\ud83d\\ude00\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_identity\":{\"agent_id\":\"support-agent\",\"environment\":\"production\",\"version\":\"1.4.0\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":2,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "59bdd8eea9e947a9b8673e79d2d8606dac1e75820e1c38f953f1d4246a557cbc"
+  },
+  {
+   "id": "v2-identity-unicode-version",
+   "note": "version text with a non-ASCII scalar (version follows the platform text rules, not the machine-key grammar)",
+   "wire_input": {
+    "schema_version": 2,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    },
+    "producer_identity": {
+     "agent_id": "support-agent",
+     "environment": "production",
+     "version": "1.4.0-\u00e9"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_identity\":{\"agent_id\":\"support-agent\",\"environment\":\"production\",\"version\":\"1.4.0-\\u00e9\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":2,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "b6d3aa2eeb0c0538d391aab0b99c0b848645e75af34f31ec05a0864d2c758f93"
+  }
+ ],
+ "pair_rules": [
+  {
+   "id": "v1-v2-same-event-id",
+   "expect": "digests differ (idempotent replay across versions is a conflict)",
+   "v1_wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_pair",
+    "producer_run_id": "run-pair",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    }
+   },
+   "v1_sha256": "f0d31e4b8978245906a3e87d3c35c8fb873d17392530499d37b0a2af661d79e9",
+   "v2_wire_input": {
+    "schema_version": 2,
+    "source": "agent-reliability",
+    "event_id": "evt_pair",
+    "producer_run_id": "run-pair",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    },
+    "producer_identity": {
+     "agent_id": "support-agent",
+     "environment": "production",
+     "version": "1.4.0"
+    }
+   },
+   "v2_sha256": "9a25147534700658e765a4ec8643b6b4fb12e742bb35f66c8758ca78878014d1"
+  },
+  {
+   "id": "v2-identity-changed",
+   "expect": "digests differ (identity participates in conflict comparison)",
+   "a_wire_input": {
+    "schema_version": 2,
+    "source": "agent-reliability",
+    "event_id": "evt_pair",
+    "producer_run_id": "run-pair",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    },
+    "producer_identity": {
+     "agent_id": "support-agent",
+     "environment": "production",
+     "version": "1.4.0"
+    }
+   },
+   "a_sha256": "9a25147534700658e765a4ec8643b6b4fb12e742bb35f66c8758ca78878014d1",
+   "b_wire_input": {
+    "schema_version": 2,
+    "source": "agent-reliability",
+    "event_id": "evt_pair",
+    "producer_run_id": "run-pair",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    },
+    "producer_identity": {
+     "agent_id": "support-agent",
+     "environment": "staging",
+     "version": "1.4.0"
+    }
+   },
+   "b_sha256": "15322a4d74a2f7cef059198365d0307b73ab832956423709f070ebb8e274d427"
+  }
+ ]
+}

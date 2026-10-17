@@ -48,6 +48,7 @@ class RunHandle:
         "__weakref__",
         "_agent",
         "_closed",
+        "_failure_callback",
         "_measurement_health_reasons",
         "_record_callback",
         "_record_evaluation_callback",
@@ -61,6 +62,9 @@ class RunHandle:
         record_callback: Callable[[RunHandle, str, EvaluationOutcome], None],
         record_evaluation_callback: Callable[[RunHandle, str, EvaluationResult], None],
     ) -> None:
+        self._failure_callback: (
+            Callable[[RunHandle, str, EvaluationExecutionFailure], None] | None
+        ) = None
         self._run = run
         self._agent = run.agent
         self._record_callback = record_callback
@@ -83,6 +87,7 @@ class RunHandle:
         docs/adr/0005-instrumentation-initialization-degraded-mode.md.
         """
         handle = cls.__new__(cls)
+        handle._failure_callback = None
         handle._run = None
         handle._agent = agent
         handle._record_callback = record_callback
@@ -156,7 +161,9 @@ class RunHandle:
             raise TypeError("result must be an EvaluationResult")
         self._record_evaluation_callback(self, indicator, result)
 
-    def record_evaluation_failure(self, *, failure: EvaluationExecutionFailure) -> None:
+    def record_evaluation_failure(
+        self, *, failure: EvaluationExecutionFailure, indicator: str | None = None
+    ) -> None:
         """Associate a failed evaluation attempt without inventing an outcome."""
         if self._closed:
             raise RuntimeError(
@@ -170,6 +177,11 @@ class RunHandle:
             else MeasurementHealthReason.EVALUATOR_EXECUTION_FAILURE
         )
         self._mark_measurement_health(reason)
+        if indicator is not None:
+            if not isinstance(indicator, str) or not indicator:
+                raise ValueError("indicator must be a non-empty string")
+            if self._failure_callback is not None:
+                self._failure_callback(self, indicator, failure)
 
     def evaluate_measurement_policy(
         self, policy: MeasurementPolicy[PolicyResultT]
