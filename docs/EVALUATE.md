@@ -180,7 +180,7 @@ raised; the coordinator cannot detect that. Watch your sink's own delivery statu
 
 ### Measurement-health safeguards
 
-| ID | What to do |
+| Safeguard | What to do |
 |---|---|
 | Budget and overload limits | Size budgets and limits so budget exhaustion and overload do not occur (`JudgeBudget`, `JudgeLimits`, `max_pending`, `max_concurrency`); treat any `JudgeBudgetExceededError` or `JudgeOverloadedError` as an incident. Defaults are safe, not fast, and are not benchmarked |
 | Run health | One judge failure sets run health `UNAVAILABLE`, which changes `measurement_state` for every indicator in the scope and window |

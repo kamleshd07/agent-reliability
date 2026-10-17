@@ -101,8 +101,12 @@ def test_p29_s12_ac04_user_docs_carry_privacy_pass_meaning_and_non_claims() -> N
         "Failures and UNKNOWN leave the reliability denominator",
         "on_no_data",
         "not indicator-scoped",
-        "SG-1",
-        "SG-6",
+        "Budget and overload limits",
+        "Run health",
+        "Coverage monitoring",
+        "Scope separation",
+        "Failure alerting",
+        "No-data policy",
     ):
         assert needle in EVALUATE, needle
     readme = (ROOT / "README.md").read_text()
