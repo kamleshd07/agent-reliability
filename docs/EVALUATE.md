@@ -71,8 +71,7 @@ conflict programmatically.
 ## LLM-judge evaluators (EXPERIMENTAL)
 
 `agent_reliability.experimental.judge` adds model-backed evaluators for semantic dimensions that equality and
-predicates cannot express. It is **Experimental** ([VERSIONING.md](VERSIONING.md),
-[ADR-0010](adr/0010-experimental-judge-adapter-amends-adr-0007-decision-9.md)): names, defaults, the prompt template (`jp1`)
+predicates cannot express. It is **Experimental** ([versioning policy](VERSIONING.md)): names, defaults, the prompt template (`jp1`)
 and vocabularies may change in a minor release with release notes. It is standard library only, ships no provider, reads no
 credentials or environment, and adds no wire member and no runtime dependency. A judge is never deterministic
 (`deterministic=False`).
@@ -141,7 +140,7 @@ yours. Load them with `load_reference_rubric(id)` or copy the JSON and edit it (
 | `groundedness` (judge-groundedness) | every material claim is supported by the supplied context blocks, with at least one citation | the context itself is true |
 | `instruction-adherence` (judge-instruction-adherence) | the checkable items stated in the instructions were followed | unstated expectations were met (deterministic checks are better where possible) |
 | `safety-policy` (judge-safety-policy) | this rubric found no violation of the supplied policy | the answer is safe |
-| `task-completion-evidence` (judge-task-completion-evidence) | the evidence TEXT supports the claim of completion | the business outcome occurred (R1: never an authoritative outcome; a fabricated confirmation passes it by construction; use a P13 outcome expectation for critical journeys) |
+| `task-completion-evidence` (judge-task-completion-evidence) | the evidence TEXT supports the claim of completion | the business outcome occurred (never an authoritative outcome; a fabricated confirmation passes it by construction; use an outcome expectation for critical journeys) |
 
 ### Outcomes, failures and what the platform sees
 
@@ -172,28 +171,28 @@ evidence not delivered".
 ### The recording gate: what runs inside it
 
 Concurrent judge *execution* is never concurrent *recording*. Every call that hands evidence to the run handle is made while holding the scope's one recording gate. `RunHandle.record_*`
-synchronously invokes your **sink and diagnostic handler inside that gate**, so they **must be non-blocking** (the P28 exporter's `emit` is); a slow sink delays all recording of the scope.
+synchronously invokes your **sink and diagnostic handler inside that gate**, so they **must be non-blocking** (the HTTP exporter's `emit` is); a slow sink delays all recording of the scope.
 A sink or diagnostic handler must not call back into the same `EvaluationScope`: such a re-entrant call raises `RuntimeError` instead of deadlocking. Application code must not record on the same
 handle from another thread while a threaded scope has evaluations in flight.
 
-"Recorded" means *handed to the run handle*. The SDK isolates a failing sink (ADR-0004), so an evaluation reported as `RECORDED_RESULT` or `RECORDED_FAILURE` may still have been dropped by a sink that
-raised; the coordinator cannot detect that. Watch your sink's own delivery status (for the P28 exporter, its delivery snapshot) next to the coordinator's `coverage()`.
+"Recorded" means *handed to the run handle*. The SDK isolates a failing sink, so an evaluation reported as `RECORDED_RESULT` or `RECORDED_FAILURE` may still have been dropped by a sink that
+raised; the coordinator cannot detect that. Watch your sink's own delivery status (for the HTTP exporter, its delivery snapshot) next to the coordinator's `coverage()`.
 
-### Measurement-health safeguards (SG-1 to SG-6)
+### Measurement-health safeguards
 
-| ID | What to do |
+| Safeguard | What to do |
 |---|---|
-| SG-1 | Size budgets and limits so budget exhaustion and overload do not occur (`JudgeBudget`, `JudgeLimits`, `max_pending`, `max_concurrency`); treat any `JudgeBudgetExceededError` or `JudgeOverloadedError` as an incident. Defaults are safe, not fast, and are not benchmarked |
-| SG-2 | One judge failure sets run health `UNAVAILABLE`, which changes `measurement_state` for every indicator in the scope and window |
-| SG-3 | Read failure rate and UNKNOWN rate beside reliability (`coverage()`; platform reads of failure and UNKNOWN counts) |
-| SG-4 | Do not interpret `measurement_state` of deterministic indicators while judge indicators share their scope and window; consider a separate scope for judge evaluation |
-| SG-5 | Wire a `JudgeObserver` (or poll `coverage()`) to your own alerting: failures by class, shed, skipped |
-| SG-6 | Set `on_no_data` explicitly; partial outage is not covered |
+| Budget and overload limits | Size budgets and limits so budget exhaustion and overload do not occur (`JudgeBudget`, `JudgeLimits`, `max_pending`, `max_concurrency`); treat any `JudgeBudgetExceededError` or `JudgeOverloadedError` as an incident. Defaults are safe, not fast, and are not benchmarked |
+| Run health | One judge failure sets run health `UNAVAILABLE`, which changes `measurement_state` for every indicator in the scope and window |
+| Coverage monitoring | Read failure rate and UNKNOWN rate beside reliability (`coverage()`; platform reads of failure and UNKNOWN counts) |
+| Scope separation | Do not interpret `measurement_state` of deterministic indicators while judge indicators share their scope and window; consider a separate scope for judge evaluation |
+| Failure alerting | Wire a `JudgeObserver` (or poll `coverage()`) to your own alerting: failures by class, shed, skipped |
+| No-data policy | Set `on_no_data` explicitly; partial outage is not covered |
 
 ### Identity and cohorts
 
 The wire identity is `name=<rubric_id>`, `version=<rubric_version>`, `configuration_id=<model_label>.jp1.mc-<min_confidence>.rp<repeats>.ct<0|1>`,
-all in the grammar `[A-Za-z0-9._-]` (1-128, alphanumeric ends) that both the SDK and the P28 exporter accept. A `+`
+all in the grammar `[A-Za-z0-9._-]` (1-128, alphanumeric ends) that both the SDK and the HTTP exporter accept. A `+`
 (for example `1.0.0+build5`) is accepted by `EvaluatorIdentity` but rejected by the exporter, so evidence for such an identity is never
 delivered; that hazard exists for any evaluator and is not changed here. The platform pools by indicator only: when a rubric or model
 change should start a new cohort, also change the indicator name (for example `groundedness-v2`).

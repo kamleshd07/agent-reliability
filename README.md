@@ -205,7 +205,7 @@ not a public issue.
 
 Apache License 2.0. See [LICENSE](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/LICENSE).
 
-### HTTP evidence delivery (P28)
+### HTTP evidence delivery
 
 The optional [HTTP exporter](https://github.com/kamleshd07/agent-reliability/blob/main/docs/HTTP_EXPORTER.md) sends schema-v2 evidence
 using `agent-reliability[http]`, bounded delivery queues and explicit shutdown.

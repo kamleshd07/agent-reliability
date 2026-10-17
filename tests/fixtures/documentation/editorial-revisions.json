@@ -1,0 +1,7 @@
+{
+  "docs/HTTP_EXPORTER.md": {
+    "previousSha256": "11b935e7073a8d3cf71c30c15a644619c2f25c896cbeb5eb761a87546d6093b9",
+    "sha256": "7d979c68eada52cdea9a0789fde743992dc7535ccacb9f542e3dda59cf7f6975",
+    "reason": "Accepted public terminology and security-boundary editorial correction; no runtime or wire-fixture revision."
+  }
+}

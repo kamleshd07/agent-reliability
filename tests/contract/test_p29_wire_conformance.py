@@ -385,9 +385,19 @@ def test_p29_s09_ac06_p28_fixtures_and_contract_documents_are_byte_identical() -
         }
     ]
     assert len(guarded) >= 10
+    # Historical runtime/fixture baselines remain immutable. Public-guide prose
+    # has one explicitly recorded editorial revision, still checked byte-for-byte.
+    revisions = json.loads(
+        (ROOT / "tests/fixtures/documentation/editorial-revisions.json").read_text()
+    )
+    assert set(revisions) == {"docs/HTTP_EXPORTER.md"}
     for name in guarded:
+        expected = baseline[name]
+        if name in revisions:
+            assert revisions[name]["previousSha256"] == expected, name
+            expected = revisions[name]["sha256"]
         digest = hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-        assert digest == baseline[name], name
+        assert digest == expected, name
 
 
 @pytest.mark.skipif(

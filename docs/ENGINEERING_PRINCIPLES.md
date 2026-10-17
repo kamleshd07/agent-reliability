@@ -78,7 +78,7 @@ AutoGen, or any other framework to be present.
 
 ## 10. Dependency discipline
 
-Runtime dependencies are minimal by default and zero at M0. Every
+Runtime dependencies are minimal, with zero mandatory core dependencies. Every
 runtime dependency must justify itself in the PR that introduces it —
 "it's convenient" is not sufficient justification.
 

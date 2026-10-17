@@ -110,7 +110,12 @@ def test_p29_s06_ac02_every_rubric_states_pass_meaning_and_uncalibrated() -> Non
         assert rid in DOCS  # documented per dimension
     task = load_reference_rubric("judge-task-completion-evidence")
     assert task.description is not None and "R1" in task.description
-    assert "R1" in DOCS and "never an authoritative outcome" in DOCS
+    task_row = next(
+        line for line in DOCS.splitlines() if "| `task-completion-evidence`" in line
+    )
+    assert "never an authoritative outcome" in task_row
+    assert "fabricated confirmation passes it by construction" in task_row
+    assert "outcome expectation for critical journeys" in task_row
     assert "uncalibrated" in DOCS.lower()
     section = DOCS.split("Meaning of PASS per dimension", 1)[1][:3000]
     for dimension in DIMENSIONS.values():

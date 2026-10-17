@@ -22,10 +22,7 @@ Follow these in order for a first integration: [Quickstart](QUICKSTART.md) →
 
 ## Guides
 
-- [SDK design and usage](SDK_DESIGN.md)
-- [Evaluator framework](EVALUATOR_FRAMEWORK.md)
 - [Evaluation provenance](EVALUATION_PROVENANCE.md)
-- [Local reliability engine](LOCAL_RELIABILITY_ENGINE.md)
 - [OpenTelemetry mapping](OTEL_MAPPING.md)
 
 ## Reference and semantics
@@ -39,22 +36,12 @@ Follow these in order for a first integration: [Quickstart](QUICKSTART.md) →
 - [Security model](SECURITY_MODEL.md)
 - [Measurement health](MEASUREMENT_HEALTH.md)
 - [Measurement-health policy examples](MEASUREMENT_HEALTH_POLICY_EXAMPLES.md)
-- [Public API review](PUBLIC_API_REVIEW.md)
 
-## Architecture
+## Engineering principles
 
-- [Architecture](ARCHITECTURE.md)
 - [Engineering principles](ENGINEERING_PRINCIPLES.md)
-- [Architecture decision records](adr/README.md)
-- [Vision](VISION.md) and [roadmap](ROADMAP.md)
 
 ## Contributing
 
-- [Release procedure](RELEASING.md)
-- [GA readiness](GA_READINESS.md)
 - [Contributor guide](../CONTRIBUTING.md)
-- [Testing strategy](TESTING_STRATEGY.md)
 - [Security reporting](../SECURITY.md)
-
-Maintainer evidence from the M6 fresh-user exercise is recorded in
-[DX review](DX_REVIEW.md).

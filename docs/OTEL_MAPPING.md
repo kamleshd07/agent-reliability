@@ -1,6 +1,6 @@
 # OpenTelemetry interoperability mapping
 
-This document defines the M3 mapping from an Agent Reliability run to
+This document defines the runtime mapping from an Agent Reliability run to
 OpenTelemetry. It is an interoperability contract, not a replacement for the
 SDK's vendor-neutral event model.
 
@@ -50,7 +50,7 @@ Span creation and context activation are distinct OpenTelemetry operations.
 Consequently, an `EventSink.emit(RunStarted)` cannot safely implement this
 lifecycle: its call has returned before user code executes, while the
 activation token must remain owned and later closed by the same run scope.
-M3 therefore uses a separate, narrow run-context bridge port. The SDK owns
+The OpenTelemetry adapter therefore uses a separate, narrow run-context bridge port. The SDK owns
 when it is called; the adapter owns only OpenTelemetry objects and cleanup.
 
 Nested runs naturally inherit the current OpenTelemetry context. Multiple SDK
@@ -81,9 +81,9 @@ following bounded set of attributes:
 | `RunCompleted` | Span end and attribute | `agent_reliability.run.status=completed` | Not duplicated as an event. |
 | `RunFailed` (failure) | Span end, attributes, status | `run.status=failed`, `error.type`, OTel `ERROR` | No exception object/content. |
 | `RunFailed` (cancellation) | Span end and attribute | `run.status=cancelled`, OTel status `UNSET` | No exception object/content. |
-| `EvaluationRecorded` | Deferred | None in OTel M3 | Remains in the Agent Reliability `EventSink`. |
-| `indicator` | Deferred with evaluation | None in OTel M3 | Would be a bounded event field, not a metric dimension by default. |
-| `EvaluationOutcome` | Deferred with evaluation | None in OTel M3 | Future mapping must preserve `pass`, `fail`, and `unknown`. |
+| `EvaluationRecorded` | Deferred | None in the OTel adapter | Remains in the Agent Reliability `EventSink`. |
+| `indicator` | Deferred with evaluation | None in the OTel adapter | Would be a bounded event field, not a metric dimension by default. |
+| `EvaluationOutcome` | Deferred with evaluation | None in the OTel adapter | Future mapping must preserve `pass`, `fail`, and `unknown`. |
 
 | Attribute | Source/value | Stability | Notes |
 |---|---|---|---|
@@ -122,7 +122,7 @@ continue through the configured `EventSink`; they are not duplicated as span
 events. OpenTelemetry is migrating events to the Logs data model and has
 announced deprecation of the span-event API. Python's first-class ergonomic
 Events API and the GenAI evaluation mapping are not stable enough to make a
-durable M3 contract. Evaluation export is therefore deliberately deferred.
+durable adapter contract. Evaluation export is therefore deliberately deferred.
 
 This deferral avoids coupling the package to a Logs SDK/provider or to an API
 that is still changing. It does not drop Agent Reliability events.
@@ -145,7 +145,7 @@ OpenTelemetry propagator and child instrumentation.
 
 ## Failure and sampling behavior
 
-The default configuration has no bridge and preserves M2.1 behavior. With the
+The default configuration has no bridge and preserves the instrumentation behavior. With the
 bridge installed, OpenTelemetry failures are instrumentation failures: they
 are reported through the SDK diagnostic handler and do not invalidate a
 successfully created Agent Reliability run, suppress its events, or replace a
@@ -161,8 +161,8 @@ OTel trace is unsampled; neither signal is a correctness dependency of the
 other.
 
 OpenTelemetry Python context and the SDK's run context both use context-local
-semantics. They isolate normal `asyncio` tasks, but M3 adds no automatic OS
+semantics. They isolate normal `asyncio` tasks, but the adapter adds no automatic OS
 thread propagation guarantee. Callers that use `contextvars.copy_context()`
 for a new thread propagate both contexts present in that copied context;
 otherwise a new thread should be treated as a new context. Multiprocessing is
-not covered by M3.
+not covered by the adapter.

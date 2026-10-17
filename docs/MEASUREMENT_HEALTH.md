@@ -92,7 +92,7 @@ diagnostic handler remains a separate trusted boundary under the 1.0 contract.
 
 Live run health is SDK-derived and cannot be reset by the agent. Constructed
 values are data, not attestations; do not trust a value supplied by acting
-agent content. See [ADR-0009](adr/0009-measurement-health-and-policy-boundary.md)
+agent content. See the measurement-health contract
 for the complete failure matrix.
 
 ## Failure scenarios
