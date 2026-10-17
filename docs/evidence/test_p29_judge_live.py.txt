@@ -1,0 +1,316 @@
+"""P29 LLM-judge capture -> real HTTP exporter -> real platform -> PostgreSQL.
+
+Scripted fake judge providers (no model, no network beyond loopback). Canary strings in the
+judged content prove that raw customer content never reaches the platform.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import re
+
+from agent_reliability.experimental.judge import (
+    CallableProvider,
+    ContentPart,
+    ContentRole,
+    EvaluationRequest,
+    IndicatorBinding,
+    JudgeCoordinator,
+    JudgeDimension,
+    JudgeProviderUnavailableError,
+    LLMJudge,
+    ProviderReply,
+    load_reference_rubric,
+)
+from agent_reliability.experimental.judge.testing import judge_reply
+from agent_reliability.sdk import AgentReliability, SdkDiagnostic
+from agent_reliability.sdk.evaluator_runner import EvaluatorRunner
+
+from tests.harness import FaultProxy, Harness, wait_until
+from tests.sdkutil import D, committed, count, make_sink
+
+CANARIES = ("CANARY-QUESTION-7f3a", "CANARY-REFERENCE-91bc", "CANARY-ANSWER-c04d")
+OUTCOMES = {"Q1": True, "Q2": False}  # Q3: the judge provider is "stopped"
+
+
+class Quiet:
+    def handle(self, diagnostic: SdkDiagnostic) -> None:
+        return None
+
+
+def _provider(indicator: str) -> CallableProvider:
+    async def complete(call) -> ProviderReply:  # type: ignore[no-untyped-def]
+        key = re.search(r"\[(Q\d)\]", call.user).group(1)  # type: ignore[union-attr]
+        if key == "Q3":
+            raise JudgeProviderUnavailableError
+        ok = OUTCOMES[key]
+        if indicator == "answer-correctness":
+            return ProviderReply(
+                judge_reply("pass", "consistent_with_reference", "high")
+                if ok
+                else judge_reply("fail", "contradicts_reference", "high")
+            )
+        return ProviderReply(
+            judge_reply("pass", "supported_by_context", "high", [0])
+            if ok
+            else judge_reply("fail", "unsupported_claim", "high")
+        )
+
+    return CallableProvider(complete, provider_label="scripted-fake")
+
+
+async def _drive(sdk: AgentReliability, tenant) -> dict[str, str]:  # type: ignore[no-untyped-def]
+    judges = {
+        name: LLMJudge(
+            rubric=load_reference_rubric(f"judge-{name}"),
+            provider=_provider(name),
+            model_label="scripted-fake",
+            jitter=lambda: 0.0,
+        )
+        for name in ("answer-correctness", "groundedness")
+    }
+    coordinator = JudgeCoordinator(
+        [IndicatorBinding(n, j) for n, j in judges.items()],
+        runner=EvaluatorRunner(diagnostic_handler=Quiet()),
+    )
+    health: dict[str, str] = {}
+    for key in ("Q1", "Q2", "Q3"):
+        with sdk.run(**tenant.identity_kwargs) as run:
+            async with coordinator.scope(run) as scope:
+                await scope.evaluate(
+                    "answer-correctness",
+                    EvaluationRequest(
+                        JudgeDimension.ANSWER_CORRECTNESS,
+                        (
+                            ContentPart(ContentRole.QUESTION, f"[{key}] {CANARIES[0]}"),
+                            ContentPart(ContentRole.REFERENCE, CANARIES[1]),
+                            ContentPart(ContentRole.ANSWER, f"[{key}] {CANARIES[2]}"),
+                        ),
+                    ),
+                )
+                await scope.evaluate(
+                    "groundedness",
+                    EvaluationRequest(
+                        JudgeDimension.GROUNDEDNESS,
+                        (
+                            ContentPart(ContentRole.CONTEXT, f"[{key}] {CANARIES[1]}"),
+                            ContentPart(ContentRole.ANSWER, f"[{key}] {CANARIES[2]}"),
+                        ),
+                    ),
+                )
+        health[key] = run.measurement_health.health.value
+    return health
+
+
+def test_judge_evidence_is_delivered_content_free_and_binds_to_the_deployment(
+    harness: Harness, tenant, other_tenant
+) -> None:
+    proxy = FaultProxy(harness.server.port)
+    try:
+        sink = make_sink(proxy.url(), tenant.credential().token, tenant)
+        health = asyncio.run(_drive(AgentReliability(sink=sink), tenant))
+        assert wait_until(lambda: sink.status.queue_depth == 0, 30)
+        snapshot = sink.close(10)
+
+        # Delivery: schema v2 only, everything acknowledged, in the right tenant only.
+        assert committed(snapshot) == count(snapshot, D.COMMITTED) > 0
+        assert {s.status for s in proxy.seen} == {201}
+        bodies = [json.loads(s.body) for s in proxy.seen]
+        assert {b["schema_version"] for b in bodies} == {2}
+        assert {b["deployment_id"] for b in bodies} == {str(tenant.deployment_id)}
+        assert {json.dumps(b["producer_identity"], sort_keys=True) for b in bodies} == {
+            json.dumps(
+                {
+                    "agent_id": "support-agent",
+                    "environment": "production",
+                    "version": "1.4.0",
+                },
+                sort_keys=True,
+            )
+        }
+        assert {e["event_id"] for e in tenant.events()} == {b["event_id"] for b in bodies}
+        assert other_tenant.events() == []
+
+        # Typed kinds only; judge failures are evidence, not silence.
+        kinds = {b["payload"]["kind"] for b in bodies}
+        assert kinds == {
+            "run_lifecycle",
+            "evaluation_outcome",
+            "evaluation_execution_failure",
+            "measurement_health",
+        }  # exactly the closed set of typed kinds; nothing else on the wire
+        outcomes = sorted(
+            (b["payload"]["indicator"], b["payload"]["outcome"])
+            for b in bodies
+            if b["payload"]["kind"] == "evaluation_outcome"
+        )
+        assert outcomes == [
+            ("answer-correctness", "fail"),
+            ("answer-correctness", "pass"),
+            ("groundedness", "fail"),
+            ("groundedness", "pass"),
+        ]
+        failures = [
+            b["payload"] for b in bodies if b["payload"]["kind"] == "evaluation_execution_failure"
+        ]
+        assert sorted(f["indicator"] for f in failures) == [
+            "answer-correctness",
+            "groundedness",
+        ]
+        # The stopped provider degrades only the run that experienced it.
+        assert health["Q1"] == health["Q2"] == "healthy" and health["Q3"] != "healthy"
+
+        # No raw customer content on the wire or in the four evidence tables the judge's
+        # data lands in (ingestion events, evaluations, measurement health, runs).
+        wire = b"".join(s.body for s in proxy.seen).decode()
+        assert not any(c in wire for c in CANARIES)
+        for table in (
+            "ingestion_events",
+            "evaluation_evidence",
+            "measurement_health_evidence",
+            "reliability_runs",
+        ):
+            for canary in CANARIES:
+                hits = harness.scalar(
+                    f"SELECT count(*) FROM {table} t WHERE to_jsonb(t)::text LIKE :p",
+                    p=f"%{canary}%",
+                )
+                assert hits == 0, (table, canary)
+
+        # Read-back through the platform API (per-indicator rows, per-run health rows).
+        runs = tenant.read(f"/api/v1/evidence/runs?deployment_id={tenant.deployment_id}")
+        assert runs.status_code == 200 and len(runs.json()["items"]) == 3
+        per_run = {}
+        for run in runs.json()["items"]:
+            evaluations = tenant.read(f"/api/v1/evidence/runs/{run['id']}/evaluations").json()
+            per_run[run["id"]] = sorted(
+                (e["indicator"], e["outcome"] or e["kind"]) for e in evaluations["items"]
+            )
+        assert len(per_run) == 3
+
+        # Health as stored by the platform (not the SDK's local object): two healthy runs
+        # and exactly one run that is not healthy (the stopped judge provider).
+        stored_health = []
+        for run in runs.json()["items"]:
+            rows = tenant.read(f"/api/v1/evidence/runs/{run['id']}/measurement-health").json()
+            stored_health.append(sorted(r["health"] for r in rows["items"]))
+        assert sorted(h[-1] for h in stored_health).count("healthy") == 2
+        assert [h for h in stored_health if h[-1] != "healthy"], stored_health
+
+        # Positive control for the content scan, run last so it cannot disturb the
+        # assertions above: store a canary in a free-text-capable member and show the
+        # same scan finds it.
+        import copy
+
+        import httpx
+
+        outcome = next(
+            b for b in bodies if b["payload"]["kind"] == "evaluation_outcome"
+        )
+        planted = copy.deepcopy(outcome)
+        planted["event_id"] = "evt_canary_control"
+        planted["producer_run_id"] = "canary-control-run"
+        planted["payload"]["evaluation_id"] = CANARIES[0]
+        control = httpx.post(
+            harness.server.endpoint,
+            headers={"Authorization": f"Bearer {tenant.credential().token}"},
+            json=planted,
+            timeout=10,
+        )
+        assert control.status_code == 201, control.text
+        assert (
+            harness.scalar(
+                "SELECT count(*) FROM evaluation_evidence t "
+                "WHERE to_jsonb(t)::text LIKE :p",
+                p=f"%{CANARIES[0]}%",
+            )
+            >= 1
+        )
+    finally:
+        proxy.close()
+
+
+def test_platform_p3_summary_and_p4_slo_match_hand_computed_values(
+    harness: Harness, tenant
+) -> None:
+    """P29-S11-AC02/AC04/AC05 on a real platform build (local, disposable, scripted).
+
+    Hand-computed BEFORE reading the platform (per indicator): runs Q1 pass, Q2 fail and Q3
+    "provider stopped" give pass 1, fail 1, unknown 0, execution failures 1, determinate 2,
+    total 3, reliability 1/2 = 0.5 (the failure leaves the denominator); health records:
+    healthy 2, unavailable 1 (one judge failure sets the run UNAVAILABLE).
+    SLO target 0.9 over those counts: allowed failures = 2 x 0.1 = 0.2, observed 1,
+    remaining 0.2 - 1 = -0.8, budget consumed 1 / 0.2 = 5, remaining -4, burn rate 5,
+    reliability delta 0.5 - 0.9 = -0.4, compliance breached.
+    """
+
+    import datetime as dt
+
+    import httpx
+
+    proxy = FaultProxy(harness.server.port)
+    try:
+        sink = make_sink(proxy.url(), tenant.credential().token, tenant)
+        asyncio.run(_drive(AgentReliability(sink=sink), tenant))
+        assert wait_until(lambda: sink.status.queue_depth == 0, 30)
+        sink.close(10)
+    finally:
+        proxy.close()
+    now = dt.datetime.now(dt.UTC)
+
+    def stamp(value: dt.datetime) -> str:
+        return value.isoformat().replace("+00:00", "Z")
+
+    window = f"start={stamp(now - dt.timedelta(hours=1))}&end={stamp(now + dt.timedelta(hours=1))}"
+    for indicator in ("answer-correctness", "groundedness"):
+        response = tenant.read(
+            f"/api/v1/reliability/deployment/{tenant.deployment_id}/summary"
+            f"?{window}&indicator={indicator}"
+        )
+        assert response.status_code == 200, response.text
+        counts = response.json()["counts"]
+        assert counts["pass_count"] == 1 and counts["fail_count"] == 1
+        assert counts["unknown_count"] == 0
+        assert counts["evaluation_execution_failure_count"] == 1
+        assert counts["determinate_count"] == 2 and counts["total_evaluation_count"] == 3
+        assert counts["reliability"] == 0.5
+        assert counts["healthy_count"] == 2 and counts["unavailable_count"] == 1
+        assert counts["degraded_count"] == 0 and counts["measurement_health_count"] == 3
+
+    headers = {
+        "Authorization": f"Bearer {tenant.human_jwt()}",
+        "X-Organization-ID": str(tenant.org_id),
+    }
+    created = httpx.post(
+        harness.server.base + "/api/v1/slos",
+        headers=headers,
+        json={
+            "name": "judge-correctness",
+            "scope_type": "deployment",
+            "scope_id": str(tenant.deployment_id),
+            "indicator": "answer-correctness",
+            "target": "0.9",
+            "compliance_window_seconds": 3600,
+            "effective_from": stamp(now - dt.timedelta(hours=1)),
+        },
+        timeout=10,
+    )
+    assert created.status_code == 201, created.text
+    evaluation = httpx.get(
+        harness.server.base + f"/api/v1/slos/{created.json()['definition']['id']}/evaluation",
+        params={"evaluation_time": stamp(now)},
+        headers=headers,
+        timeout=10,
+    )
+    assert evaluation.status_code == 200, evaluation.text
+    body = evaluation.json()
+    assert body["compliance_state"] == "breached"
+    assert body["reliability_delta"] == "-0.4"
+    budget = body["error_budget"]
+    assert budget["allowed_failures"] == "0.2" and budget["observed_failures"] == 1
+    assert budget["remaining_failure_budget"] == "-0.8"
+    assert budget["budget_consumed_fraction"] == "5"
+    assert budget["budget_remaining_fraction"] == "-4" and budget["burn_rate"] == "5"
+    # Documented semantic (SG-2): the judge failure changes measurement_state for the scope.
+    assert body["measurement_state"] == "unavailable"
