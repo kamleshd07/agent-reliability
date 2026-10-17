@@ -2,6 +2,58 @@
 
 Date: 2026-10-17.
 
+**PR/CI status: `P28_P29_PR_CI_GREEN_READY_FOR_MERGE_REVIEW`** (see section 00). This is hosted-CI evidence on four
+draft PRs only. It is **not** configured branch protection (no required checks exist), **not** merge authorization
+(nothing was merged; the PRs are drafts), and **not** `P28_P29_RELEASE_GOVERNANCE_APPROVED_AND_CI_VERIFIED`, which
+remains unreached because governance items are open (section 0, last paragraph, and section 8-9).
+
+## 00. Frontend audit remediation and green CI (2026-10-17)
+
+**Finding** (reproduced locally against the lockfile with `npm audit --audit-level=high`): `source-map-js`
+1.0.0-1.2.1, advisory GHSA-68fv-2mgg-jv7q (event-loop denial of service through indexed source-map section offsets),
+severity high. It is a **transitive, dev-only** dependency (required by `postcss` 8.5.28 and `css-tree` 3.2.1,
+both dev; `"dev": true` in `package-lock.json`), i.e. build/test tooling, not shipped in the bundle; a
+denial-of-service in a build-time source-map parser is not reachable from the running application. Patched version
+1.2.2 exists and satisfies the existing `^1.2.1` ranges, so no breaking upgrade was needed and no exception was
+proposed.
+**Remediation:** `npm update source-map-js --package-lock-only` (no `--force`, no `package.json` change): the
+lockfile changed in 3 lines, `source-map-js` 1.2.1 -> 1.2.2 (version, resolved URL, integrity), nothing else.
+**Local verification** (`npm ci`, Node 26 locally; CI uses 24.19.0): `npm audit --audit-level=high` 0
+vulnerabilities; `npm run check` (tsc) clean; `npm test` 66 passed; `npm run build` succeeded. Browser e2e ran in CI only.
+**Commits** (appended, history not rewritten): `1c45758` on `final/p28-pc2-ingestion-v2` and its cherry-pick
+`28e6b00` on `final/p28-integration-tip` (`fix(frontend): update transitive source-map-js to 1.2.2`); both pushed.
+The SDK report-provenance commit `7402b4e` (execution report, preserved unchanged) was pushed to
+`final/p29-experimental-judge`.
+
+**Actual hosted CI after the fix** (all jobs success):
+
+| PR | Head | Run | Jobs |
+|---|---|---|---|
+| SDK #1 https://github.com/kamleshd07/agent-reliability/pull/1 | `a388202` | https://github.com/kamleshd07/agent-reliability/actions/runs/39016050376 | 6/6 success |
+| SDK #2 https://github.com/kamleshd07/agent-reliability/pull/2 | `7402b4e` | https://github.com/kamleshd07/agent-reliability/actions/runs/39018711695 | 6/6 success (py3.11/3.12/3.13, lint, artifacts, Node reference) |
+| Platform #53 https://github.com/kamleshd07/agent-reliability-platform/pull/53 | `1c45758` | https://github.com/kamleshd07/agent-reliability-platform/actions/runs/39018706354 | 6/6 success incl. frontend; no `postgres-slow` job in this PR |
+| Platform #54 https://github.com/kamleshd07/agent-reliability-platform/pull/54 | `28e6b00` | https://github.com/kamleshd07/agent-reliability-platform/actions/runs/39018705472 | 7/7 success incl. frontend and **PostgreSQL slow migration-safety tests** |
+
+The frontend audit was the only failing job before the fix; backend, PostgreSQL integration and slow jobs were
+already green. All four PRs are still drafts and `MERGEABLE`.
+
+**Required-check configuration (prepared, NOT applied).** Branch protection does not exist on either `main`
+(HTTP 404); the platform ruleset "Merge-rule" (id 22061691) is `disabled` with only deletion/non-fast-forward
+rules. The GitHub status-check names (taken from the check runs of the PR heads, produced by the GitHub Actions app)
+are the job names, not the workflow names:
+* SDK: `Lint, format, and type-check`; `Test stable contracts (py3.11)`, `Test stable contracts (py3.12)`,
+  `Test stable contracts (py3.13)`; `Release artifacts, extras, examples, and typing`;
+  `Independent Node reference check of the P28 contract fixtures`.
+* Platform: `Frontend type, test, accessibility, and browser gates` (includes the npm audit);
+  `Lint, format, and type-check`; `Unit and property tests`; `PostgreSQL integration and migrations`;
+  `PostgreSQL slow migration-safety tests` (decision D3; exists only once P-2's CI commit is on `main`, and a check
+  must have run once before it can be selected); `Package and dependency security`; `Production container artifact`.
+Applying these needs repository-administrator settings (Settings -> Branches / Rules); not done.
+
+**Remaining merge blockers (decisions, not CI):** merge authorization (none given; PRs are drafts); review/merge
+order P-1 -> P-2 and S-1 -> S-2; required checks not configured; D14 condition (production-equivalent OIDC matrix);
+OD-10 confirmation; decision whether S-2 (experimental judge) merges before the pilot-gate decision.
+
 **Status: `P28_P29_RELEASE_GOVERNANCE_APPROVED_AND_CI_VERIFIED` is NOT reached.** The owner pushed the four
 branches; draft PRs were opened and GitHub Actions ran. SDK CI is green on both PRs. The platform runs are green
 except one pre-existing, unrelated failure (frontend `npm audit`), and several governance gates are still open.
