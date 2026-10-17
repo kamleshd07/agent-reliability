@@ -1,8 +1,8 @@
 # Telemetry Contract
 
-Status: the M2 vendor-neutral event contract, M3 OpenTelemetry run-span
-mapping, and M4 evaluation provenance extension are implemented. M5 adds
-pure local analysis and does not change or emit telemetry.
+Status: the vendor-neutral event contract, OpenTelemetry run-span
+mapping, and evaluation provenance extension are implemented. Local analysis
+does not change or emit telemetry.
 Evaluation-to-OpenTelemetry mapping remains deferred.
 
 ## Principle
@@ -14,7 +14,7 @@ without changing the domain. Our additional semantics concern
 *agent reliability* — they extend telemetry, they do not replace
 distributed tracing, metrics, or logging as already defined by OTel.
 
-## M4 evaluation event extension
+## Evaluation event extension
 
 `EvaluationRecorded` preserves its existing run ID, indicator, outcome, and
 recording timestamp. It additively carries optional immutable evaluator
@@ -24,10 +24,10 @@ opaque version, optional configuration identity, evaluation completion time,
 and determinism declaration. No evaluation input, output, evidence payload,
 score, exception, or arbitrary metadata is emitted.
 
-This remains a vendor-neutral `EventSink` event. M4 does not add an OTel event,
+This remains a vendor-neutral `EventSink` event. The evaluation event does not add an OTel event,
 span attribute, metric, log mapping, or semantic-convention claim.
 
-## M3 resolution and continuing review rule
+## Semantic-convention review rule
 
 Before this project adopts or changes a span name or attribute key, it must:
 
@@ -42,33 +42,17 @@ Before this project adopts or changes a span name or attribute key, it must:
 4. Document the stability level of every convention adopted or
    introduced.
 
-M3's normative mapping, reviewed upstream versions, stability, privacy, and
+The normative adapter mapping, reviewed upstream versions, stability, privacy, and
 compatibility rules are in [OTEL_MAPPING.md](OTEL_MAPPING.md).
 
 ## Namespacing
 
 - Attributes and events defined by this project, not by OpenTelemetry
   upstream, live under a distinct namespace prefix reserved for this
-  project. M3 selected `agent_reliability.*`; every such attribute is
+  project. The adapter uses `agent_reliability.*`; every such attribute is
   Project Experimental and is not presented as an upstream convention.
 - Nothing under that namespace is considered stable until explicitly
   promoted; see versioning below.
-
-## Illustrative conceptual events (names not final)
-
-```text
-agent.run.started
-agent.run.completed
-agent.evaluation.completed
-agent.reliability.changed
-agent.slo.breached
-```
-
-These are placeholders to communicate intent (a run lifecycle, an
-evaluation being recorded, a reliability-state transition, an SLO
-breach) — not a committed schema. The M3 ADR ("OpenTelemetry integration
-strategy") replaces this list with real, versioned definitions, informed
-by step 1–4 above.
 
 ## Schema/convention versioning mechanism
 
@@ -81,7 +65,7 @@ stable         — follows semantic versioning; breaking changes require
                  a major version bump and a deprecation window
 ```
 
-M3 identifies its mapping with `agent_reliability.schema.version=1`. It does
+The adapter identifies its mapping with `agent_reliability.schema.version=1`. It does
 not claim an OpenTelemetry schema URL because the project has not published a
 schema file or transformation.
 What is decided now is that **no experimental convention may be

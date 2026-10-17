@@ -51,7 +51,7 @@ itself change the measurement—it explains how much tolerance remains.
 ## Burn rate
 
 Observed bad-event rate divided by the SLO's allowed bad-event rate. It is not
-“current failures divided by total failures.” M5 calculates a burn rate only
+“current failures divided by total failures.” The local reliability engine calculates a burn rate only
 when the caller supplies an explicit lookback ratio; it does not retain data or
 select a time window.
 

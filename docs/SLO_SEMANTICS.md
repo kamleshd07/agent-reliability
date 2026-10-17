@@ -1,6 +1,6 @@
 # SLO Semantics
 
-Status: implemented by M1 and consumed without formula duplication by M5.
+The domain SLO implementation is reused by local reliability analysis without formula duplication.
 This document defines the mathematics that the Reliability Domain Kernel
 implements exactly.
 No rolling-window algorithms, multi-window burn-rate alerting, or
@@ -89,7 +89,7 @@ between meeting and breaching a 99.5% target.
 
 ## SLO
 
-**Corrected by [ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md)**,
+**Corrected by the reliability semantics contract**,
 which resolved a contradiction in an earlier revision of this document
 (it had claimed the SLI itself "is already the bad fraction" for
 `AT_MOST` SLOs, which conflicts with `good_event` always meaning `PASS`
@@ -171,14 +171,14 @@ magnitude of a breach is never silently lost.
 
 Two distinct situations make the formulas above unable to produce an
 ordinary number, and they are not the same situation — see
-[ADR-0002](adr/0002-reliability-mathematics-and-undefined-data-semantics.md)
+the reliability semantics contract
 for the full reasoning:
 
 | Situation | `considered_events` | `allowed_bad_fraction` | Result |
 |---|---|---|---|
 | No data | `0` | any | SLI, error budget, and burn rate are all **undefined** — not `0`, not `1`. The SLO status is `UNKNOWN`. |
 | Zero tolerance, intact | `> 0` | `0` (a 100% `AT_LEAST` or 0% `AT_MOST` target) | `0` observed bad events → budget fully intact (`remaining_fraction = 1`, burn rate `0`); this is well-defined, not undefined, because zero violations against a zero-tolerance target is a real, decidable outcome. |
-| Zero tolerance, exceeded | `> 0` | `0` | `> 0` observed bad events → the true consumption/burn magnitude is unbounded (division by zero). This is reported as its own explicit state rather than as a floating-point infinity or `NaN` — see ADR-0002. |
+| Zero tolerance, exceeded | `> 0` | `0` | `> 0` observed bad events → the true consumption/burn magnitude is unbounded (division by zero). This is reported as its own explicit state rather than as a floating-point infinity or `NaN` — see the reliability semantics contract. |
 
 ## Burn Rate
 
@@ -215,7 +215,7 @@ budget above are, mechanically, the *same* division
 observation windows — a full window for the error budget, an arbitrary
 shorter lookback for burn rate. This is a discovered simplification,
 not two independently-specified formulas that happen to look similar;
-see ADR-0002. The zero-data and zero-tolerance cases above therefore
+see the reliability semantics contract. The zero-data and zero-tolerance cases above therefore
 apply identically to burn rate.
 
 **Not specified here (future ADR item):** multi-window burn-rate
@@ -229,7 +229,7 @@ report; it deliberately does not yet define an alerting policy.
 
 Every example above is a fixed calculation with no free implementation
 choice once the UNKNOWN policy and window boundaries are fixed. This
-makes them suitable as golden test cases at M1: given the same inputs,
+makes them suitable as golden domain test cases: given the same inputs,
 policy, and window, the domain kernel must reproduce these exact
 numbers, and property-based tests must confirm the general invariants
 (see [TESTING_STRATEGY.md](TESTING_STRATEGY.md)):
@@ -237,6 +237,6 @@ numbers, and property-based tests must confirm the general invariants
 ```text
 0 <= SLI <= 1 whenever it is defined
 error_budget_remaining_fraction is never NaN (it is a Fraction, or
-    None with an explicit status — see ADR-0002)
+    None with an explicit status — see the reliability semantics contract)
 identical input always produces identical output
 ```

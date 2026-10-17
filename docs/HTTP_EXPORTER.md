@@ -101,7 +101,7 @@ monotonic time and strict `>` expiry. Active time starts at first dispatch,
 continues through backoff, and stops for queued/held work.
 
 429 increments a separate per-record throttle counter and gates the whole
-sink. RA-b accepts exactly one ASCII digit field, numeric value at most
+sink. `Retry-After` accepts exactly one ASCII digit field, numeric value at most
 4,294,967,295, including long zero prefixes; dates, comma lists, multiple
 fields, signs and decimals are invalid. Clamp to remaining residence, then
 add independent 0–2-second jitter, including for zero. Invalid guidance uses
@@ -123,19 +123,14 @@ exhausts that record while still applying the gate.
   without that envelope retries normally.
 - Three matching compatibility-422 responses pause schema delivery;
   `resume_schema()` clears that gate and streak. Compatibility responses
-  consume no ordinary attempt. J2 recognizes `unsupported_schema_version`,
+  consume no ordinary attempt. The compatibility classifier recognizes `unsupported_schema_version`,
   or `validation_error` with exactly one detail at
   `location: ["body", "producer_identity"]`, independently of library type or
   message. Only acknowledgement resets the streak; other outcomes are neutral.
-- L2 (endpoint pause). The first redirect, or the **third consecutive TLS
+- Endpoint pause. The first redirect, or the **third consecutive TLS
   certificate-verification failure**, pauses endpoint delivery; `resume_endpoint()`
   is the explicit recovery. Records are held (up to the maximum residence), not
-  dropped. Details (the real-handshake tests in
-  `tests/unit/test_http_exporter_tls_real.py` cover classification of the four
-  verification failures, the exact third-failure pause, N-1, reset by an exchange
-  and by `resume_endpoint()`, interleaved plain-TCP failures, an explicit proxy, and
-  the async exporter; other network-failure kinds are covered by classification
-  tests only):
+  dropped. The endpoint-pause behavior is:
   - Scope: the streak belongs to one exporter instance, which is bound to one
     endpoint for its whole life; it is not shared between exporters or endpoints.
   - What counts: only a failed certificate verification (untrusted CA, wrong
@@ -153,8 +148,6 @@ exhausts that record while still applying the gate.
     code, not only acknowledgements) and `resume_endpoint()`. After a reset three
     further consecutive verification failures are needed to pause again.
   - Other gates remain independently active.
-  - These semantics, including the three refinements above (sent-attempt rule, proxy
-    CONNECT, per-exporter endpoint scope), were confirmed by the owner on 2026-10-17.
 - `409 deployment_identity_mismatch` permanently fails its record, cancels
   others and requires a new sink. `409 conflict` fails only its record.
   Other content 4xx errors permanently fail the affected record.
@@ -163,14 +156,14 @@ Held records remain subject to absolute residence. Resume never resets
 retry/throttle budgets. No automatic discovery, schema downgrade, endpoint
 probe or token fallback exists. Compatibility retries with alternating keys
 can amplify requests until active time expires; workload/rate targets remain
-pilot hypotheses rather than production SLOs (see the owner decision record).
+unvalidated workload assumptions rather than production SLOs.
 
 ## Security and lifecycle
 
 TLS certificate and hostname verification are always enabled. HTTPS URLs
-follow A-https-1 syntax checks; userinfo, backslashes and fragments are
+are syntax-checked; userinfo, backslashes and fragments are
 rejected. Plain HTTP permits literal 127/8 IPv4 and `[::1]` only; `localhost`
-is rejected under A2-3. No DNS result authorizes plaintext. Redirects are never
+is rejected. No DNS result authorizes plaintext. Redirects are never
 followed. The configured destination and an explicit inspecting proxy/CA
 remain trusted operator choices.
 
@@ -187,7 +180,7 @@ Requests and responses cap at 64 KiB. Response bytes are streamed with a cap;
 acknowledgements decode strict UTF-8, reject BOM/non-JSON tokens/trailing text,
 keep the last duplicate member, and compare exact case-sensitive names after
 unescaping. Unknown response members are ignored. Parser limits support the
-approved 64 nesting levels and 1,000-character number tokens. Malformed or
+64 nesting levels and 1,000-character number tokens. Malformed or
 oversized bodies never count as acknowledgement. JSON responses are requested
 without content compression.
 
@@ -237,8 +230,7 @@ event loop or this diagnostic. Mutations require the creating loop/thread;
 
 ## Stability status
 
-**Classification: INTERNAL** under `GA_CONTRACT.md` (owner decision of 2026-10-17; there is
-no "Beta" class and none was introduced). INTERNAL means "unsupported implementation detail;
+**Classification: INTERNAL** under [the compatibility contract](GA_CONTRACT.md). INTERNAL means "unsupported implementation detail;
 it may change in any release; importability does not create a promise". No compatibility
 promise beyond that existing policy is made, and no release version is promised here.
 
@@ -262,25 +254,6 @@ classification.
 
 ## Validation and integration boundary
 
-The vendored platform fixture files are unchanged. Run
-`python scripts/verify_p28_fixtures.py --platform-root ../agent-reliability-platform`
-for local drift checks. CI verifies hashes; a remote drift job awaits a
-published platform manifest/access mechanism. RA-b explicitly differs from
-older ra-006's RA-a expectation, and the test records both outcomes without
-editing the fixture. Loopback syntax and A2-3 restriction are also tested
-separately against the unchanged base vectors.
+Mocked delivery does not certify end-to-end operation. Validate secure ingestion, tenant isolation, identity binding, durable acknowledgement, replay/conflict handling, schema compatibility, rate limiting, lost acknowledgements and TLS behavior against the exact platform deployment and its persistence layer. Local results do not establish production readiness.
 
-Mocked delivery is not end-to-end certification. Combined PC-1/PC-2 live tests
-must prove machine auth/no fallback, organization isolation, identity binding,
-tenant-hidden 404, durable acknowledgement/replay conflict, v1/v2 digests,
-rate limits, mixed-fleet schema pause, lost acknowledgements, TLS/proxy
-isolation and bounded shutdown against actual persistence. Release still
-requires platform-first per-instance build evidence and independent review.
-
-
-Independent review identified a low-severity observability gap: some local
-structural diagnostics (exception-label substitution, unknown release,
-no-capable-child composite and unstamped final health) are private or not
-counted on the public snapshot. This is explicitly deferred; delivery
-commitment, retry/pause states and uncertainty must be monitored through the
-existing public fields. No claim of complete diagnostic-reason coverage is made.
+Monitor delivery commitment, retry/pause states and uncertainty through the documented snapshot fields. Some structural diagnostics are not counted there; no claim of complete diagnostic-reason coverage is made.

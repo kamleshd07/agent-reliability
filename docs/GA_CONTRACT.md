@@ -239,24 +239,23 @@ are internal. Direct imports are unsupported.
 `agent_reliability.experimental` exports nothing in 1.0. No experimental
 Python functionality is invented for GA.
 
-### P28 HTTP evidence exporter (unreleased): INTERNAL
+### HTTP evidence exporter (unreleased): INTERNAL
 
 `agent_reliability.adapters.http_event_sink` and everything behind it
-(`_http_delivery`, `_http_protocol`) are **INTERNAL** (owner decision of 2026-10-17); no Beta
+(`_http_delivery`, `_http_protocol`) are **INTERNAL**; no Beta
 class exists. [HTTP_EXPORTER.md](HTTP_EXPORTER.md) names the documented consumer entry
 points (the exporter classes, the delivery status types and local exceptions, the optional
 `HealthEvidenceSink` protocol and the `indicator=` argument of
 `RunHandle.record_evaluation_failure`); everything else is an implementation detail. No
 stable compatibility promise is made beyond the policy above.
 
-### Experimental namespace: `agent_reliability.experimental.judge` (P29, unreleased)
+### Experimental namespace: `agent_reliability.experimental.judge` (unreleased)
 
 Contract class **EXPERIMENTAL** (see Contract classes above; not part of 1.0,
 not part of any stable inventory). Not released: it exists only in an
 unpublished working tree. It follows the Experimental policy in
 [VERSIONING.md](VERSIONING.md) and may change in a minor release with release
-notes. Governing decision: [ADR-0010](adr/0010-experimental-judge-adapter-amends-adr-0007-decision-9.md)
-(amends ADR-0007 decision 9 for this namespace only). Its public names are the
+notes. Its documented names are the
 `__all__` of `agent_reliability.experimental.judge`, snapshotted by
 `tests/compat/test_experimental_judge_api.py`. It adds no wire member, no
 runtime dependency (`dependencies = []` is unchanged) and no change to any
@@ -298,7 +297,7 @@ assert_slo_met
 None of these additions change outcome semantics, reliability arithmetic,
 `UnknownPolicy` behavior, the evaluator protocol, degraded-mode behavior, or
 OTel behavior. `format_report`/`report_to_dict` never recompute a value the
-M1/M5 engine already produced. `assert_slo_met` never introduces a new
+domain/local reliability engine already produced. `assert_slo_met` never introduces a new
 UNKNOWN/failure policy; it only surfaces `SloStatus`/`AggregationConflict`
 values the engine already computed. A deliberate `JsonSchemaEvaluator`
 deferral is recorded in `CHANGELOG.md` under `[1.2.0]`.

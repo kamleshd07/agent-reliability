@@ -3,7 +3,7 @@
 ## Definition
 
 Evaluation provenance is the immutable attribution necessary to interpret one
-completed evaluation result. In M4 it answers:
+completed evaluation result. It answers:
 
 ```text
 Which evaluator produced the judgment?
@@ -39,7 +39,7 @@ other configuration changes. `configuration_id` is an opaque label, not raw
 configuration and not an automatically generated hash. It must contain no
 secret or customer content.
 
-M5 local reliability analysis groups observations by:
+Local reliability analysis groups observations by:
 
 ```text
 indicator
@@ -55,7 +55,7 @@ allows an evaluator change to be distinguished from an agent change. See
 
 ## What provenance does not contain
 
-M4 provenance never automatically contains:
+Evaluator provenance never automatically contains:
 
 - evaluation input or output;
 - prompt, response, tool arguments, message history, or domain object;

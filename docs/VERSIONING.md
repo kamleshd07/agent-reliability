@@ -52,7 +52,7 @@ namespace/label and may evolve in a minor release with prominent notes. This
 does not weaken stable contracts.
 
 The first Experimental namespace is `agent_reliability.experimental.judge`
-(an LLM-judge evaluator adapter; [ADR-0010](adr/0010-experimental-judge-adapter-amends-adr-0007-decision-9.md)).
+(an LLM-judge evaluator adapter; the experimental evaluation policy).
 It is excluded from the stable inventory: its names, signatures, defaults,
 prompt-template text (identified by `template_id`, currently `jp1`),
 reason-code vocabulary and failure classes may change in a minor release with
