@@ -1,0 +1,1537 @@
+{
+ "fixture_format_version": 1,
+ "wire_version": 1,
+ "kind": "operational vectors: plaintext loopback endpoint URL rule, Retry-After rule, A-https-1 endpoint rule (pending option) and acknowledgement classification (P28 Contract 15.1, 15.5)",
+ "provenance": {
+  "generated_by": "DESIGN-013 throwaway scripts: implementation 1 (stepwise, no regex) and implementation 2 (single anchored regex plus numeric checks); every vector gave the same outcome in both and equals the expected outcome; a 200,000-string fuzz run found 0 disagreements between the two; DESIGN-021 added the A-https-1 vectors (two implementations plus a 200,000-string fuzz, 0 disagreements) and the acknowledgement vectors; DESIGN-023 added three acknowledgement vectors (byte-order mark, duplicate members, trailing text) classified identically by two implementations; DESIGN-025 added two acknowledgement vectors (case-variant member name, NaN token) classified identically by two implementations; DESIGN-027 added acknowledgement_byte_vectors (byte-level rules of Contract 15.1) classified by two independent implementations; no earlier array was changed; DESIGN-029 added acknowledgement_escape_vectors (JSON escape handling of Contract 15.1) classified by two independent implementations; no earlier array was changed; P28 PC-2 owner decision D1 (2026-10-16) added acknowledgement_extra_member_vectors (additional members of the acknowledgement; classified identically by the Python reference decoder in tests/contracts and the Node decoder in tests/contracts/node); no earlier array was changed",
+  "specification": "P28 Contract 15.5 (rules, not the implementations, are normative)"
+ },
+ "loopback_url_vectors": [
+  {
+   "id": "lb-001",
+   "note": "name without port",
+   "expected": "accept",
+   "input": "http://localhost"
+  },
+  {
+   "id": "lb-002",
+   "note": "ASCII case-insensitive host, port, path",
+   "expected": "accept",
+   "input": "http://LOCALHOST:8080/x"
+  },
+  {
+   "id": "lb-003",
+   "note": "lowest port",
+   "expected": "accept",
+   "input": "http://localhost:1"
+  },
+  {
+   "id": "lb-004",
+   "note": "highest port",
+   "expected": "accept",
+   "input": "http://localhost:65535"
+  },
+  {
+   "id": "lb-005",
+   "note": "loopback literal",
+   "expected": "accept",
+   "input": "http://127.0.0.1"
+  },
+  {
+   "id": "lb-006",
+   "note": "127/8, port, path, query",
+   "expected": "accept",
+   "input": "http://127.1.2.3:9/p?q"
+  },
+  {
+   "id": "lb-007",
+   "note": "network address of 127/8",
+   "expected": "accept",
+   "input": "http://127.0.0.0"
+  },
+  {
+   "id": "lb-008",
+   "note": "top of 127/8",
+   "expected": "accept",
+   "input": "http://127.255.255.255:80"
+  },
+  {
+   "id": "lb-009",
+   "note": "bracketed loopback with port",
+   "expected": "accept",
+   "input": "http://[::1]:8000"
+  },
+  {
+   "id": "lb-010",
+   "note": "bracketed loopback",
+   "expected": "accept",
+   "input": "http://[::1]"
+  },
+  {
+   "id": "lb-011",
+   "note": "authority ends at ?",
+   "expected": "accept",
+   "input": "http://localhost?x=1"
+  },
+  {
+   "id": "lb-012",
+   "note": "percent in the path is allowed (only the authority is restricted)",
+   "expected": "accept",
+   "input": "http://localhost/a%20b"
+  },
+  {
+   "id": "lb-013",
+   "note": "five-digit port",
+   "expected": "accept",
+   "input": "http://127.0.0.1:12345/api/v1"
+  },
+  {
+   "id": "lb-014",
+   "note": "fragment anywhere is rejected (revises DESIGN-011 vector)",
+   "expected": "reject",
+   "input": "http://127.1.2.3:9/p?q#f"
+  },
+  {
+   "id": "lb-015",
+   "note": "empty fragment",
+   "expected": "reject",
+   "input": "http://localhost#"
+  },
+  {
+   "id": "lb-016",
+   "note": "fragment after path",
+   "expected": "reject",
+   "input": "http://localhost/#frag"
+  },
+  {
+   "id": "lb-017",
+   "note": "port 0",
+   "expected": "reject",
+   "input": "http://localhost:0"
+  },
+  {
+   "id": "lb-018",
+   "note": "leading zeros in port",
+   "expected": "reject",
+   "input": "http://localhost:00080"
+  },
+  {
+   "id": "lb-019",
+   "note": "leading zero in port",
+   "expected": "reject",
+   "input": "http://localhost:080"
+  },
+  {
+   "id": "lb-020",
+   "note": "port above 65535",
+   "expected": "reject",
+   "input": "http://localhost:65536"
+  },
+  {
+   "id": "lb-021",
+   "note": "port above 65535",
+   "expected": "reject",
+   "input": "http://localhost:99999"
+  },
+  {
+   "id": "lb-022",
+   "note": "six-digit port",
+   "expected": "reject",
+   "input": "http://localhost:100000"
+  },
+  {
+   "id": "lb-023",
+   "note": "empty port",
+   "expected": "reject",
+   "input": "http://localhost:"
+  },
+  {
+   "id": "lb-024",
+   "note": "non-digit port text",
+   "expected": "reject",
+   "input": "http://localhost:99999x"
+  },
+  {
+   "id": "lb-025",
+   "note": "bracketed host, port 0",
+   "expected": "reject",
+   "input": "http://[::1]:0"
+  },
+  {
+   "id": "lb-026",
+   "note": "bracketed host, port above 65535",
+   "expected": "reject",
+   "input": "http://[::1]:70000"
+  },
+  {
+   "id": "lb-027",
+   "note": "trailing dot",
+   "expected": "reject",
+   "input": "http://localhost."
+  },
+  {
+   "id": "lb-028",
+   "note": "short IPv4",
+   "expected": "reject",
+   "input": "http://127.1"
+  },
+  {
+   "id": "lb-029",
+   "note": "hex octet",
+   "expected": "reject",
+   "input": "http://0x7f.0.0.1"
+  },
+  {
+   "id": "lb-030",
+   "note": "integer IPv4",
+   "expected": "reject",
+   "input": "http://2130706433"
+  },
+  {
+   "id": "lb-031",
+   "note": "leading zero octet",
+   "expected": "reject",
+   "input": "http://127.0.0.01"
+  },
+  {
+   "id": "lb-032",
+   "note": "octet above 255",
+   "expected": "reject",
+   "input": "http://127.0.0.256"
+  },
+  {
+   "id": "lb-033",
+   "note": "long IPv6 form",
+   "expected": "reject",
+   "input": "http://[0:0:0:0:0:0:0:1]"
+  },
+  {
+   "id": "lb-034",
+   "note": "IPv4-mapped IPv6",
+   "expected": "reject",
+   "input": "http://[::ffff:127.0.0.1]"
+  },
+  {
+   "id": "lb-035",
+   "note": "unspecified address",
+   "expected": "reject",
+   "input": "http://0.0.0.0"
+  },
+  {
+   "id": "lb-036",
+   "note": "suffix host",
+   "expected": "reject",
+   "input": "http://127.0.0.1.evil.test"
+  },
+  {
+   "id": "lb-037",
+   "note": "ideographic full stop separators",
+   "expected": "reject",
+   "input_code_points": [
+    104,
+    116,
+    116,
+    112,
+    58,
+    47,
+    47,
+    49,
+    50,
+    55,
+    12290,
+    48,
+    12290,
+    48,
+    12290,
+    49,
+    47
+   ]
+  },
+  {
+   "id": "lb-038",
+   "note": "backslash",
+   "expected": "reject",
+   "input": "http://127.0.0.1\\@evil.test/"
+  },
+  {
+   "id": "lb-039",
+   "note": "userinfo",
+   "expected": "reject",
+   "input": "http://user@127.0.0.1"
+  },
+  {
+   "id": "lb-040",
+   "note": "port-looking userinfo",
+   "expected": "reject",
+   "input": "http://127.0.0.1:80@evil.test"
+  },
+  {
+   "id": "lb-041",
+   "note": "percent-encoded host",
+   "expected": "reject",
+   "input": "http://localhost%2e"
+  },
+  {
+   "id": "lb-042",
+   "note": "percent-encoded host letters",
+   "expected": "reject",
+   "input": "http://%6c%6fcalhost"
+  },
+  {
+   "id": "lb-043",
+   "note": "scheme not lowercase",
+   "expected": "reject",
+   "input": "HTTP://localhost"
+  },
+  {
+   "id": "lb-044",
+   "note": "scheme mixed case",
+   "expected": "reject",
+   "input": "Http://localhost"
+  },
+  {
+   "id": "lb-045",
+   "note": "https scheme not lowercase is also rejected, never normalized",
+   "expected": "reject",
+   "input": "HTTPS://localhost"
+  },
+  {
+   "id": "lb-046",
+   "note": "scheme",
+   "expected": "reject",
+   "input": "ftp://localhost"
+  },
+  {
+   "id": "lb-047",
+   "note": "empty",
+   "expected": "reject",
+   "input": "http://"
+  },
+  {
+   "id": "lb-048",
+   "note": "empty authority",
+   "expected": "reject",
+   "input": "http:///x"
+  },
+  {
+   "id": "lb-049",
+   "note": "unterminated bracket",
+   "expected": "reject",
+   "input": "http://[::1"
+  },
+  {
+   "id": "lb-050",
+   "note": "bracketed host with suffix",
+   "expected": "reject",
+   "input": "http://[::1].evil.test"
+  },
+  {
+   "id": "lb-051",
+   "note": "control character",
+   "expected": "reject",
+   "input": "http://localhost/\t"
+  },
+  {
+   "id": "lb-052",
+   "note": "space",
+   "expected": "reject",
+   "input": "http://localhost/ x"
+  },
+  {
+   "id": "lb-053",
+   "note": "non-ASCII in path",
+   "expected": "reject",
+   "input_code_points": [
+    104,
+    116,
+    116,
+    112,
+    58,
+    47,
+    47,
+    108,
+    111,
+    99,
+    97,
+    108,
+    104,
+    111,
+    115,
+    116,
+    47,
+    233
+   ]
+  },
+  {
+   "id": "lb-054",
+   "note": "dotless i look-alike host",
+   "expected": "reject",
+   "input_code_points": [
+    104,
+    116,
+    116,
+    112,
+    58,
+    47,
+    47,
+    108,
+    111,
+    99,
+    97,
+    108,
+    305,
+    104,
+    111,
+    115,
+    116
+   ]
+  },
+  {
+   "id": "lb-055",
+   "note": "other name",
+   "expected": "reject",
+   "input": "http://localhost.localdomain"
+  },
+  {
+   "id": "lb-056",
+   "note": "other host",
+   "expected": "reject",
+   "input": "http://example.com"
+  },
+  {
+   "id": "lb-057",
+   "note": "empty host",
+   "expected": "reject",
+   "input": "http://:80"
+  },
+  {
+   "id": "lb-058",
+   "note": "two colons",
+   "expected": "reject",
+   "input": "http://127.0.0.1:80:90"
+  },
+  {
+   "id": "lb-059",
+   "note": "empty string",
+   "expected": "reject",
+   "input": ""
+  },
+  {
+   "id": "lb-060",
+   "note": "no scheme",
+   "expected": "reject",
+   "input": "localhost:8000"
+  },
+  {
+   "id": "lb-061",
+   "note": "https is not a plaintext case",
+   "expected": "not_a_plaintext_case",
+   "input": "https://localhost"
+  },
+  {
+   "id": "lb-062",
+   "note": "https is not a plaintext case",
+   "expected": "not_a_plaintext_case",
+   "input": "https://example.com/a"
+  },
+  {
+   "id": "lb-063",
+   "note": "https with a fragment is out of scope (step 1 precedes the fragment test)",
+   "expected": "not_a_plaintext_case",
+   "input": "https://example.com/#frag"
+  },
+  {
+   "id": "lb-064",
+   "note": "https with a space is out of scope",
+   "expected": "not_a_plaintext_case",
+   "input": "https://example.com/a b"
+  },
+  {
+   "id": "lb-065",
+   "note": "https with a non-ASCII host is out of scope",
+   "expected": "not_a_plaintext_case",
+   "input_code_points": [
+    104,
+    116,
+    116,
+    112,
+    115,
+    58,
+    47,
+    47,
+    101,
+    120,
+    228,
+    109,
+    112,
+    108,
+    101,
+    46,
+    99,
+    111,
+    109
+   ]
+  }
+ ],
+ "retry_after_vectors": [
+  {
+   "id": "ra-001",
+   "field_lines": [
+    "60"
+   ],
+   "expected_delay_seconds": 60
+  },
+  {
+   "id": "ra-002",
+   "field_lines": [
+    "0"
+   ],
+   "expected_delay_seconds": 0
+  },
+  {
+   "id": "ra-003",
+   "field_lines": [
+    "060"
+   ],
+   "expected_delay_seconds": 60
+  },
+  {
+   "id": "ra-004",
+   "field_lines": [
+    "4294967295"
+   ],
+   "expected_delay_seconds": 4294967295
+  },
+  {
+   "id": "ra-005",
+   "field_lines": [
+    "0000000060"
+   ],
+   "expected_delay_seconds": 60
+  },
+  {
+   "id": "ra-006",
+   "field_lines": [
+    "00000000060"
+   ],
+   "expected_delay_seconds": null,
+   "pending_option": "Ratification R option RA: expected is null under RA-a (the narrowing, used here) and 60 under RA-b"
+  },
+  {
+   "id": "ra-007",
+   "field_lines": [
+    "4294967296"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-008",
+   "field_lines": [
+    "99999999999"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-009",
+   "field_lines": [
+    ""
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-010",
+   "field_lines": [
+    "-1"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-011",
+   "field_lines": [
+    "+5"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-012",
+   "field_lines": [
+    "1.5"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-013",
+   "field_lines": [
+    "6_0"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-014",
+   "field_lines": [
+    " 60"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-015",
+   "field_lines": [
+    "60 "
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-016",
+   "field_lines_code_points": [
+    [
+     65302,
+     65296
+    ]
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-017",
+   "field_lines_code_points": [
+    [
+     1638,
+     1632
+    ]
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-018",
+   "field_lines": [
+    "Wed, 21 Oct 2026 07:28:00 GMT"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-019",
+   "field_lines": [
+    "60, 60"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-020",
+   "field_lines": [
+    "60",
+    "60"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-021",
+   "field_lines": [
+    "abc"
+   ],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-022",
+   "field_lines": [],
+   "expected_delay_seconds": null
+  },
+  {
+   "id": "ra-023",
+   "field_lines": [
+    "60\n"
+   ],
+   "expected_delay_seconds": null
+  }
+ ],
+ "https_endpoint_vectors_a_https_1": {
+  "applies_only_if": "Decision A option A-https-1 is selected (pending); outside that option these URLs are only 'not a plaintext case'",
+  "vectors": [
+   {
+    "id": "ah-001",
+    "note": "plain host",
+    "expected": "accept",
+    "input": "https://example.com"
+   },
+   {
+    "id": "ah-002",
+    "note": "path",
+    "expected": "accept",
+    "input": "https://example.com/a"
+   },
+   {
+    "id": "ah-003",
+    "note": "upper-case host",
+    "expected": "accept",
+    "input": "https://EXAMPLE.com"
+   },
+   {
+    "id": "ah-004",
+    "note": "port with path",
+    "expected": "accept",
+    "input": "https://example.com:443/x"
+   },
+   {
+    "id": "ah-005",
+    "note": "authority ends at ?",
+    "expected": "accept",
+    "input": "https://example.com?x=1"
+   },
+   {
+    "id": "ah-006",
+    "note": "bracketed IPv6 with port",
+    "expected": "accept",
+    "input": "https://[::1]:8443/"
+   },
+   {
+    "id": "ah-007",
+    "note": "bracketed IPv6, no port",
+    "expected": "accept",
+    "input": "https://[2001:db8::1]/x"
+   },
+   {
+    "id": "ah-008",
+    "note": "IPv4 literal with port",
+    "expected": "accept",
+    "input": "https://127.0.0.1:8443"
+   },
+   {
+    "id": "ah-009",
+    "note": "lowest port",
+    "expected": "accept",
+    "input": "https://example.com:1"
+   },
+   {
+    "id": "ah-010",
+    "note": "highest port",
+    "expected": "accept",
+    "input": "https://example.com:65535"
+   },
+   {
+    "id": "ah-011",
+    "note": "subdomains",
+    "expected": "accept",
+    "input": "https://a.b.c.example.com/v1/evidence"
+   },
+   {
+    "id": "ah-012",
+    "note": "empty port",
+    "expected": "reject",
+    "input": "https://example.com:/x"
+   },
+   {
+    "id": "ah-013",
+    "note": "empty host",
+    "expected": "reject",
+    "input": "https://:443/x"
+   },
+   {
+    "id": "ah-014",
+    "note": "more than one colon outside brackets",
+    "expected": "reject",
+    "input": "https://a:b:c/"
+   },
+   {
+    "id": "ah-015",
+    "note": "non-digit port text",
+    "expected": "reject",
+    "input": "https://example.com:44x3/"
+   },
+   {
+    "id": "ah-016",
+    "note": "unterminated bracket",
+    "expected": "reject",
+    "input": "https://[::1"
+   },
+   {
+    "id": "ah-017",
+    "note": "text after the closing bracket that is not a port",
+    "expected": "reject",
+    "input": "https://[::1]x/"
+   },
+   {
+    "id": "ah-018",
+    "note": "userinfo",
+    "expected": "reject",
+    "input": "https://u:p@example.com/x"
+   },
+   {
+    "id": "ah-019",
+    "note": "fragment",
+    "expected": "reject",
+    "input": "https://example.com/#f"
+   },
+   {
+    "id": "ah-020",
+    "note": "backslash",
+    "expected": "reject",
+    "input": "https://good.com\\@evil.example/x"
+   },
+   {
+    "id": "ah-021",
+    "note": "port 0",
+    "expected": "reject",
+    "input": "https://example.com:0/"
+   },
+   {
+    "id": "ah-022",
+    "note": "port above 65535",
+    "expected": "reject",
+    "input": "https://example.com:65536/"
+   },
+   {
+    "id": "ah-023",
+    "note": "leading zero in port",
+    "expected": "reject",
+    "input": "https://example.com:080/"
+   },
+   {
+    "id": "ah-024",
+    "note": "space",
+    "expected": "reject",
+    "input": "https://example.com/a b"
+   },
+   {
+    "id": "ah-025",
+    "note": "non-ASCII host (punycode must be supplied)",
+    "expected": "reject",
+    "input_code_points": [
+     104,
+     116,
+     116,
+     112,
+     115,
+     58,
+     47,
+     47,
+     101,
+     120,
+     228,
+     109,
+     112,
+     108,
+     101,
+     46,
+     99,
+     111,
+     109
+    ]
+   },
+   {
+    "id": "ah-026",
+    "note": "percent in the authority",
+    "expected": "reject",
+    "input": "https://example.com%2e/"
+   },
+   {
+    "id": "ah-027",
+    "note": "empty bracket",
+    "expected": "reject",
+    "input": "https://[]/x"
+   },
+   {
+    "id": "ah-028",
+    "note": "empty port after bracket",
+    "expected": "reject",
+    "input": "https://[::1]:/"
+   },
+   {
+    "id": "ah-029",
+    "note": "non-hex character in the bracket",
+    "expected": "reject",
+    "input": "https://[g::1]/"
+   },
+   {
+    "id": "ah-030",
+    "note": "nothing after the scheme",
+    "expected": "reject",
+    "input": "https://"
+   },
+   {
+    "id": "ah-031",
+    "note": "empty authority",
+    "expected": "reject",
+    "input": "https:///x"
+   },
+   {
+    "id": "ah-032",
+    "note": "scheme not lowercase (fails step 1)",
+    "expected": "reject",
+    "input": "HTTPS://example.com"
+   },
+   {
+    "id": "ah-033",
+    "note": "not https (fails step 1)",
+    "expected": "reject",
+    "input": "http://example.com"
+   },
+   {
+    "id": "ah-034",
+    "note": "control character",
+    "expected": "reject",
+    "input": "https://example.com/\t"
+   },
+   {
+    "id": "ah-035",
+    "note": "port above 65535",
+    "expected": "reject",
+    "input": "https://example.com:99999/"
+   }
+  ]
+ },
+ "acknowledgement_vectors": {
+  "rule": "Contract 15.1: 201 with status accepted or 200 with status duplicate, body = documented object with event_id equal to the id sent, durability committed, run_id a lowercase hyphenated UUID; otherwise not an acknowledgement (TRANSIENT, marker set)",
+  "vectors": [
+   {
+    "id": "ack-valid-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\"}",
+    "expected": "ack:COMMITTED",
+    "note": "documented object, status accepted"
+   },
+   {
+    "id": "ack-valid-200",
+    "http_status": 200,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"duplicate\", \"durability\": \"committed\"}",
+    "expected": "ack:DUPLICATE",
+    "note": "documented object, status duplicate"
+   },
+   {
+    "id": "ack-extra-member-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"extra\": \"x\"}",
+    "expected": "ack:COMMITTED",
+    "note": "additional members are ignored"
+   },
+   {
+    "id": "ack-html-200",
+    "http_status": 200,
+    "sent_event_id": "evt_1",
+    "body_text": "<html><body>Welcome</body></html>",
+    "expected": "not_ack:response_unparseable",
+    "note": "SPA fallback or block page"
+   },
+   {
+    "id": "ack-empty-200",
+    "http_status": 200,
+    "sent_event_id": "evt_1",
+    "body_text": "",
+    "expected": "not_ack:response_unparseable",
+    "note": "empty body"
+   },
+   {
+    "id": "ack-empty-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "",
+    "expected": "not_ack:response_unparseable",
+    "note": "empty body"
+   },
+   {
+    "id": "ack-json-array-200",
+    "http_status": 200,
+    "sent_event_id": "evt_1",
+    "body_text": "[]",
+    "expected": "not_ack:response_unparseable",
+    "note": "JSON but not an object"
+   },
+   {
+    "id": "ack-json-null-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "null",
+    "expected": "not_ack:response_unparseable",
+    "note": "JSON null"
+   },
+   {
+    "id": "ack-empty-object-200",
+    "http_status": 200,
+    "sent_event_id": "evt_1",
+    "body_text": "{}",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "required members missing"
+   },
+   {
+    "id": "ack-wrong-event-id-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_2\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\"}",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "event_id differs from the id sent"
+   },
+   {
+    "id": "ack-wrong-status-for-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"duplicate\", \"durability\": \"committed\"}",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "201 must carry accepted"
+   },
+   {
+    "id": "ack-wrong-status-for-200",
+    "http_status": 200,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\"}",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "200 must carry duplicate"
+   },
+   {
+    "id": "ack-durability-pending",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"pending\"}",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "durability must be committed"
+   },
+   {
+    "id": "ack-run-id-not-uuid",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"not-a-uuid\", \"status\": \"accepted\", \"durability\": \"committed\"}",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "run_id must be a lowercase hyphenated UUID"
+   },
+   {
+    "id": "ack-event-id-number",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": 1, \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\"}",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "event_id must be a string"
+   },
+   {
+    "id": "ack-204-empty",
+    "http_status": 204,
+    "sent_event_id": "evt_1",
+    "body_text": "",
+    "expected": "other_2xx_transient",
+    "note": "any other 2xx is transient (Contract 15.1)"
+   },
+   {
+    "id": "ack-bom-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "\ufeff{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\"}",
+    "expected": "not_ack:response_unparseable",
+    "note": "a leading byte-order mark (U+FEFF) makes the body not valid JSON; strict parsers agree, lenient ones must be configured to reject it"
+   },
+   {
+    "id": "ack-duplicate-members-last-wins-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_2\", \"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\"}",
+    "expected": "ack:COMMITTED",
+    "note": "duplicate object member: the last value wins (the first event_id evt_2 is overridden by evt_1), so the body is classified by its final value; a parser that keeps the first value or rejects duplicates must be configured to follow this rule"
+   },
+   {
+    "id": "ack-trailing-text-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\"} trailing",
+    "expected": "not_ack:response_unparseable",
+    "note": "text after the JSON object makes the body not a single JSON value"
+   },
+   {
+    "id": "ack-case-variant-member-name-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"Event_ID\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\"}",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "member names match exactly and case-sensitively; Event_ID is not event_id, so a required member is missing (a decoder that matches names case-insensitively, such as Go's default, must be configured off)"
+   },
+   {
+    "id": "ack-nan-token-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"x\": NaN}",
+    "expected": "not_ack:response_unparseable",
+    "note": "NaN, Infinity and -Infinity are not RFC 8259 JSON, so the body is unparseable whichever member holds them (Python's default json.loads accepts them and must be configured to reject)"
+   }
+  ]
+ },
+ "acknowledgement_byte_vectors": {
+  "rule": "Contract 15.1 byte-level rules: body_hex is the response body as bytes in hexadecimal; the body must be strict UTF-8 (no byte-order mark, no UTF-16/32 detection), valid RFC 8259 JSON, last duplicate member wins, member names exact, required members strings; 'allowed' lists the outcomes that are both conforming where the body exceeds the minimum nesting depth (64) or number-token length (1,000) every implementation must support",
+  "vectors": [
+   {
+    "id": "ackb-utf8-bom-bytes",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "efbbbf7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "note": "UTF-8 byte-order mark bytes EF BB BF before the object: unparseable (a decoder that strips the BOM silently, such as Python json.loads on bytes or a default Node TextDecoder, must be configured not to)",
+    "expected": "not_ack:response_unparseable"
+   },
+   {
+    "id": "ackb-invalid-utf8-in-extra-member",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c2278223a22ff227d",
+    "note": "byte FF (invalid UTF-8) inside the string of an extra member: the body is not strict UTF-8, so it is unparseable (Go and a default Node TextDecoder repair it to U+FFFD and must be configured to reject)",
+    "expected": "not_ack:response_unparseable"
+   },
+   {
+    "id": "ackb-invalid-utf8-in-event-id",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745fff222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "note": "invalid UTF-8 in a required member is unparseable, not a mismatch: decoding fails before any member is read",
+    "expected": "not_ack:response_unparseable"
+   },
+   {
+    "id": "ackb-overlong-utf8-in-extra-member",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c2278223a22c0af227d",
+    "note": "overlong UTF-8 encoding C0 AF is invalid UTF-8",
+    "expected": "not_ack:response_unparseable"
+   },
+   {
+    "id": "ackb-utf16le-bom",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "fffe7b0022006500760065006e0074005f006900640022003a0022006500760074005f00310022002c002200720075006e005f006900640022003a002200300030003000300030003000300030002d0030003000300030002d0034003000300030002d0038003000300030002d0030003000300030003000300030003000300030003000370022002c00220073007400610074007500730022003a0022006100630063006500700074006500640022002c0022006400750072006100620069006c0069007400790022003a00220063006f006d006d006900740074006500640022007d00",
+    "note": "UTF-16LE with a byte-order mark: the body is not UTF-8 JSON; no UTF-16/32 detection is performed (Python json.loads on bytes auto-detects it and must not be used on bytes)",
+    "expected": "not_ack:response_unparseable"
+   },
+   {
+    "id": "ackb-utf16le-no-bom",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b0022006500760065006e0074005f006900640022003a0022006500760074005f00310022002c002200720075006e005f006900640022003a002200300030003000300030003000300030002d0030003000300030002d0034003000300030002d0038003000300030002d0030003000300030003000300030003000300030003000370022002c00220073007400610074007500730022003a0022006100630063006500700074006500640022002c0022006400750072006100620069006c0069007400790022003a00220063006f006d006d006900740074006500640022007d00",
+    "note": "UTF-16LE without a mark: NUL bytes are not valid JSON outside a string; no encoding detection",
+    "expected": "not_ack:response_unparseable"
+   },
+   {
+    "id": "ackb-utf32be-no-bom",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "0000007b000000220000006500000076000000650000006e000000740000005f0000006900000064000000220000003a000000220000006500000076000000740000005f00000031000000220000002c0000002200000072000000750000006e0000005f0000006900000064000000220000003a0000002200000030000000300000003000000030000000300000003000000030000000300000002d000000300000003000000030000000300000002d000000340000003000000030000000300000002d000000380000003000000030000000300000002d000000300000003000000030000000300000003000000030000000300000003000000030000000300000003000000037000000220000002c00000022000000730000007400000061000000740000007500000073000000220000003a000000220000006100000063000000630000006500000070000000740000006500000064000000220000002c000000220000006400000075000000720000006100000062000000690000006c000000690000007400000079000000220000003a00000022000000630000006f0000006d0000006d0000006900000074000000740000006500000064000000220000007d",
+    "note": "UTF-32BE without a mark: unparseable; no encoding detection",
+    "expected": "not_ack:response_unparseable"
+   },
+   {
+    "id": "ackb-nesting-64-in-extra-member",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c2278223a5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d7d",
+    "note": "an extra member nested 64 levels deep must be accepted: 64 is the minimum nesting depth an implementation must support",
+    "expected": "ack:COMMITTED"
+   },
+   {
+    "id": "ackb-nesting-5000-in-extra-member",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c2278223a5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d7d",
+    "note": "nesting 5,000 exceeds the required minimum: an implementation either accepts (ack) or exceeds its own limit (response_unparseable); both are conforming, nothing else is",
+    "allowed": [
+     "ack:COMMITTED",
+     "not_ack:response_unparseable"
+    ]
+   },
+   {
+    "id": "ackb-integer-1000-digits-in-extra-member",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c2278223a313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131317d",
+    "note": "a number token of 1,000 characters must be accepted: 1,000 is the minimum number-token length an implementation must support",
+    "expected": "ack:COMMITTED"
+   },
+   {
+    "id": "ackb-integer-5000-digits-in-extra-member",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c2278223a31313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131317d",
+    "note": "a number token of 5,000 characters exceeds the required minimum: ack or response_unparseable (Python 3.11 raises ValueError above 4,300 digits)",
+    "allowed": [
+     "ack:COMMITTED",
+     "not_ack:response_unparseable"
+    ]
+   },
+   {
+    "id": "ackb-exponent-1e999-in-extra-member",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c2278223a31653939397d",
+    "note": "1e999 is valid JSON but not representable as a double: ack, or response_unparseable where the decoder rejects it (Go generic decoding)",
+    "allowed": [
+     "ack:COMMITTED",
+     "not_ack:response_unparseable"
+    ]
+   },
+   {
+    "id": "ackb-duplicate-event-id-last-null",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c226576656e745f6964223a6e756c6c7d",
+    "note": "the last duplicate wins even when it is null: event_id is null, a required member that is not a string (a Go struct decoder keeps the earlier value and must not be used)",
+    "expected": "not_ack:acknowledgement_mismatch"
+   },
+   {
+    "id": "ackb-event-id-null",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a6e756c6c2c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "note": "required member null",
+    "expected": "not_ack:acknowledgement_mismatch"
+   },
+   {
+    "id": "ackb-durability-null",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a6e756c6c7d",
+    "note": "required member null",
+    "expected": "not_ack:acknowledgement_mismatch"
+   },
+   {
+    "id": "ackb-status-number",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a312c226475726162696c697479223a22636f6d6d6974746564227d",
+    "note": "required member not a string",
+    "expected": "not_ack:acknowledgement_mismatch"
+   },
+   {
+    "id": "ackb-run-id-number",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a372c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "note": "required member not a string",
+    "expected": "not_ack:acknowledgement_mismatch"
+   }
+  ]
+ },
+ "acknowledgement_escape_vectors": {
+  "rule": "Contract 15.1: member names and string values are compared after JSON unescaping, exactly and case-sensitively; a lone-surrogate escape is not an error by itself and equals no id; each vector gives the body both as ASCII text (body_text) and as hexadecimal bytes (body_hex, the same bytes)",
+  "vectors": [
+   {
+    "id": "acke-escaped-name-event-id",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"\\u0065vent_id\":\"evt_1\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\"}",
+    "body_hex": "7b225c753030363576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "expected": "ack:COMMITTED",
+    "note": "member names are compared after JSON unescaping: the escape u0065 is e, so the name is event_id"
+   },
+   {
+    "id": "acke-all-names-escaped",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"\\u0065vent\\u005fid\":\"evt_1\",\"\\u0072un_id\":\"00000000-0000-4000-8000-000000000007\",\"\\u0073tatus\":\"accepted\",\"\\u0064urability\":\"committed\"}",
+    "body_hex": "7b225c753030363576656e745c75303035666964223a226576745f31222c225c7530303732756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c225c75303037337461747573223a226163636570746564222c225c753030363475726162696c697479223a22636f6d6d6974746564227d",
+    "expected": "ack:COMMITTED",
+    "note": "all four names written with escapes"
+   },
+   {
+    "id": "acke-escaped-value-event-id",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\":\"evt\\u005f1\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\"}",
+    "body_hex": "7b226576656e745f6964223a226576745c753030356631222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "expected": "ack:COMMITTED",
+    "note": "string values are compared after unescaping: evt then u005f then 1 is evt_1"
+   },
+   {
+    "id": "acke-escaped-name-upper-case",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"\\u0045vent_id\":\"evt_1\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\"}",
+    "body_hex": "7b225c753030343576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "the escape u0045 is E, so the name is Event_id: not event_id, compared case-sensitively after unescaping"
+   },
+   {
+    "id": "acke-duplicate-escaped-name-last-null",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\":\"evt_1\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\",\"\\u0065vent_id\":null}",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c225c753030363576656e745f6964223a6e756c6c7d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "an escaped duplicate of event_id is the same name: last wins, and null is not a string"
+   },
+   {
+    "id": "acke-duplicate-escaped-name-last-wrong",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\":\"evt_1\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\",\"\\u0065vent_id\":\"evt_2\"}",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c225c753030363576656e745f6964223a226576745f32227d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "an escaped duplicate of event_id is the same name: last wins, evt_2 is not the id sent"
+   },
+   {
+    "id": "acke-duplicate-escaped-name-last-right",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\":\"evt_2\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\",\"\\u0065vent_id\":\"evt_1\"}",
+    "body_hex": "7b226576656e745f6964223a226576745f32222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c225c753030363576656e745f6964223a226576745f31227d",
+    "expected": "ack:COMMITTED",
+    "note": "the escaped last duplicate wins and is the id sent"
+   },
+   {
+    "id": "acke-lone-surrogate-escape-in-extra-value",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\":\"evt_1\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\",\"x\":\"\\ud800\"}",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c2278223a225c7564383030227d",
+    "expected": "ack:COMMITTED",
+    "note": "a lone-surrogate escape is not an error by itself: it is valid RFC 8259 and decodes to a code point that equals no id; in an extra member it is ignored"
+   },
+   {
+    "id": "acke-lone-surrogate-escape-in-extra-name",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\":\"evt_1\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\",\"\\ud800\":1}",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c225c7564383030223a317d",
+    "expected": "ack:COMMITTED",
+    "note": "a lone-surrogate escape in an extra member name is just another name"
+   },
+   {
+    "id": "acke-lone-surrogate-escape-in-event-id",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\":\"evt_\\ud800\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\"}",
+    "body_hex": "7b226576656e745f6964223a226576745f5c7564383030222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "a lone-surrogate escape in a required value never equals the id sent: mismatch, not unparseable"
+   },
+   {
+    "id": "acke-lone-surrogate-escape-in-required-name",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_\\ud800id\":\"evt_1\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\"}",
+    "body_hex": "7b226576656e745f5c75643830306964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "a lone-surrogate escape inside a name makes it a different name, so event_id is missing: mismatch"
+   },
+   {
+    "id": "acke-surrogate-pair-in-extra-value",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\":\"evt_1\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\",\"x\":\"\\ud83d\\ude00\"}",
+    "body_hex": "7b226576656e745f6964223a226576745f31222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564222c2278223a225c75643833645c7564653030227d",
+    "expected": "ack:COMMITTED",
+    "note": "a valid surrogate pair decodes to one code point and is ignored in an extra member"
+   },
+   {
+    "id": "acke-surrogate-pair-in-event-id",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\":\"evt_\\ud83d\\ude00\",\"run_id\":\"00000000-0000-4000-8000-000000000007\",\"status\":\"accepted\",\"durability\":\"committed\"}",
+    "body_hex": "7b226576656e745f6964223a226576745f5c75643833645c7564653030222c2272756e5f6964223a2230303030303030302d303030302d343030302d383030302d303030303030303030303037222c22737461747573223a226163636570746564222c226475726162696c697479223a22636f6d6d6974746564227d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "a valid surrogate pair in a required value is not the id sent: mismatch"
+   }
+  ]
+ },
+ "acknowledgement_extra_member_vectors": {
+  "rule": "Contract 15.1 and 15.1a (owner decision D1, 2026-10-16, option A): the IngestionAcknowledgement object permits additional members; a client ignores every member other than event_id, run_id, status and durability and classifies by those four exactly as for the other acknowledgement arrays; an unknown member (any JSON value, any nesting) never makes a body an acknowledgement, never repairs a required member and never turns an acknowledgement into a non-acknowledgement; each vector gives the body both as text (body_text) and as hexadecimal bytes (body_hex, the same bytes)",
+  "vectors": [
+   {
+    "id": "ackx-extra-string-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"trace_id\": \"abc\"}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c202274726163655f6964223a2022616263227d",
+    "expected": "ack:COMMITTED",
+    "note": "an unknown string member is ignored (owner decision D1, option A)"
+   },
+   {
+    "id": "ackx-extra-number-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"attempt\": 3}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c2022617474656d7074223a20337d",
+    "expected": "ack:COMMITTED",
+    "note": "an unknown number member is ignored"
+   },
+   {
+    "id": "ackx-extra-boolean-null-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"flag\": true, \"gone\": null}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c2022666c6167223a20747275652c2022676f6e65223a206e756c6c7d",
+    "expected": "ack:COMMITTED",
+    "note": "unknown boolean and null members are ignored"
+   },
+   {
+    "id": "ackx-extra-nested-object-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"meta\": {\"region\": \"eu\", \"labels\": {\"a\": \"b\", \"n\": [1, 2, {\"deep\": []}]}}}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c20226d657461223a207b22726567696f6e223a20226575222c20226c6162656c73223a207b2261223a202262222c20226e223a205b312c20322c207b2264656570223a205b5d7d5d7d7d7d",
+    "expected": "ack:COMMITTED",
+    "note": "an unknown nested object is ignored, whatever it contains"
+   },
+   {
+    "id": "ackx-extra-array-of-objects-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"items\": [{\"event_id\": \"evt_other\"}, {\"status\": \"rejected\"}]}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c20226974656d73223a205b7b226576656e745f6964223a20226576745f6f74686572227d2c207b22737461747573223a202272656a6563746564227d5d7d",
+    "expected": "ack:COMMITTED",
+    "note": "required-member names inside an unknown nested value do not count"
+   },
+   {
+    "id": "ackx-extra-before-required-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"x\": 1, \"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\"}",
+    "body_hex": "7b2278223a20312c20226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564227d",
+    "expected": "ack:COMMITTED",
+    "note": "an unknown member may precede the required members"
+   },
+   {
+    "id": "ackx-extra-between-required-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"x\": {\"y\": 1}, \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"z\": [], \"durability\": \"committed\"}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202278223a207b2279223a20317d2c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20227a223a205b5d2c20226475726162696c697479223a2022636f6d6d6974746564227d",
+    "expected": "ack:COMMITTED",
+    "note": "unknown members may sit between required members"
+   },
+   {
+    "id": "ackx-extra-duplicate-200",
+    "http_status": 200,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"duplicate\", \"durability\": \"committed\", \"x\": 1, \"x\": 2}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226475706c6963617465222c20226475726162696c697479223a2022636f6d6d6974746564222c202278223a20312c202278223a20327d",
+    "expected": "ack:DUPLICATE",
+    "note": "a duplicate unknown member is ignored; the 200 duplicate acknowledgement is tolerant too"
+   },
+   {
+    "id": "ackx-extra-empty-name-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"\": \"empty-name\"}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c2022223a2022656d7074792d6e616d65227d",
+    "expected": "ack:COMMITTED",
+    "note": "an unknown member whose name is the empty string is ignored"
+   },
+   {
+    "id": "ackx-extra-case-variants-of-required-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"Event_ID\": \"evt_other\", \"STATUS\": \"rejected\", \"Durability\": \"pending\", \"Run_Id\": \"bad\"}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c20224576656e745f4944223a20226576745f6f74686572222c2022535441545553223a202272656a6563746564222c20224475726162696c697479223a202270656e64696e67222c202252756e5f4964223a2022626164227d",
+    "expected": "ack:COMMITTED",
+    "note": "case variants of required names are different (unknown) names: exact required members present, so an acknowledgement"
+   },
+   {
+    "id": "ackx-extra-lookalike-names-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"status_detail\": \"rejected\", \"durability_final\": \"pending\", \"event_id_alias\": \"evt_other\", \"error\": {\"code\": \"conflict\"}}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c20227374617475735f64657461696c223a202272656a6563746564222c20226475726162696c6974795f66696e616c223a202270656e64696e67222c20226576656e745f69645f616c696173223a20226576745f6f74686572222c20226572726f72223a207b22636f6465223a2022636f6e666c696374227d7d",
+    "expected": "ack:COMMITTED",
+    "note": "unknown members that look like errors or overrides never change the classification"
+   },
+   {
+    "id": "ackx-extra-unicode-name-and-value-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"\u00e9\u4e2d\": \"\ud83d\ude00\"}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c2022c3a9e4b8ad223a2022f09f9880227d",
+    "expected": "ack:COMMITTED",
+    "note": "a non-ASCII unknown member name and value are ignored"
+   },
+   {
+    "id": "ackx-extra-large-number-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"big\": 123456789012345678901234567890, \"frac\": 1.5e300}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c2022626967223a203132333435363738393031323334353637383930313233343536373839302c202266726163223a20312e35653330307d",
+    "expected": "ack:COMMITTED",
+    "note": "unknown numbers outside binary64 integer range are ignored"
+   },
+   {
+    "id": "ackx-extra-many-members-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"k0\": 0, \"k1\": 1, \"k2\": 2, \"k3\": 3, \"k4\": 4, \"k5\": 5, \"k6\": 6, \"k7\": 7, \"k8\": 8, \"k9\": 9, \"k10\": 10, \"k11\": 11, \"k12\": 12, \"k13\": 13, \"k14\": 14, \"k15\": 15, \"k16\": 16, \"k17\": 17, \"k18\": 18, \"k19\": 19, \"k20\": 20, \"k21\": 21, \"k22\": 22, \"k23\": 23, \"k24\": 24, \"k25\": 25, \"k26\": 26, \"k27\": 27, \"k28\": 28, \"k29\": 29, \"k30\": 30, \"k31\": 31, \"k32\": 32, \"k33\": 33, \"k34\": 34, \"k35\": 35, \"k36\": 36, \"k37\": 37, \"k38\": 38, \"k39\": 39, \"k40\": 40, \"k41\": 41, \"k42\": 42, \"k43\": 43, \"k44\": 44, \"k45\": 45, \"k46\": 46, \"k47\": 47, \"k48\": 48, \"k49\": 49}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c20226b30223a20302c20226b31223a20312c20226b32223a20322c20226b33223a20332c20226b34223a20342c20226b35223a20352c20226b36223a20362c20226b37223a20372c20226b38223a20382c20226b39223a20392c20226b3130223a2031302c20226b3131223a2031312c20226b3132223a2031322c20226b3133223a2031332c20226b3134223a2031342c20226b3135223a2031352c20226b3136223a2031362c20226b3137223a2031372c20226b3138223a2031382c20226b3139223a2031392c20226b3230223a2032302c20226b3231223a2032312c20226b3232223a2032322c20226b3233223a2032332c20226b3234223a2032342c20226b3235223a2032352c20226b3236223a2032362c20226b3237223a2032372c20226b3238223a2032382c20226b3239223a2032392c20226b3330223a2033302c20226b3331223a2033312c20226b3332223a2033322c20226b3333223a2033332c20226b3334223a2033342c20226b3335223a2033352c20226b3336223a2033362c20226b3337223a2033372c20226b3338223a2033382c20226b3339223a2033392c20226b3430223a2034302c20226b3431223a2034312c20226b3432223a2034322c20226b3433223a2034332c20226b3434223a2034342c20226b3435223a2034352c20226b3436223a2034362c20226b3437223a2034372c20226b3438223a2034382c20226b3439223a2034397d",
+    "expected": "ack:COMMITTED",
+    "note": "fifty unknown members are ignored"
+   },
+   {
+    "id": "ackx-extra-cannot-supply-missing-event-id-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"event_id_alias\": \"evt_1\"}",
+    "body_hex": "7b2272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c20226576656e745f69645f616c696173223a20226576745f31227d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "an unknown member does not stand in for a missing required member"
+   },
+   {
+    "id": "ackx-extra-cannot-repair-wrong-event-id-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_2\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"event_id_sent\": \"evt_1\"}",
+    "body_hex": "7b226576656e745f6964223a20226576745f32222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c20226576656e745f69645f73656e74223a20226576745f31227d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "an unknown member does not repair a wrong event_id"
+   },
+   {
+    "id": "ackx-extra-cannot-repair-durability-pending-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"pending\", \"durability_final\": \"committed\"}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a202270656e64696e67222c20226475726162696c6974795f66696e616c223a2022636f6d6d6974746564227d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "an unknown member does not repair durability"
+   },
+   {
+    "id": "ackx-extra-cannot-repair-wrong-status-for-200",
+    "http_status": 200,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"duplicate\": true}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c20226475706c6963617465223a20747275657d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "an unknown member does not repair a status that is wrong for the code"
+   },
+   {
+    "id": "ackx-extra-cannot-repair-invalid-run-id-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"not-a-uuid\", \"status\": \"accepted\", \"durability\": \"committed\", \"run_id_ok\": \"00000000-0000-4000-8000-000000000007\"}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a20226e6f742d612d75756964222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c202272756e5f69645f6f6b223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037227d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "an unknown member does not repair run_id"
+   },
+   {
+    "id": "ackx-extra-only-unknown-members-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"a\": 1, \"b\": {\"c\": 2}}",
+    "body_hex": "7b2261223a20312c202262223a207b2263223a20327d7d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "a body with only unknown members lacks every required member"
+   },
+   {
+    "id": "ackx-extra-required-null-plus-unknown-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": null, \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"x\": 1}",
+    "body_hex": "7b226576656e745f6964223a206e756c6c2c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c202278223a20317d",
+    "expected": "not_ack:acknowledgement_mismatch",
+    "note": "a null required member stays a mismatch next to unknown members"
+   },
+   {
+    "id": "ackx-extra-invalid-json-in-unknown-member-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"x\": NaN}",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c202278223a204e614e7d",
+    "expected": "not_ack:response_unparseable",
+    "note": "an unknown member does not relax RFC 8259: NaN anywhere is unparseable"
+   },
+   {
+    "id": "ackx-extra-trailing-text-after-unknown-members-201",
+    "http_status": 201,
+    "sent_event_id": "evt_1",
+    "body_text": "{\"event_id\": \"evt_1\", \"run_id\": \"00000000-0000-4000-8000-000000000007\", \"status\": \"accepted\", \"durability\": \"committed\", \"x\": 1} tail",
+    "body_hex": "7b226576656e745f6964223a20226576745f31222c202272756e5f6964223a202230303030303030302d303030302d343030302d383030302d303030303030303030303037222c2022737461747573223a20226163636570746564222c20226475726162696c697479223a2022636f6d6d6974746564222c202278223a20317d207461696c",
+    "expected": "not_ack:response_unparseable",
+    "note": "text after the object is unparseable whatever the members"
+   }
+  ]
+ }
+}

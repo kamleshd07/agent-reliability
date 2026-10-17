@@ -9,11 +9,14 @@ foreclose an async, I/O-performing sink in a later milestone.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Protocol, runtime_checkable
 
+from agent_reliability.domain.measurement_health import MeasurementHealthReport
+from agent_reliability.evaluation import EvaluationExecutionFailure
 from agent_reliability.ports.events import InstrumentationEvent
 
-__all__ = ["EventSink"]
+__all__ = ["EventSink", "HealthEvidenceSink"]
 
 
 @runtime_checkable
@@ -34,3 +37,29 @@ class EventSink(Protocol):
     """
 
     def emit(self, event: InstrumentationEvent) -> None: ...
+
+
+@runtime_checkable
+class HealthEvidenceSink(Protocol):
+    """Optional evidence capability; existing EventSink implementations stay valid."""
+
+    def submit_evaluation_failure(
+        self,
+        failure: EvaluationExecutionFailure,
+        *,
+        run_id: str,
+        indicator: str,
+        evaluation_id: str | None = None,
+        occurred_at: datetime | None = None,
+    ) -> None: ...
+
+    def submit_measurement_health(
+        self,
+        report: MeasurementHealthReport,
+        *,
+        run_id: str,
+        measurement_id: str | None = None,
+        observed_at: datetime | None = None,
+    ) -> None: ...
+
+    def release_run(self, run_id: str) -> None: ...

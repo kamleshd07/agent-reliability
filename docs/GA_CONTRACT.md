@@ -239,6 +239,16 @@ are internal. Direct imports are unsupported.
 `agent_reliability.experimental` exports nothing in 1.0. No experimental
 Python functionality is invented for GA.
 
+### P28 HTTP evidence exporter (unreleased): INTERNAL
+
+`agent_reliability.adapters.http_event_sink` and everything behind it
+(`_http_delivery`, `_http_protocol`) are **INTERNAL** (owner decision of 2026-10-17); no Beta
+class exists. [HTTP_EXPORTER.md](HTTP_EXPORTER.md) names the documented consumer entry
+points (the exporter classes, the delivery status types and local exceptions, the optional
+`HealthEvidenceSink` protocol and the `indicator=` argument of
+`RunHandle.record_evaluation_failure`); everything else is an implementation detail. No
+stable compatibility promise is made beyond the policy above.
+
 ## Developer-adoption additive API (1.2.0)
 
 The following are additive to the namespaces above and to two brand-new

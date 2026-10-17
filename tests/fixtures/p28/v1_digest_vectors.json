@@ -1,0 +1,1657 @@
+{
+ "fixture_format_version": 1,
+ "wire_version": 1,
+ "kind": "schema-v1 canonical digest vectors",
+ "algorithm": "docs/architecture/LANGUAGE_NEUTRAL_HTTP_CONTRACTS.md section 3, with the clarification that the wire discriminator member `kind` is NOT part of the canonical payload object (pending owner ratification, DESIGN-013 R-10)",
+ "input_field": "wire_input = the request body a client sends (schema_version 1, `kind` included, optional members present, null or absent as noted)",
+ "provenance": {
+  "file_revision": 2,
+  "supersedes": "DESIGN-011 revision 1 of this file (14 vectors written in semantic_input form); its 14 ids, canonical texts and digests are carried over unchanged and asserted unchanged at generation",
+  "generated_by": "package-independent reference implementation A (no platform or SDK import, no dataclass/asdict/Pydantic, no datetime, no json module) written for P28-DESIGN-013; wire_input is the JSON envelope a client sends, `kind` included",
+  "cross_checked_against": "agent_reliability_platform.api.evidence_schemas.EvidenceEnvelope.model_validate(wire_input).to_domain().digest() (the real validation and IngestionEnvelope.digest() path) at the pre-PC-2 source state",
+  "platform_repo_head": "d606293ee9ce0b2641a928fbb99f2b7ab6fe6d0c",
+  "src_tests_migrations_uncommitted_changes_at_generation": "none",
+  "git_status_command": "git status --short -- src tests migrations (empty output)",
+  "cross_check_mismatches": 0,
+  "kind_included_variant_matches": 0,
+  "vector_count": 71,
+  "carried_over_vector_count": 14,
+  "coverage_claims": [
+   "non-UTC offsets: positive (+05:30, +14:00) and negative (-03:00, -12:00, -05:00, -01:00, -05:30, -00:01) and -00:00",
+   "fractions of 0, 1, 2, 3, 4, 5 and 6 digits including explicit all-zero fractions",
+   "offset conversions that cross a day, a year end and a leap day, and both range bounds reached through offsets",
+   "empty, single, two, three and eight-element reason sets",
+   "deterministic true and false; provenance absent, null, with and without configuration_id",
+   "absent versus null optional members (same canonical text)",
+   "escaping of quotation mark, reverse solidus, BMP and supplementary scalars, U+2028, U+2029, U+FEFF, U+200B, U+202E, U+FFFF, 200-scalar value"
+  ],
+  "not_covered": [
+   "control characters U+0000-U+001F and U+007F (rejected by every text grammar before the digest is computed, so they cannot occur in digest input)",
+   "lone surrogates (invalid input)",
+   "lenient server forms (strings for integers, epoch timestamps, uppercase UUIDs, lowercase z): not part of the contract"
+  ]
+ },
+ "vectors": [
+  {
+   "id": "v1-lifecycle-started",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-lifecycle",
+    "producer_run_id": "run-v1-lifec",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00",
+     "exception_type": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-lifecycle\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_run_id\":\"run-v1-lifec\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "4f32483c2f4ef17a9848ca8ae0ededac60764b7253397cfcfa2217dba01ecd1b"
+  },
+  {
+   "id": "v1-lifecycle-started-with-parent",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-lifecycle",
+    "producer_run_id": "run-v1-lifec",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": "parent-run-1",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00",
+     "exception_type": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-lifecycle\",\"parent_producer_run_id\":\"parent-run-1\",\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_run_id\":\"run-v1-lifec\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "85f18be1394ad8fa87bb243c7ccd543aea5cc443fdca073c27c582dda399c0ff"
+  },
+  {
+   "id": "v1-lifecycle-failed-offset-micro",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-lifecycle",
+    "producer_run_id": "run-v1-lifec",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "failed",
+     "occurred_at": "2026-07-01T00:05:07.123456+00:00",
+     "exception_type": "ValueError"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-lifecycle\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":\"ValueError\",\"occurred_at\":\"2026-07-01T00:05:07.123456+00:00\",\"status\":\"failed\"},\"producer_run_id\":\"run-v1-lifec\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "5330f196284497b112774ba9256b85f1eb4e7c8454160c4eb9e957169bbabc8a"
+  },
+  {
+   "id": "v1-lifecycle-failed-offset-micro-with-parent",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-lifecycle",
+    "producer_run_id": "run-v1-lifec",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": "parent-run-1",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "failed",
+     "occurred_at": "2026-07-01T00:05:07.123456+00:00",
+     "exception_type": "ValueError"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-lifecycle\",\"parent_producer_run_id\":\"parent-run-1\",\"payload\":{\"exception_type\":\"ValueError\",\"occurred_at\":\"2026-07-01T00:05:07.123456+00:00\",\"status\":\"failed\"},\"producer_run_id\":\"run-v1-lifec\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "5aec21d5e157b547685e6f71e04eeaf6dfa6425279f28c2b28008bbb2a0a2a61"
+  },
+  {
+   "id": "v1-outcome-provenance-unicode",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-outcome-p",
+    "producer_run_id": "run-v1-outco",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "ev:1",
+     "indicator": "task\u00e9-\u00f1\ud83d\ude00",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:07.123456+00:00",
+     "provenance": {
+      "name": "judge",
+      "version": "1.0.0",
+      "configuration_id": null,
+      "deterministic": true
+     },
+     "reason_code": "ok"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-outcome-p\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"ev:1\",\"indicator\":\"task\\u00e9-\\u00f1\\ud83d\\ude00\",\"outcome\":\"pass\",\"provenance\":{\"configuration_id\":null,\"deterministic\":true,\"name\":\"judge\",\"version\":\"1.0.0\"},\"reason_code\":\"ok\",\"recorded_at\":\"2026-07-01T00:05:07.123456+00:00\"},\"producer_run_id\":\"run-v1-outco\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "7e8d9b654fcc5cc6a18feb6b4743cfd8052ae3d585858d669160cffd2b5a0e3f"
+  },
+  {
+   "id": "v1-outcome-provenance-unicode-with-parent",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-outcome-p",
+    "producer_run_id": "run-v1-outco",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": "parent-run-1",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "ev:1",
+     "indicator": "task\u00e9-\u00f1\ud83d\ude00",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:07.123456+00:00",
+     "provenance": {
+      "name": "judge",
+      "version": "1.0.0",
+      "configuration_id": null,
+      "deterministic": true
+     },
+     "reason_code": "ok"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-outcome-p\",\"parent_producer_run_id\":\"parent-run-1\",\"payload\":{\"evaluation_id\":\"ev:1\",\"indicator\":\"task\\u00e9-\\u00f1\\ud83d\\ude00\",\"outcome\":\"pass\",\"provenance\":{\"configuration_id\":null,\"deterministic\":true,\"name\":\"judge\",\"version\":\"1.0.0\"},\"reason_code\":\"ok\",\"recorded_at\":\"2026-07-01T00:05:07.123456+00:00\"},\"producer_run_id\":\"run-v1-outco\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "81bfd640714366ca0a92d5bb2691a2bf1a3ad871d980d700c5f261e8a8c079f3"
+  },
+  {
+   "id": "v1-outcome-null-provenance",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-outcome-n",
+    "producer_run_id": "run-v1-outco",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "ev:2",
+     "indicator": "task",
+     "outcome": "unknown",
+     "recorded_at": "2026-07-01T00:05:00+00:00",
+     "provenance": null,
+     "reason_code": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-outcome-n\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"ev:2\",\"indicator\":\"task\",\"outcome\":\"unknown\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:00+00:00\"},\"producer_run_id\":\"run-v1-outco\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "94462b1cd716a2904956ed45c7a2d6e05690a01e887a04e4b04029d3afd232e9"
+  },
+  {
+   "id": "v1-outcome-null-provenance-with-parent",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-outcome-n",
+    "producer_run_id": "run-v1-outco",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": "parent-run-1",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "ev:2",
+     "indicator": "task",
+     "outcome": "unknown",
+     "recorded_at": "2026-07-01T00:05:00+00:00",
+     "provenance": null,
+     "reason_code": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-outcome-n\",\"parent_producer_run_id\":\"parent-run-1\",\"payload\":{\"evaluation_id\":\"ev:2\",\"indicator\":\"task\",\"outcome\":\"unknown\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:00+00:00\"},\"producer_run_id\":\"run-v1-outco\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "3a952ca555f316b242b7f22e9b7fddcf2c0886a01eedc56d5e0d3c838a502688"
+  },
+  {
+   "id": "v1-failure-flat-evaluator-fields",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-failure-f",
+    "producer_run_id": "run-v1-failu",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "evaluation_execution_failure",
+     "evaluation_id": "ev:3",
+     "indicator": "task",
+     "stage": "evaluation",
+     "exception_type": "TimeoutError",
+     "occurred_at": "2026-07-01T00:05:00+00:00",
+     "evaluator_name": "judge",
+     "evaluator_version": "1",
+     "evaluator_configuration_id": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-failure-f\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"ev:3\",\"evaluator_configuration_id\":null,\"evaluator_name\":\"judge\",\"evaluator_version\":\"1\",\"exception_type\":\"TimeoutError\",\"indicator\":\"task\",\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"stage\":\"evaluation\"},\"producer_run_id\":\"run-v1-failu\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "d3e9fcf44cac37cb654f8f6bbe3e0c391bc733f17a1186b953ea366017dcade6"
+  },
+  {
+   "id": "v1-failure-flat-evaluator-fields-with-parent",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-failure-f",
+    "producer_run_id": "run-v1-failu",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": "parent-run-1",
+    "payload": {
+     "kind": "evaluation_execution_failure",
+     "evaluation_id": "ev:3",
+     "indicator": "task",
+     "stage": "evaluation",
+     "exception_type": "TimeoutError",
+     "occurred_at": "2026-07-01T00:05:00+00:00",
+     "evaluator_name": "judge",
+     "evaluator_version": "1",
+     "evaluator_configuration_id": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-failure-f\",\"parent_producer_run_id\":\"parent-run-1\",\"payload\":{\"evaluation_id\":\"ev:3\",\"evaluator_configuration_id\":null,\"evaluator_name\":\"judge\",\"evaluator_version\":\"1\",\"exception_type\":\"TimeoutError\",\"indicator\":\"task\",\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"stage\":\"evaluation\"},\"producer_run_id\":\"run-v1-failu\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "ba768bd6e6ede844cce57b21c63d3b0f17965dc1e66edba5faa1297a8ac64c30"
+  },
+  {
+   "id": "v1-health-reason-set",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-health-re",
+    "producer_run_id": "run-v1-healt",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "measurement_health",
+     "measurement_id": "m1",
+     "health": "degraded",
+     "reasons": [
+      "event_delivery_failure",
+      "partial_evidence"
+     ],
+     "observed_at": "2026-07-01T00:05:00+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-health-re\",\"parent_producer_run_id\":null,\"payload\":{\"health\":\"degraded\",\"measurement_id\":\"m1\",\"observed_at\":\"2026-07-01T00:05:00+00:00\",\"reasons\":\"event_delivery_failure,partial_evidence\"},\"producer_run_id\":\"run-v1-healt\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "ff24cd8f7cf9e70310105c7057414a3a4cdec2c6b374bdce69e61dd454acb1ad"
+  },
+  {
+   "id": "v1-health-reason-set-with-parent",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-health-re",
+    "producer_run_id": "run-v1-healt",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": "parent-run-1",
+    "payload": {
+     "kind": "measurement_health",
+     "measurement_id": "m1",
+     "health": "degraded",
+     "reasons": [
+      "event_delivery_failure",
+      "partial_evidence"
+     ],
+     "observed_at": "2026-07-01T00:05:00+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-health-re\",\"parent_producer_run_id\":\"parent-run-1\",\"payload\":{\"health\":\"degraded\",\"measurement_id\":\"m1\",\"observed_at\":\"2026-07-01T00:05:00+00:00\",\"reasons\":\"event_delivery_failure,partial_evidence\"},\"producer_run_id\":\"run-v1-healt\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "60e3558c3052ef430adbdd2a346ce3d72ac94bd7250025f0445533b9042c486f"
+  },
+  {
+   "id": "v1-indicator-escapes",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-indicator",
+    "producer_run_id": "run-v1-indic",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "ev:4",
+     "indicator": "quote\" back\\slash mid\u2028line \u00e9",
+     "outcome": "fail",
+     "recorded_at": "2026-07-01T00:05:00+00:00",
+     "provenance": null,
+     "reason_code": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-indicator\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"ev:4\",\"indicator\":\"quote\\\" back\\\\slash mid\\u2028line \\u00e9\",\"outcome\":\"fail\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:00+00:00\"},\"producer_run_id\":\"run-v1-indic\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "600943c5e0fcc91347d1f13fd724af333d6c751beac7ab2d67d20b32635690aa"
+  },
+  {
+   "id": "v1-indicator-escapes-with-parent",
+   "origin": "DESIGN-011 vector, unchanged",
+   "note": "carried over; wire timestamps are all +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-indicator",
+    "producer_run_id": "run-v1-indic",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": "parent-run-1",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "ev:4",
+     "indicator": "quote\" back\\slash mid\u2028line \u00e9",
+     "outcome": "fail",
+     "recorded_at": "2026-07-01T00:05:00+00:00",
+     "provenance": null,
+     "reason_code": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-indicator\",\"parent_producer_run_id\":\"parent-run-1\",\"payload\":{\"evaluation_id\":\"ev:4\",\"indicator\":\"quote\\\" back\\\\slash mid\\u2028line \\u00e9\",\"outcome\":\"fail\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:00+00:00\"},\"producer_run_id\":\"run-v1-indic\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "a3f70b4c7c4de6d3b0b1e67d38b030475ff92c37289fef33c7240c117ff9df65"
+  },
+  {
+   "id": "v1-ts-00",
+   "origin": "DESIGN-013",
+   "note": "positive half-hour offset, 6-digit fraction",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-00",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T05:35:07.123456+05:30",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T05:35:07.123456+05:30"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-00\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07.123456+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "3d41f7b8124306c8d42f5c8b88fcee83311fcb8146eac419155fcdab9d7f9b9c"
+  },
+  {
+   "id": "v1-ts-01",
+   "origin": "DESIGN-013",
+   "note": "negative offset, no fraction, previous-day rollover",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-01",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-06-30T21:05:07-03:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-06-30T21:05:07-03:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-01\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "1873937ecc3b63cdb7535800f25b1ca0b333d67edacbdf58a227af3940fca061"
+  },
+  {
+   "id": "v1-ts-02",
+   "origin": "DESIGN-013",
+   "note": "1-digit fraction, uppercase Z",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-02",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.5Z",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T00:05:07.5Z"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-02\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07.500000+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07.500000+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "5cbc0dec9ab29fd28db0f32240b545de27e34da37421147241e81b4e21ca3c96"
+  },
+  {
+   "id": "v1-ts-03",
+   "origin": "DESIGN-013",
+   "note": "2-digit fraction, explicit +00:00",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-03",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.12+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T00:05:07.12+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-03\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07.120000+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07.120000+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "cab801c6d361cae59e7cc1c6815e1eeb7a388db1affa758b805759a3b88c179e"
+  },
+  {
+   "id": "v1-ts-04",
+   "origin": "DESIGN-013",
+   "note": "3-digit fraction, maximum-style positive offset",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-04",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T14:05:07.123+14:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T14:05:07.123+14:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-04\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07.123000+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07.123000+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "4311f3d61fc671debb160cc130182646d58f68dfd39d12e041fcb4faa02ca173"
+  },
+  {
+   "id": "v1-ts-05",
+   "origin": "DESIGN-013",
+   "note": "4-digit fraction, negative offset, crosses into next UTC day",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-05",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-06-30T12:05:07.1234-12:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-06-30T12:05:07.1234-12:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-05\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07.123400+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07.123400+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "0dc4776822642e6d90273bbb707f84edaf5f0965bdda44e48eedc0c4ec96eb91"
+  },
+  {
+   "id": "v1-ts-06",
+   "origin": "DESIGN-013",
+   "note": "5-digit fraction",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-06",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.12345Z",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T00:05:07.12345Z"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-06\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07.123450+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07.123450+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "8d8b7430f349bb0263fa06b44ffb7a3436a3b0612c79b93230733e5b2b94c7f1"
+  },
+  {
+   "id": "v1-ts-07",
+   "origin": "DESIGN-013",
+   "note": "6-digit fraction with leading zeros",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-07",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.000007Z",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T00:05:07.000007Z"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-07\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07.000007+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07.000007+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "cf16072d48004f8594ec68e596e20422c1a3006bedd046eafdb716029522b790"
+  },
+  {
+   "id": "v1-ts-08",
+   "origin": "DESIGN-013",
+   "note": "all-zero fraction is omitted from the canonical text",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-08",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.000000Z",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T00:05:07.000000Z"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-08\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "efc2d722e9930d9912eb2e7347fd3d85590ac86073d676d36729f3a8febadd04"
+  },
+  {
+   "id": "v1-ts-09",
+   "origin": "DESIGN-013",
+   "note": "1-digit zero fraction is omitted",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-09",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.0Z",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T00:05:07.0Z"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-09\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "70a2c074a2753fb2577acce43b2a75ca95a8ad122781ae00f2be43161b71be1a"
+  },
+  {
+   "id": "v1-ts-10",
+   "origin": "DESIGN-013",
+   "note": "negative-zero offset is UTC",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-10",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07-00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T00:05:07-00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-10\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:07+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-07-01T00:05:07+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "2cdf3681f05383bd6d63f17316d0c508aec94620bad67040dd7bee72d3c0a301"
+  },
+  {
+   "id": "v1-ts-11",
+   "origin": "DESIGN-013",
+   "note": "offset conversion crosses to previous day",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-11",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:30:00+05:30",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-07-01T00:30:00+05:30"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-11\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-06-30T19:00:00+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2026-06-30T19:00:00+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "6a009ffd1565c9f8bf3d530832a592bc610c6e7dc1a6e718e3fae5868bd956e9"
+  },
+  {
+   "id": "v1-ts-12",
+   "origin": "DESIGN-013",
+   "note": "offset conversion crosses year end",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-12",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-12-31T23:30:00-05:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2026-12-31T23:30:00-05:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-12\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2027-01-01T04:30:00+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2027-01-01T04:30:00+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "de49c1724d6ca3f642dc41ae6f2de24264cb09eb1fc8ec3c32200411ec26e3e5"
+  },
+  {
+   "id": "v1-ts-13",
+   "origin": "DESIGN-013",
+   "note": "leap-day offset conversion into March",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-13",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2024-02-29T23:30:00-01:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2024-02-29T23:30:00-01:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-13\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2024-03-01T00:30:00+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2024-03-01T00:30:00+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "17ca9bb65716e6877131fe5aff471fc06b17e3bb7da46e92643231d5c30ec709"
+  },
+  {
+   "id": "v1-ts-14",
+   "origin": "DESIGN-013",
+   "note": "one-minute offset at year end",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-14",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2023-12-31T23:59:59.999999-00:01",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "2023-12-31T23:59:59.999999-00:01"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-14\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2024-01-01T00:00:59.999999+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"2024-01-01T00:00:59.999999+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "32cb100eebfff8f39e3233e7ca71956a49436bb05ba12debb3ca2a1c33510adf"
+  },
+  {
+   "id": "v1-ts-15",
+   "origin": "DESIGN-013",
+   "note": "range minimum, UTC",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-15",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "0001-01-01T00:00:00Z",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "0001-01-01T00:00:00Z"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-15\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"0001-01-01T00:00:00+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"0001-01-01T00:00:00+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "0bd85249265c903c3d3ab56a73371a278ffbf88303a13e6cedf93d4b7b417940"
+  },
+  {
+   "id": "v1-ts-16",
+   "origin": "DESIGN-013",
+   "note": "range minimum reached through a positive offset",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-16",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "0001-01-01T05:30:00+05:30",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "0001-01-01T05:30:00+05:30"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-16\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"0001-01-01T00:00:00+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"0001-01-01T00:00:00+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "60fd75cba79607c789f6b06a97a9d0477d3cdcc8227937853de8082932d57fce"
+  },
+  {
+   "id": "v1-ts-17",
+   "origin": "DESIGN-013",
+   "note": "range maximum, UTC",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-17",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "9999-12-31T23:59:59.999999Z",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "9999-12-31T23:59:59.999999Z"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-17\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"9999-12-31T23:59:59.999999+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"9999-12-31T23:59:59.999999+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "26d441b0e54fe3d59cec588a1c283be0d9e0f19769308f2a702ed4168acc31ae"
+  },
+  {
+   "id": "v1-ts-18",
+   "origin": "DESIGN-013",
+   "note": "range maximum reached through a negative offset",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-ts-18",
+    "producer_run_id": "run-v1-ts",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "9999-12-31T18:29:59.999999-05:30",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "completed",
+     "occurred_at": "9999-12-31T18:29:59.999999-05:30"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-ts-18\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"9999-12-31T23:59:59.999999+00:00\",\"status\":\"completed\"},\"producer_run_id\":\"run-v1-ts\",\"producer_timestamp\":\"9999-12-31T23:59:59.999999+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "b9e43bb6a252a1ef5e1d9350d6b88a8cd01f72de1d4c7e8b6d924cbf69e59e79"
+  },
+  {
+   "id": "v1-null-vs-absent-a",
+   "origin": "DESIGN-013",
+   "note": "parent and exception_type members absent",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "5f7923d306a9b82b67d44faf9a8c34441a3e66750a187a3931cfa5b1218d3b1a"
+  },
+  {
+   "id": "v1-null-vs-absent-b",
+   "origin": "DESIGN-013",
+   "note": "parent and exception_type explicitly null (same canonical text as -a)",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": null,
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00",
+     "exception_type": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "5f7923d306a9b82b67d44faf9a8c34441a3e66750a187a3931cfa5b1218d3b1a"
+  },
+  {
+   "id": "v1-parent-present",
+   "origin": "DESIGN-013",
+   "note": "parent run present",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": "parent-run-1",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":\"parent-run-1\",\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "8bbd4f91518d16eb5166f7957db32053a87835b060cafa97795ead885e000c2c"
+  },
+  {
+   "id": "v1-health-empty-reasons",
+   "origin": "DESIGN-013",
+   "note": "empty reason set encodes as the empty string",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "measurement_health",
+     "measurement_id": "meas-1",
+     "health": "healthy",
+     "reasons": [],
+     "observed_at": "2026-07-01T00:05:03+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"health\":\"healthy\",\"measurement_id\":\"meas-1\",\"observed_at\":\"2026-07-01T00:05:03+00:00\",\"reasons\":\"\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "307746e35b09abe4f7182e1b290fe13cd4ccfc5bec5530f665fc1269cf28f27e"
+  },
+  {
+   "id": "v1-health-single-reason",
+   "origin": "DESIGN-013",
+   "note": "single-element reason set",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "measurement_health",
+     "measurement_id": "meas-1",
+     "health": "degraded",
+     "reasons": [
+      "event_delivery_failure"
+     ],
+     "observed_at": "2026-07-01T00:05:03+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"health\":\"degraded\",\"measurement_id\":\"meas-1\",\"observed_at\":\"2026-07-01T00:05:03+00:00\",\"reasons\":\"event_delivery_failure\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "1a574ce46a9f5b064250bef7cc9edbf1eff8c9b82981f28e25764af074cbbdda"
+  },
+  {
+   "id": "v1-health-three-reasons-unsorted",
+   "origin": "DESIGN-013",
+   "note": "wire order differs from sorted order",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "measurement_health",
+     "measurement_id": "meas-1",
+     "health": "unavailable",
+     "reasons": [
+      "partial_evidence",
+      "evaluator_execution_failure",
+      "event_delivery_failure"
+     ],
+     "observed_at": "2026-07-01T00:05:03+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"health\":\"unavailable\",\"measurement_id\":\"meas-1\",\"observed_at\":\"2026-07-01T00:05:03+00:00\",\"reasons\":\"evaluator_execution_failure,event_delivery_failure,partial_evidence\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "61ad7b200aff44d96196c4efdb3c1dfd5d5837b103acd82cc87d92062ab74414"
+  },
+  {
+   "id": "v1-health-all-eight-reasons",
+   "origin": "DESIGN-013",
+   "note": "all eight reasons",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "measurement_health",
+     "measurement_id": "meas-1",
+     "health": "unavailable",
+     "reasons": [
+      "incompatible_evidence",
+      "provenance_unavailable",
+      "partial_evidence",
+      "event_delivery_failure",
+      "evidence_timestamp_failure",
+      "evaluation_timestamp_failure",
+      "evaluator_execution_failure",
+      "run_initialization_failure"
+     ],
+     "observed_at": "2026-07-01T00:05:03+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"health\":\"unavailable\",\"measurement_id\":\"meas-1\",\"observed_at\":\"2026-07-01T00:05:03+00:00\",\"reasons\":\"evaluation_timestamp_failure,evaluator_execution_failure,event_delivery_failure,evidence_timestamp_failure,incompatible_evidence,partial_evidence,provenance_unavailable,run_initialization_failure\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "9485290f12877cde12e9d1b2482beb7f72c22c97e2b5557bfd0c7c73f16324e1"
+  },
+  {
+   "id": "v1-health-degraded-two",
+   "origin": "DESIGN-013",
+   "note": "two degraded-only reasons",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "measurement_health",
+     "measurement_id": "meas-1",
+     "health": "degraded",
+     "reasons": [
+      "partial_evidence",
+      "event_delivery_failure"
+     ],
+     "observed_at": "2026-07-01T00:05:03+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"health\":\"degraded\",\"measurement_id\":\"meas-1\",\"observed_at\":\"2026-07-01T00:05:03+00:00\",\"reasons\":\"event_delivery_failure,partial_evidence\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "fd7000446ad5931995b5e7f46e12f1e01e16ce5a1fec3cabd25395d25967b5dc"
+  },
+  {
+   "id": "v1-health-offset-observed",
+   "origin": "DESIGN-013",
+   "note": "observed_at with offset and fraction",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "measurement_health",
+     "measurement_id": "meas-1",
+     "health": "degraded",
+     "reasons": [
+      "evidence_timestamp_failure"
+     ],
+     "observed_at": "2026-07-01T05:35:03.25+05:30"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"health\":\"degraded\",\"measurement_id\":\"meas-1\",\"observed_at\":\"2026-07-01T00:05:03.250000+00:00\",\"reasons\":\"evidence_timestamp_failure\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "717b3e2dd9f543216bf0f8e2178822db1efe69d586d6ab2eb94f6d43cb9cb5cc"
+  },
+  {
+   "id": "v1-outcome-no-provenance-member",
+   "origin": "DESIGN-013",
+   "note": "provenance member absent",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "task-success",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"task-success\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "26fa8c00a07147a8e18b0dd6fdecd693558461429e061e171bf30aadf154b873"
+  },
+  {
+   "id": "v1-outcome-explicit-null-members",
+   "origin": "DESIGN-013",
+   "note": "provenance explicit null, reason_code explicit null",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "task-success",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00",
+     "provenance": null,
+     "reason_code": null
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"task-success\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "26fa8c00a07147a8e18b0dd6fdecd693558461429e061e171bf30aadf154b873"
+  },
+  {
+   "id": "v1-outcome-provenance-deterministic-true",
+   "origin": "DESIGN-013",
+   "note": "provenance with configuration_id absent, deterministic true",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "task-success",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00",
+     "provenance": {
+      "name": "judge",
+      "version": "1.0.0",
+      "deterministic": true
+     }
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"task-success\",\"outcome\":\"pass\",\"provenance\":{\"configuration_id\":null,\"deterministic\":true,\"name\":\"judge\",\"version\":\"1.0.0\"},\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "f4fa1ed988c3e0cfa1a6ae7c318cfec374dc848a4f3186bd0a490dae13461939"
+  },
+  {
+   "id": "v1-outcome-provenance-deterministic-false",
+   "origin": "DESIGN-013",
+   "note": "deterministic false (boolean literal), configuration_id present, reason_code present",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "task-success",
+     "outcome": "unknown",
+     "recorded_at": "2026-07-01T00:05:01+00:00",
+     "provenance": {
+      "name": "judge",
+      "version": "1.0.0",
+      "configuration_id": "cfg:7",
+      "deterministic": false
+     },
+     "reason_code": "insufficient.evidence"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"task-success\",\"outcome\":\"unknown\",\"provenance\":{\"configuration_id\":\"cfg:7\",\"deterministic\":false,\"name\":\"judge\",\"version\":\"1.0.0\"},\"reason_code\":\"insufficient.evidence\",\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "b0bcf035a994d261e1fb5a6422256c19f6a1e9b8e1736a205111a7ee3a749c5f"
+  },
+  {
+   "id": "v1-outcome-fail-offset",
+   "origin": "DESIGN-013",
+   "note": "fail outcome with offset recorded_at",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "task-success",
+     "outcome": "fail",
+     "recorded_at": "2026-07-01T05:35:01.5+05:30"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"task-success\",\"outcome\":\"fail\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01.500000+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "c4e77c2775b1830d117e7aaef7d5fc64bcd33c92e57cc4ef1d2e2f025a63cf71"
+  },
+  {
+   "id": "v1-failure-no-evaluator",
+   "origin": "DESIGN-013",
+   "note": "all three evaluator members absent",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_execution_failure",
+     "evaluation_id": "eval-2",
+     "indicator": "task-success",
+     "stage": "evaluation",
+     "exception_type": "TimeoutError",
+     "occurred_at": "2026-07-01T00:05:02+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-2\",\"evaluator_configuration_id\":null,\"evaluator_name\":null,\"evaluator_version\":null,\"exception_type\":\"TimeoutError\",\"indicator\":\"task-success\",\"occurred_at\":\"2026-07-01T00:05:02+00:00\",\"stage\":\"evaluation\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "8810d8d919f78f556697ae351b47f19559970189bb4c4b73339c66b902f47fd8"
+  },
+  {
+   "id": "v1-failure-name-version",
+   "origin": "DESIGN-013",
+   "note": "name and version, configuration absent",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_execution_failure",
+     "evaluation_id": "eval-2",
+     "indicator": "task-success",
+     "stage": "evaluation",
+     "exception_type": "TimeoutError",
+     "occurred_at": "2026-07-01T00:05:02+00:00",
+     "evaluator_name": "judge",
+     "evaluator_version": "2"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-2\",\"evaluator_configuration_id\":null,\"evaluator_name\":\"judge\",\"evaluator_version\":\"2\",\"exception_type\":\"TimeoutError\",\"indicator\":\"task-success\",\"occurred_at\":\"2026-07-01T00:05:02+00:00\",\"stage\":\"evaluation\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "0a7f9c27a367f19f2c2c7283355fec5305847ccb2c650a9ef0c36aec36ebc71a"
+  },
+  {
+   "id": "v1-failure-full-evaluator",
+   "origin": "DESIGN-013",
+   "note": "name, version, configuration id; stage timestamp; dotted exception type",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_execution_failure",
+     "evaluation_id": "eval-2",
+     "indicator": "task-success",
+     "stage": "timestamp",
+     "exception_type": "asyncio.TimeoutError",
+     "occurred_at": "2026-07-01T05:35:02+05:30",
+     "evaluator_name": "judge",
+     "evaluator_version": "2",
+     "evaluator_configuration_id": "cfg-1"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-2\",\"evaluator_configuration_id\":\"cfg-1\",\"evaluator_name\":\"judge\",\"evaluator_version\":\"2\",\"exception_type\":\"asyncio.TimeoutError\",\"indicator\":\"task-success\",\"occurred_at\":\"2026-07-01T00:05:02+00:00\",\"stage\":\"timestamp\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "7abe900be09d2003338c33897cc293d1b0096476cf45bd44d478d288586f795b"
+  },
+  {
+   "id": "v1-lifecycle-failed",
+   "origin": "DESIGN-013",
+   "note": "failed with exception label",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "failed",
+     "occurred_at": "2026-07-01T00:05:00+00:00",
+     "exception_type": "ValueError"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":\"ValueError\",\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"failed\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "b684e425c5e076bf43350bd173e21cb32ce8d4576c4fe018d0e069abd9221278"
+  },
+  {
+   "id": "v1-lifecycle-cancelled",
+   "origin": "DESIGN-013",
+   "note": "cancelled with dotted label",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "cancelled",
+     "occurred_at": "2026-07-01T00:05:00+00:00",
+     "exception_type": "asyncio.CancelledError"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":\"asyncio.CancelledError\",\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"cancelled\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "08dab9badca86b79261f7d4920021b2bbbc7abc7783f157849a60d04537844dc"
+  },
+  {
+   "id": "v1-text-quote",
+   "origin": "DESIGN-013",
+   "note": "quotation mark",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-quote",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "say \"hi\"",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-quote\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"say \\\"hi\\\"\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "17c5a4a803d27961fe80056377f6ba22ddfe7ed9f3f7d23a445b036713552c92"
+  },
+  {
+   "id": "v1-text-backslash",
+   "origin": "DESIGN-013",
+   "note": "reverse solidus",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-backslash",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "back\\slash",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-backslash\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"back\\\\slash\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "3d005640b231907115bfbad50c96f0ab68eaeafacb9f55bcc5d46d1a7da07f69"
+  },
+  {
+   "id": "v1-text-solidus-lt-gt-amp",
+   "origin": "DESIGN-013",
+   "note": "solidus, angle brackets, ampersand are not escaped",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-solidus-lt-gt-amp",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "a/b<c>d&e",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-solidus-lt-gt-amp\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"a/b<c>d&e\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "8fe353ca7ac0116c9dde87b1da251d4dcf065a41fba37a410da14b8f392ab6cc"
+  },
+  {
+   "id": "v1-text-bmp-nonascii",
+   "origin": "DESIGN-013",
+   "note": "BMP non-ASCII scalars are escaped as lowercase \\uXXXX",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-bmp-nonascii",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "caf\u00e9 \u00f1",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-bmp-nonascii\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"caf\\u00e9 \\u00f1\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "064e864c8c05017efe877e99adbbc541d5715669da3c268d3ce8ea6143a49a7f"
+  },
+  {
+   "id": "v1-text-supplementary",
+   "origin": "DESIGN-013",
+   "note": "supplementary scalar as a surrogate-pair escape",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-supplementary",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "grin \ud83d\ude00 end",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-supplementary\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"grin \\ud83d\\ude00 end\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "8dd7b0e42812de33edcd1fdc58fbd2d1d3655ed8cdbd95256e79bfe504bdb135"
+  },
+  {
+   "id": "v1-text-supplementary-min",
+   "origin": "DESIGN-013",
+   "note": "lowest supplementary scalar",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-supplementary-min",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "\ud800\udc00x",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-supplementary-min\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"\\ud800\\udc00x\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "821443862381ac607fa3465ca0fb76d266701cc3604721287d76e2fd497f8486"
+  },
+  {
+   "id": "v1-text-supplementary-max",
+   "origin": "DESIGN-013",
+   "note": "highest scalar value",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-supplementary-max",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "x\udbff\udfff",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-supplementary-max\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"x\\udbff\\udfff\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "5ef2953526898a5c95a79d7b5a9652d9ffe222f39dfeafbac8ba5ce0d44f0547"
+  },
+  {
+   "id": "v1-text-u2028",
+   "origin": "DESIGN-013",
+   "note": "U+2028 inside a value",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-u2028",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "line\u2028sep",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-u2028\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"line\\u2028sep\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "b88fd08ed0973b5c93312df5d5a05b96d7d5b814559f63f409a476686d03c3c7"
+  },
+  {
+   "id": "v1-text-u2029",
+   "origin": "DESIGN-013",
+   "note": "U+2029 inside a value",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-u2029",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "para\u2029sep",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-u2029\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"para\\u2029sep\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "fbb61e28693f2cddf75a858c3ceff606994886c6ef014962016ac3bb9997fc5b"
+  },
+  {
+   "id": "v1-text-feff",
+   "origin": "DESIGN-013",
+   "note": "U+FEFF inside a value",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-feff",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "a\ufeffb",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-feff\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"a\\ufeffb\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "31b96035fe6199a643661db200d4736d96500677983a36618063beafecb93a26"
+  },
+  {
+   "id": "v1-text-zwsp",
+   "origin": "DESIGN-013",
+   "note": "U+200B ZERO WIDTH SPACE (format character) inside a value",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-zwsp",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "a\u200bb",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-zwsp\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"a\\u200bb\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "a548a69d1af32ff17938c99967aa32ebc741192dced6da59f731e31af376992f"
+  },
+  {
+   "id": "v1-text-nbsp-inside",
+   "origin": "DESIGN-013",
+   "note": "U+00A0 inside a value (edge-whitespace set, but not at the edge)",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-nbsp-inside",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "a\u00a0b",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-nbsp-inside\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"a\\u00a0b\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "20a09c5e3e55d316f6fbf296839ecae625630b9ca38eca359c404cd33b0fb355"
+  },
+  {
+   "id": "v1-text-bidi",
+   "origin": "DESIGN-013",
+   "note": "U+202E right-to-left override inside a value",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-bidi",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "a\u202eb",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-bidi\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"a\\u202eb\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "457f7a549b5bd4c32997b574f4bd7eb9ec80924b09665aa06ea19c71cd44f348"
+  },
+  {
+   "id": "v1-text-noncharacter",
+   "origin": "DESIGN-013",
+   "note": "U+FFFF noncharacter",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-noncharacter",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "a\uffffb",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-noncharacter\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"a\\uffffb\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "c3dc73a3f0f5ac6e28a525d06a8edfbbccca5285471879c507404831d31b4d70"
+  },
+  {
+   "id": "v1-text-space-inside",
+   "origin": "DESIGN-013",
+   "note": "ordinary space",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-space-inside",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "two words",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-space-inside\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"two words\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "242b3d4f21e48457d57195e902ee1be4d6d8260295463ae6d4d9aaaa8e66da1d"
+  },
+  {
+   "id": "v1-text-len-200",
+   "origin": "DESIGN-013",
+   "note": "indicator at the 200 scalar-value bound",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "evt_v1-text-len-200",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "evaluation_outcome",
+     "evaluation_id": "eval-1",
+     "indicator": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "outcome": "pass",
+     "recorded_at": "2026-07-01T00:05:01+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1-text-len-200\",\"parent_producer_run_id\":null,\"payload\":{\"evaluation_id\":\"eval-1\",\"indicator\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"outcome\":\"pass\",\"provenance\":null,\"reason_code\":null,\"recorded_at\":\"2026-07-01T00:05:01+00:00\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "17b267075ec70f58f898feed4589eee3d8959e05b2b39d767e23e5573d93f46a"
+  },
+  {
+   "id": "v1-id-forms",
+   "origin": "DESIGN-013",
+   "note": "opaque identifiers with : / . - characters at their grammar edges",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "E0:a/b.c-d_e",
+    "producer_run_id": "R9.x:y/z",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "parent_producer_run_id": "P1:q",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"E0:a/b.c-d_e\",\"parent_producer_run_id\":\"P1:q\",\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_run_id\":\"R9.x:y/z\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "97242b008f610c697a5583152320f5ec8ae68da85ff52fe8791f7555ed4096c8"
+  },
+  {
+   "id": "v1-source-dotted",
+   "origin": "DESIGN-013",
+   "note": "source with dots and hyphens",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "vendor.sdk-1",
+    "event_id": "evt_v1",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"evt_v1\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"vendor.sdk-1\"}",
+   "sha256_lowercase_hex": "d0a53032c965ae6ac8470f9bcfb9fb52dff837a492446c18cb7247743ecee763"
+  },
+  {
+   "id": "v1-event-id-200",
+   "origin": "DESIGN-013",
+   "note": "event_id at the 200-character bound",
+   "wire_input": {
+    "schema_version": 1,
+    "source": "agent-reliability",
+    "event_id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "producer_run_id": "run-v1",
+    "deployment_id": "00000000-0000-4000-8000-000000000007",
+    "producer_timestamp": "2026-07-01T00:05:07.123456+00:00",
+    "payload": {
+     "kind": "run_lifecycle",
+     "status": "started",
+     "occurred_at": "2026-07-01T00:05:00+00:00"
+    }
+   },
+   "canonical_utf8_text": "{\"deployment_id\":\"00000000-0000-4000-8000-000000000007\",\"event_id\":\"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",\"parent_producer_run_id\":null,\"payload\":{\"exception_type\":null,\"occurred_at\":\"2026-07-01T00:05:00+00:00\",\"status\":\"started\"},\"producer_run_id\":\"run-v1\",\"producer_timestamp\":\"2026-07-01T00:05:07.123456+00:00\",\"schema_version\":1,\"source\":\"agent-reliability\"}",
+   "sha256_lowercase_hex": "116c3ae7a80fc9d394f8e630fc3ada8d435080643f09f3cf2028ad576e100688"
+  }
+ ]
+}

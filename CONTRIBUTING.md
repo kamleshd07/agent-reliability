@@ -12,7 +12,7 @@ Requires Python 3.11–3.13.
 python -m venv .venv
 # POSIX: source .venv/bin/activate
 # Windows PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,http,otel-test]"
 ```
 
 Branches use `<type>/<short-description>`, for example

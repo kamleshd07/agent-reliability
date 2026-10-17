@@ -41,6 +41,7 @@ Documentation = "https://github.com/kamleshd07/agent-reliability/tree/main/docs"
 Changelog = "https://github.com/kamleshd07/agent-reliability/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
+http = ["httpx>=0.28.1,<1"]
 otel = ["opentelemetry-api>=1.44,<2"]
 otel-test = ["opentelemetry-sdk>=1.44,<2"]
 dev = [
@@ -51,10 +52,19 @@ dev = [
     "pytest-asyncio>=0.24",
     "hypothesis>=6.108",
     "build>=1.2",
+    # Test-only: generates the disposable TLS certificates used by the real-TLS tests.
+    "cryptography>=42",
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agent_reliability"]
+
+# Internal agent instructions and the internal P28 review/execution reports are not part
+# of the distributed source (public documentation, licence and packaging inputs stay).
+# Other milestones (e.g. P29) decide their own sdist contents when they are released.
+# Owner decision F-9 (2026-10-17): CLAUDE.md, AGENTS.md and docs/P28_* are excluded.
+[tool.hatch.build.targets.sdist]
+exclude = ["/CLAUDE.md", "/AGENTS.md", "/docs/P28_*"]
 
 [tool.hatch.version]
 path = "src/agent_reliability/__init__.py"

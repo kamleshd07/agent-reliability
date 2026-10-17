@@ -1,0 +1,22 @@
+{
+  "v1_digest_vectors.json": {
+    "sha256": "bf052784aea962d3ddfaf7f55901da1f02f1de370b730b5c77f749f0b45d0fb6",
+    "fixture_format_version": 1,
+    "wire_version": 1
+  },
+  "v2_digest_vectors_specification_only.json": {
+    "sha256": "d96a79fe87b387f944209be8f1e69d9817124f11f50209f06174d3b6b44b246a",
+    "fixture_format_version": 1,
+    "wire_version": 2
+  },
+  "operational_vectors.json": {
+    "sha256": "c115c39b713926bdc4968dd4dd2feb1409f62437e0ab7ce240dd4b5100f2c2b6",
+    "fixture_format_version": 1,
+    "wire_version": 1
+  },
+  "legacy_platform_responses.json": {
+    "sha256": "662d9cba2029b88ff447fbac07e7d84ada3efce8450392a87ecff51e67aa46f2",
+    "fixture_format_version": 1,
+    "wire_version": 1
+  }
+}

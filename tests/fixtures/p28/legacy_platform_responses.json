@@ -1,0 +1,161 @@
+{
+ "fixture_format_version": 1,
+ "wire_version": 1,
+ "kind": "pre-PC-2 platform response bodies",
+ "provenance": {
+  "platform_repo_head": "d606293ee9ce0b2641a928fbb99f2b7ab6fe6d0c",
+  "src_tests_migrations_uncommitted_changes_at_generation": "none"
+ },
+ "responses": [
+  {
+   "id": "v1-accepted",
+   "http_status": 201,
+   "body": {
+    "event_id": "event-1",
+    "run_id": "00000000-0000-0000-0000-000000000007",
+    "status": "accepted",
+    "durability": "committed"
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "v1-duplicate",
+   "http_status": 200,
+   "body": {
+    "event_id": "event-1",
+    "run_id": "00000000-0000-0000-0000-000000000007",
+    "status": "duplicate",
+    "durability": "committed"
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "v1-conflict-same-event-id-different-content",
+   "http_status": 409,
+   "body": {
+    "error": {
+     "code": "conflict",
+     "message": "idempotency key was already used for different evidence"
+    }
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "v2-envelope-sent-to-pre-PC2-platform",
+   "http_status": 422,
+   "body": {
+    "error": {
+     "code": "validation_error",
+     "message": "request validation failed",
+     "details": [
+      {
+       "location": [
+        "body",
+        "producer_identity"
+       ],
+       "message": "Extra inputs are not permitted",
+       "type": "extra_forbidden"
+      }
+     ]
+    }
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "v1-shape-with-schema-version-3",
+   "http_status": 422,
+   "body": {
+    "error": {
+     "code": "validation_error",
+     "message": "unsupported schema_version: 3"
+    }
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "deployment-not-found",
+   "http_status": 404,
+   "body": {
+    "error": {
+     "code": "not_found",
+     "message": "deployment not found"
+    }
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "domain-validation-error-trailing-space-indicator",
+   "http_status": 422,
+   "body": {
+    "error": {
+     "code": "validation_error",
+     "message": "indicator must not have leading or trailing whitespace"
+    }
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "wrong-path-404",
+   "http_status": 404,
+   "body": {
+    "detail": "Not Found"
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "wrong-method-405",
+   "http_status": 405,
+   "body": {
+    "detail": "Method Not Allowed"
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "missing-organization-header",
+   "http_status": 401,
+   "body": {
+    "error": {
+     "code": "authentication_failed",
+     "message": "authentication required or invalid"
+    }
+   },
+   "capture": "unit-test client (dev_header mode)"
+  },
+  {
+   "id": "401-authentication-failed",
+   "http_status": 401,
+   "body": {
+    "error": {
+     "code": "authentication_failed",
+     "message": "authentication required or invalid"
+    }
+   },
+   "capture": "observed in OIDC-mode reproduction (DESIGN-002/004/006); body shape also at api/errors.py:44"
+  },
+  {
+   "id": "403-permission-denied",
+   "http_status": 403,
+   "body": {
+    "error": {
+     "code": "permission_denied",
+     "message": "principal is not permitted"
+    }
+   },
+   "capture": "source literal api/errors.py:50"
+  },
+  {
+   "id": "429-rate-limited",
+   "http_status": 429,
+   "headers": {
+    "Retry-After": "60"
+   },
+   "body": {
+    "error": {
+     "code": "rate_limited",
+     "message": "request rate exceeded"
+    }
+   },
+   "capture": "source literal api/security_rate_limit.py:54-62"
+  }
+ ]
+}

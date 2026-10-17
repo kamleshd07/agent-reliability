@@ -25,9 +25,9 @@ from agent_reliability.domain import (
     RunStatus,
 )
 from agent_reliability.domain.measurement_health import MeasurementHealthReason
-from agent_reliability.evaluation import EvaluationResult
+from agent_reliability.evaluation import EvaluationExecutionFailure, EvaluationResult
 from agent_reliability.ports.clock import Clock
-from agent_reliability.ports.event_sink import EventSink
+from agent_reliability.ports.event_sink import EventSink, HealthEvidenceSink
 from agent_reliability.ports.events import (
     EvaluationRecorded,
     InstrumentationEvent,
@@ -224,6 +224,26 @@ class AgentReliability:
         )
         self._safe_emit(event, run_id=run_id, handle=handle)
 
+    def _safe_record_evaluation_failure(
+        self, handle: RunHandle, indicator: str, failure: EvaluationExecutionFailure
+    ) -> None:
+        if handle.run_id is None or not isinstance(self._sink, HealthEvidenceSink):
+            return
+        at = self._safe_now(component="clock", run_id=handle.run_id, handle=handle)
+        if at is None:
+            return
+        try:
+            self._sink.submit_evaluation_failure(
+                failure, run_id=handle.run_id, indicator=indicator, occurred_at=at
+            )
+        except Exception as exc:
+            handle._mark_measurement_health(
+                MeasurementHealthReason.EVENT_DELIVERY_FAILURE
+            )
+            self._report_diagnostic(
+                component="sink", operation="emit", run_id=handle.run_id, exception=exc
+            )
+
 
 class RunSession:
     """The context manager object returned by ``AgentReliability.run(...)``.
@@ -234,7 +254,14 @@ class RunSession:
     docs/adr/0003-python-sdk-runtime-and-context-architecture.md).
     """
 
-    __slots__ = ("_agent", "_bridge_scope", "_client", "_handle", "_token")
+    __slots__ = (
+        "_agent",
+        "_binding_released",
+        "_bridge_scope",
+        "_client",
+        "_handle",
+        "_token",
+    )
 
     def __init__(self, client: AgentReliability, agent: AgentIdentity) -> None:
         self._client = client
@@ -242,6 +269,7 @@ class RunSession:
         self._handle: RunHandle | None = None
         self._token: Token[RunHandle | None] | None = None
         self._bridge_scope: RunContextScope | None = None
+        self._binding_released = False
 
     # -- sync protocol --
 
@@ -317,6 +345,7 @@ class RunSession:
                 record_callback=self._client._safe_record,
                 record_evaluation_callback=self._client._safe_record_evaluation,
             )
+            handle._failure_callback = self._client._safe_record_evaluation_failure
             started_event = RunStarted(
                 run_id=run_id,
                 parent_run_id=parent_run_id,
@@ -351,7 +380,10 @@ class RunSession:
                 try:
                     self._close_handle(handle)
                 finally:
-                    self._reset_context(handle)
+                    try:
+                        self._reset_context(handle)
+                    finally:
+                        self._release_binding(handle)
             raise
         return handle
 
@@ -383,7 +415,30 @@ class RunSession:
                 try:
                     self._close_handle(handle)
                 finally:
-                    self._reset_context(handle)
+                    try:
+                        self._reset_context(handle)
+                    finally:
+                        self._release_binding(handle)
+
+    def _release_binding(self, handle: RunHandle) -> None:
+        if self._binding_released:
+            return
+        self._binding_released = True
+        if handle.run_id is not None and isinstance(
+            self._client._sink, HealthEvidenceSink
+        ):
+            try:
+                self._client._sink.release_run(handle.run_id)
+            except Exception as exc:
+                handle._mark_measurement_health(
+                    MeasurementHealthReason.EVENT_DELIVERY_FAILURE
+                )
+                self._client._report_diagnostic(
+                    component="sink",
+                    operation="emit",
+                    run_id=handle.run_id,
+                    exception=exc,
+                )
 
     def _start_bridge(self, run: AgentRun) -> None:
         bridge = self._client._run_context_bridge
@@ -488,6 +543,19 @@ class RunSession:
                     exception_type=exc_type.__name__,
                 )
             self._client._safe_emit(event, run_id=run_id, handle=handle)
+            if isinstance(self._client._sink, HealthEvidenceSink):
+                try:
+                    self._client._sink.submit_measurement_health(
+                        handle.measurement_health, run_id=run_id, observed_at=ended_at
+                    )
+                except Exception as exc:
+                    handle._mark_measurement_health(
+                        MeasurementHealthReason.EVENT_DELIVERY_FAILURE
+                    )
+                    self._client._report_diagnostic(
+                        component="sink", operation="emit", run_id=run_id, exception=exc
+                    )
+
         except Exception as exc:
             self._client._report_diagnostic(
                 component="sdk",
