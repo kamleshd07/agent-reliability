@@ -2,11 +2,54 @@
 
 Date: 2026-10-17.
 
-**Status: `P28_P29_RELEASE_GOVERNANCE_APPROVED_AND_CI_VERIFIED` is NOT reached.** Local work is complete and
-verified; the `git push` of the integration branches was **denied by the Claude Code permission classifier**
-("Out-of-Place Publication") despite the owner's written authorization to push. I did not retry or work around
-the denial. Consequently: no branch exists on GitHub, no draft PR was opened, **no hosted CI job ran**, and no
-required-check configuration could be inspected. Nothing was merged, tagged, released, published or deployed.
+**Status: `P28_P29_RELEASE_GOVERNANCE_APPROVED_AND_CI_VERIFIED` is NOT reached.** The owner pushed the four
+branches; draft PRs were opened and GitHub Actions ran. SDK CI is green on both PRs. The platform runs are green
+except one pre-existing, unrelated failure (frontend `npm audit`), and several governance gates are still open.
+Nothing was merged, tagged, released, published or deployed. (History: my first push attempt was denied by the
+permission classifier and not retried; the owner then pushed manually.)
+
+## 0. Update after the owner's push (2026-10-17)
+
+Branch verification (`git ls-remote`): all four exist on the intended remotes with SHAs equal to the locally
+verified commits: SDK `final/p28-sdk-http-exporter` `a388202`, `final/p29-experimental-judge` `efbb69d`; platform
+`final/p28-pc2-ingestion-v2` `75a0451`, `final/p28-integration-tip` `f0aa3cc`.
+
+| PR (draft, base `main`) | Head | Actions run | Result |
+|---|---|---|---|
+| SDK S-1 https://github.com/kamleshd07/agent-reliability/pull/1 | `a388202` | https://github.com/kamleshd07/agent-reliability/actions/runs/39016050376 | **success**: lint/format/mypy; tests on Python 3.11, 3.12, 3.13; release artifacts; Node reference vectors |
+| SDK S-2 https://github.com/kamleshd07/agent-reliability/pull/2 | `efbb69d` | https://github.com/kamleshd07/agent-reliability/actions/runs/39016057208 | **success**: same six jobs |
+| Platform P-1 https://github.com/kamleshd07/agent-reliability-platform/pull/53 | `75a0451` | https://github.com/kamleshd07/agent-reliability-platform/actions/runs/39016059093 | **failure** (one job): quality, unit/property, PostgreSQL integration, package security, container: success; frontend: **failure**. P-1 has no `postgres-slow` job (the job arrives with the CI commit in P-2) |
+| Platform P-2 https://github.com/kamleshd07/agent-reliability-platform/pull/54 | `f0aa3cc` | https://github.com/kamleshd07/agent-reliability-platform/actions/runs/39016061238 | **failure** (one job): quality, unit/property, PostgreSQL integration, **PostgreSQL slow migration-safety tests**, package security, container: success; frontend: **failure** |
+
+Every PR description states the review and merge order (S-1 before S-2; P-1 before P-2; release order separate).
+Merge dependencies: the PRs are cumulative against `main` because the workflows only run for PRs targeting `main`.
+
+**The one failure is pre-existing and unrelated.** The frontend job fails at `npm audit --audit-level=high`: one
+high-severity advisory in the transitive dependency `source-map-js` (event-loop denial of service, versions up to
+1.2.1, "fix available via npm audit fix"). The frontend is untouched by these PRs, and the same job already fails on
+`main` (push run 37953543916 for `88d0e58`) and on earlier PRs. Because the step fails, the later frontend steps
+(build, Playwright browser tests) did not run, so those frontend gates are NOT evidenced. I made no correction: it
+is a frontend dependency update outside the P28/P29 scope. Owner action, from the platform `frontend/` directory:
+`npm audit fix` (or update `source-map-js` to a fixed version), then commit and push to a separate branch.
+
+**Content scan of the PR diffs (via `gh pr diff`):** no added line contains a developer-machine path
+(`/Users/…`, `/private/tmp/…`) or a credential pattern except two descriptive sentences in reviewer documents
+that name the `BEGIN PRIVATE KEY` marker (SDK #2, text only, no key). `CLAUDE.md` and `AGENTS.md` are included in
+SDK #2 and platform #54 by the approved OD-7 decision (sdist-excluded internal files); nothing else internal.
+
+**Required checks:** not configured and not changed. SDK repository `agent-reliability`: `main` has no branch
+protection (HTTP 404) and no rulesets. Platform repository: `main` has no branch protection; one ruleset
+"Merge-rule" exists but is **disabled** and contains only deletion and non-fast-forward rules, with no required
+status checks, so `postgres-slow` (decision D3) is not required. Administrator action needed to enforce it: add a
+required-status-check rule naming the job (`PostgreSQL slow migration-safety tests`) and the other CI jobs; for the
+SDK also `Independent Node reference check of the P28 contract fixtures`.
+
+Remaining gates for the target status: hosted CI is green for the SDK and for all platform Python/PostgreSQL jobs,
+but the platform workflow is red because of the frontend advisory; required checks are not configured; D14 is
+conditional on the production-equivalent OIDC matrix (not run); quota values, retention periods/owners, release
+roles/versions, pilot owner and OD-10 confirmation are still not supplied. The status therefore remains incomplete.
+
+The sections below describe the state before the owner's push and are kept for the record.
 
 ## 1. Recorded owner decisions
 
@@ -109,14 +152,9 @@ SG-1..SG-6 NOT SATISFIED (no pilot, no owner, no evidence); calibration not auth
 confirmation.
 
 ## 10. Exact next authorized action
-Allow the push, or run it yourself:
-
-```bash
-git -C <workspace>/agent-reliability-integration push -u origin final/p28-sdk-http-exporter final/p29-experimental-judge
-git -C <workspace>/agent-reliability-platform-integration-pr push -u origin final/p28-pc2-ingestion-v2 final/p28-integration-tip
-```
-
-then open draft PRs against `main` (SDK: `final/p28-sdk-http-exporter`, `final/p29-experimental-judge`;
-platform: `final/p28-pc2-ingestion-v2`, `final/p28-integration-tip`), read the Actions results, and fix scoped
-failures. The permission rule that blocked the push must be added by the user in Claude Code settings; I will not
-change it.
+1. Owner: fix the frontend advisory (`npm audit fix` in `frontend/`) on its own branch/PR so the platform workflow can
+   go green; optionally configure the required checks listed above (repository settings, administrator only).
+2. Owner: supply or defer the open values (quotas, retention, roles/versions, OD-10 confirmation, pilot).
+3. Then re-run the platform workflows (re-push or re-run) and update this report. Pushing this report-update commit
+   (local branch `final/p29-experimental-judge`) is an owner action:
+   `git -C <workspace>/agent-reliability-integration push origin final/p29-experimental-judge`.
