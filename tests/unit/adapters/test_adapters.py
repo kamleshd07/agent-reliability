@@ -4,6 +4,7 @@ import subprocess
 import sys
 import threading
 from datetime import timedelta
+from uuid import UUID
 
 import pytest
 
@@ -36,11 +37,23 @@ class TestUuidRunIdGenerator:
         ids = {generator.generate() for _ in range(1000)}
         assert len(ids) == 1000
 
-    def test_ids_are_not_sequential(self) -> None:
+    def test_ids_preserve_independent_uuid4_values(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # Valid random UUIDs can end in0 then1; suffixes do not imply counting.
+        expected = (
+            UUID("88be00dc-4e83-4ed2-a5d8-8ecae45ebb50"),
+            UUID("13c508f2-ae09-4b46-beae-b0256edb3381"),
+        )
+        values = iter(expected)
+        monkeypatch.setattr(
+            "agent_reliability.adapters.uuid_run_id_generator.uuid.uuid4",
+            lambda: next(values),
+        )
         generator = UuidRunIdGenerator()
-        a, b = generator.generate(), generator.generate()
-        assert a != b
-        assert not (a.endswith("0") and b.endswith("1"))  # not literally counting
+        generated = (generator.generate(), generator.generate())
+        assert generated == tuple(map(str, expected))
+        assert all(UUID(value).version == 4 for value in generated)
 
 
 class TestNoOpEventSink:
