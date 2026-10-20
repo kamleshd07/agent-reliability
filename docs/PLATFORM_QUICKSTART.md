@@ -1,6 +1,6 @@
 # First evidence delivery from a local build
 
-This procedure is for controlled local verification of the **unreleased** HTTP exporter. The published 1.2.1 package does not contain it; do not install the PyPI release expecting platform delivery. Current main's locally built distribution also reports 1.2.1 and includes the Experimental judge. It is not a 1.3 release candidate. See the release-readiness record before customer exposure.
+This procedure verifies first evidence delivery from a **locally built distribution of the 1.3 release candidate** (`1.3.0rc1`, unpublished). The published 1.2.1 package does not contain the exporter; do not install the PyPI release expecting platform delivery. The candidate also contains the Experimental judge adapter, which this procedure does not use. It describes a local, disposable platform: no hosted Gentlity service and no production support are implied (see the [release notes](RELEASE_NOTES_1_3.md)).
 
 ## Prerequisites
 
@@ -8,13 +8,13 @@ Use Python 3.11+, a built wheel from the reviewed commit, and an initialized loc
 
 ```sh
 python -m venv .venv
-.venv/bin/python -m pip install '/absolute/path/to/agent_reliability-1.2.1-py3-none-any.whl[http]'
+.venv/bin/python -m pip install '/absolute/path/to/agent_reliability-1.3.0rc1-py3-none-any.whl[http]'
 .venv/bin/python -c 'import agent_reliability; print(agent_reliability.__version__, agent_reliability.__file__)'
 ```
 
 The path is an artifact path, not a public package version recommendation. Confirm the module comes from this environment's `site-packages`, not a source checkout. Do not set `PYTHONPATH` to SDK source for installation verification.
 
-An authorized platform administrator must create an organization, workspace, environment, agent, version and deployment, and issue a machine credential with only `evidence:ingest`. Use the platform's existing security bootstrap/runbook and authenticated registry/security APIs; do not enable development tenant-header authentication for hosted use. The deployment must belong to the credential's organization. Its agent key, display name, version and environment key must exactly match the values below. Never use customer data for the demonstration. Human read/SLO-authoring permissions are separate from the machine credential.
+An authorized platform operator/administrator must create an organization (an operator-only step: the organization-creation API is available only in the platform's local development-header mode), bootstrap its first administrator with the platform's operator bootstrap command, then use authenticated registry APIs to create a workspace, environment, agent, version and deployment, and issue a machine credential with only `evidence:ingest`. Do not enable development tenant-header authentication for hosted use. The deployment must belong to the credential's organization. Its agent key, display name, version and environment key must exactly match the values below. Never use customer data for the demonstration. Human read/SLO-authoring permissions are separate from the machine credential.
 
 ## Run the synthetic example
 
