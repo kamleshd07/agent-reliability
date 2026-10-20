@@ -230,9 +230,11 @@ event loop or this diagnostic. Mutations require the creating loop/thread;
 
 ## Stability status
 
-**Classification: INTERNAL** under [the compatibility contract](GA_CONTRACT.md). INTERNAL means "unsupported implementation detail;
-it may change in any release; importability does not create a promise". No compatibility
-promise beyond that existing policy is made, and no release version is promised here.
+**Classification: EXPERIMENTAL** (entry points) under [the compatibility contract](GA_CONTRACT.md):
+public and documented, but it may change in a minor release with release notes
+([VERSIONING.md](VERSIONING.md)). It ships in the 1.3 release line. The implementation
+modules are INTERNAL (below). Promotion to STABLE requires a later documented decision after
+hosted validation.
 
 Intended consumer entry points (the names this document describes; use them rather than
 anything else in the modules):
@@ -248,7 +250,7 @@ anything else in the modules):
 Internal implementation modules (never import from them): `_http_delivery`,
 `_http_protocol`, and every underscore-prefixed or undocumented name, including the
 test seams `_transport` and `_core`. Pin the SDK version and read the CHANGELOG before
-upgrading. The published wire contract (schema version 2 and the acknowledgement) is defined
+upgrading; experimental names may change in a minor release. The published wire contract (schema version 2 and the acknowledgement) is defined
 by the platform's OpenAPI and fixtures, not by this module, and is not affected by this
 classification.
 

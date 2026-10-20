@@ -51,6 +51,10 @@ Experimental APIs, if introduced later, require an explicit experimental
 namespace/label and may evolve in a minor release with prominent notes. This
 does not weaken stable contracts.
 
+In 1.3 the documented entry points of the optional HTTP exporter
+(`agent_reliability.adapters.http_event_sink`, listed in [GA_CONTRACT.md](GA_CONTRACT.md)) are
+also classed EXPERIMENTAL on the same terms; they are not in the stable inventory.
+
 The first Experimental namespace is `agent_reliability.experimental.judge`
 (an LLM-judge evaluator adapter; the experimental evaluation policy).
 It is excluded from the stable inventory: its names, signatures, defaults,
