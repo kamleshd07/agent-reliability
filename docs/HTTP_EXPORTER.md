@@ -2,7 +2,7 @@
 
 Install the optional transport with `pip install 'agent-reliability[http]'`.
 Core installation still has no runtime dependencies. HTTPX is constrained to
-`>=0.28.1,<1`; importing normal SDK APIs does not import it.
+`>=0.28.1,<0.29`; importing normal SDK APIs does not import it.
 
 ```python
 import os
@@ -60,6 +60,31 @@ record has an opaque UUID-v4 event id and, where needed, an evaluation or
 measurement id. Retries reuse the exact serialized body and identifiers.
 The canonical digest preserves v1 bytes and adds exactly the documented v2
 identity/version inputs; canonical serialization is distinct from wire JSON.
+
+## Delivery guarantee (summary)
+
+Delivery is **best-effort with idempotent acknowledgement; it is not exactly-once and not durable.**
+Per record the exporter makes at most `retry_max_attempts` (default 3) ordinary attempts with
+full-jitter backoff (about 1.3-1.6 s in total for a refused connection), within the active/absolute
+deadlines below; records still undelivered then end as `retry_exhausted` or `permanently_failed`
+and are **reported** in the status snapshot, never silently dropped. A platform outage longer than the
+retry window loses the affected evidence unless you raise `retry_max_attempts` (bounded by
+`active_delivery_seconds`). The queue is in memory only: pending evidence is lost if the process
+exits or is killed, and local admission (`emit`) is not delivery. A request that may have left the
+process stays flagged `may_have_committed` until acknowledged, so an unacknowledged record can
+already be committed on the platform. Retrying identical bytes and event ids makes duplicate
+delivery safe: the platform answers `200 duplicate` for a replay.
+
+## Caller-chosen text
+
+The SDK has no API to attach prompts, responses, tool arguments/results, documents, exception
+messages or arbitrary metadata, and none are sent. A few fields, however, are strings you choose and
+that are transmitted **verbatim**: the `indicator` (the published wire contract allows 1-200 printable
+characters, including spaces and non-ASCII text), evaluator `version` and `configuration_id`,
+provenance names, reason codes, and the *class name* of an exception that escapes a run
+(`exception_type`; the message is never sent). Treat these as identifiers: never derive them from user
+input, model output, document text or secrets, and do not put credentials in the endpoint URL (HTTPX
+logs URLs at INFO). The SDK cannot detect sensitive content inside an identifier you choose.
 
 ## Capacity and time configuration
 

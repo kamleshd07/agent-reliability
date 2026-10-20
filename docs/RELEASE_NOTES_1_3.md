@@ -8,7 +8,7 @@ updated only when the release is approved.
 ## What 1.3 adds
 
 1. **An optional HTTP evidence exporter** — `pip install 'agent-reliability[http]'`
-   (`httpx>=0.28.1,<1`). `HTTPEventSink` and `AsyncHTTPEventSink` send content-free run, evaluation
+   (`httpx>=0.28.1,<0.29`). `HTTPEventSink` and `AsyncHTTPEventSink` send content-free run, evaluation
    and measurement-health evidence from your agent to a Gentlity platform ingestion endpoint using a
    machine credential you supply. See [HTTP exporter](HTTP_EXPORTER.md) and the
    [platform quickstart](PLATFORM_QUICKSTART.md).
@@ -30,15 +30,20 @@ identity, indicator and evaluator identifiers, outcomes, timestamps, lifecycle s
 exception **class names**, evaluator provenance and measurement-health reasons. It never sends
 prompts, model responses, tool arguments or results, documents, exception messages, tracebacks,
 credentials or arbitrary metadata, and it has no API to attach them. Keep identifiers you choose
-(indicator names, evaluator names, reason codes) free of sensitive text: they are transmitted as-is
-within their length/grammar limits.
+(indicator names, evaluator versions and configuration ids, reason codes, exception class names) free of
+sensitive text: they are transmitted as-is within their length/grammar limits — the wire contract allows an
+indicator of up to 200 printable characters, spaces included — and the SDK cannot detect sensitive content
+inside them.
 
 ## Delivery guarantees (exact)
 
 * `emit` only admits an event to a bounded **in-memory** queue; it never performs network I/O on
   your thread. The queue is **not durable**: pending evidence is lost if the process dies.
-* Delivery is **at-least-once attempted with idempotent acknowledgement**, not exactly-once.
-  Retries reuse the identical serialized body and event id; the platform answers `201 accepted` or
+* Delivery is **best-effort with idempotent acknowledgement**, not exactly-once and not durable. Each record
+  gets at most `retry_max_attempts` (default 3) ordinary attempts with jittered backoff — about 1.3-1.6 s
+  in total for a refused connection — so a platform outage longer than that **loses the affected
+  evidence** (reported as `retry_exhausted`) unless you raise `retry_max_attempts` (bounded by
+  `active_delivery_seconds`, default 75 s). Retries reuse the identical serialized body and event id; the platform answers `201 accepted` or
   `200 duplicate`, and only a validated acknowledgement counts as committed. A request that may have
   left the process stays flagged `may_have_committed` until acknowledged, so a timeout can leave a
   record committed but unacknowledged.
@@ -55,7 +60,7 @@ within their length/grammar limits.
   It requires a platform whose evidence-ingestion endpoint accepts schema v2 and machine
   credentials; there is no automatic downgrade or discovery. See the exporter document for the exact
   response/gating behaviour.
-* Dependencies: base none; `http` extra `httpx>=0.28.1,<1`; `otel` extra unchanged.
+* Dependencies: base none; `http` extra `httpx>=0.28.1,<0.29` (the exporter reads one HTTPX/httpcore trace event to know a request may have left the process, so the supported range is pinned and covered by real-socket tests); `otel` extra unchanged.
 * **Public API classification:** see [GA_CONTRACT.md](GA_CONTRACT.md) — the exporter entry points
   and the judge adapter are labelled there; internal modules (`_http_*`) carry no promise.
 

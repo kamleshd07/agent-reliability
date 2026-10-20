@@ -28,7 +28,7 @@ the exporter.
 
 ### Added
 
-- Optional `agent-reliability[http]` extra (`httpx>=0.28.1,<1`) and the
+- Optional `agent-reliability[http]` extra (`httpx>=0.28.1,<0.29`) and the
   `agent_reliability.adapters.http_event_sink` module with `HTTPEventSink`
   (thread-safe, two daemon delivery workers) and `AsyncHTTPEventSink`. Both export
   evidence to one complete platform POST URL using a machine credential obtained

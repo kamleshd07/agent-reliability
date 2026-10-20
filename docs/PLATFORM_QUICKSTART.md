@@ -37,6 +37,14 @@ As a human member of the same organization, read `/api/v1/evidence/runs?deployme
 
 For a reproducible negative demonstration, a second run recording FAIL for the same indicator yields pass 1 / fail 1 and reliability 0.5 in a fresh scope. A 0.99 target then violates compliance. Compare stored canonical digests and use a second synthetic tenant to verify foreign deployment/read denial. Retrying the *same serialized event* is idempotent; rerunning this example creates a new run/events and correctly increases totals.
 
+## What this example guarantees (and does not)
+
+Delivery is best-effort with idempotent acknowledgement, not exactly-once and not durable: each record
+gets a few jittered attempts (about 1.5 s of backoff by default), so a platform outage longer than that
+loses the affected evidence unless you raise `retry_max_attempts`; loss is reported in the delivery
+status, never silent. Indicator names and other identifiers you choose are sent verbatim: never derive
+them from user input, model output or secrets. Details: [HTTP exporter](HTTP_EXPORTER.md).
+
 ## Troubleshooting and bounded behavior
 
 - Missing configuration/invalid deployment identity: correct local configuration before retrying. Never weaken schema validation or change supported source literals.
