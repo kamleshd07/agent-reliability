@@ -65,7 +65,7 @@ identity/version inputs; canonical serialization is distinct from wire JSON.
 
 Delivery is **best-effort with idempotent acknowledgement; it is not exactly-once and not durable.**
 Per record the exporter makes at most `retry_max_attempts` (default 3) ordinary attempts with
-full-jitter backoff (about 1.3-1.6 s in total for a refused connection), within the active/absolute
+full-jitter backoff (under about 2 s in total for a refused connection), within the active/absolute
 deadlines below; records still undelivered then end as `retry_exhausted` or `permanently_failed`
 and are **reported** in the status snapshot, never silently dropped. A platform outage longer than the
 retry window loses the affected evidence unless you raise `retry_max_attempts` (bounded by
@@ -90,8 +90,10 @@ Of these, only the `indicator` accepts free text; the others are restricted to a
 identifier character set. To remove the risk of an indicator being built from dynamic content, pass
 `indicator_allowlist=[...]` (a non-empty collection of the exact indicator names you use, each 1-200
 valid characters; copied at construction). An evaluation or failure whose indicator is not in the list
-is rejected locally with `indicator_not_allowed` before anything is queued or sent, and counted in the
-exporter diagnostics. The list is opt-in so that existing integrations are unaffected; with it unset
+is rejected locally (`EventDeliveryRejected`, code `indicator_not_allowed`) before anything is queued
+or sent; the SDK isolates sink errors, so the run itself is unaffected, and logs the rejection as an
+instrumentation failure (exception type only, never the rejected text). The rejection is not a delivery
+status and does not appear in the status snapshot, so watch your logs when you first set the list. The list is opt-in so that existing integrations are unaffected; with it unset
 the behaviour is exactly as in the release candidate. An invalid list raises `ConfigurationError`.
 
 ## Capacity and time configuration

@@ -629,6 +629,10 @@ class Core:
         return self.bindings[run_id][0]
 
     def _indicator(self, value: Any) -> str:
+        if type(value) is not str and isinstance(value, str):
+            # Work on an exact ``str`` copy so a subclass cannot lie about its
+            # contents, length or equality between validation and serialisation.
+            value = str.__add__("", value)
         checked = text(value, 200, "indicator_unsupported")
         allowed = self.config.indicator_allowlist
         if allowed is not None and checked not in allowed:

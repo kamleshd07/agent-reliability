@@ -41,7 +41,7 @@ indicators are then rejected locally and never queued or sent (opt-in; default b
 * `emit` only admits an event to a bounded **in-memory** queue; it never performs network I/O on
   your thread. The queue is **not durable**: pending evidence is lost if the process dies.
 * Delivery is **best-effort with idempotent acknowledgement**, not exactly-once and not durable. Each record
-  gets at most `retry_max_attempts` (default 3) ordinary attempts with jittered backoff — about 1.3-1.6 s
+  gets at most `retry_max_attempts` (default 3) ordinary attempts with jittered backoff — under about 2 s
   in total for a refused connection — so a platform outage longer than that **loses the affected
   evidence** (reported as `retry_exhausted`) unless you raise `retry_max_attempts` (bounded by
   `active_delivery_seconds`, default 75 s). Retries reuse the identical serialized body and event id; the platform answers `201 accepted` or

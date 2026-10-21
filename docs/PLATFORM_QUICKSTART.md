@@ -40,7 +40,7 @@ For a reproducible negative demonstration, a second run recording FAIL for the s
 ## What this example guarantees (and does not)
 
 Delivery is best-effort with idempotent acknowledgement, not exactly-once and not durable: each record
-gets a few jittered attempts (about 1.5 s of backoff by default), so a platform outage longer than that
+gets a few jittered attempts (under about 2 s in total by default), so a platform outage longer than that
 loses the affected evidence unless you raise `retry_max_attempts`; loss is reported in the delivery
 status, never silent. Indicator names and other identifiers you choose are sent verbatim: never derive
 them from user input, model output or secrets. Details: [HTTP exporter](HTTP_EXPORTER.md).
