@@ -1,6 +1,6 @@
 # First evidence delivery from a local build
 
-This procedure verifies first evidence delivery from a **locally built distribution of the 1.3 release candidate** (`1.3.0rc1`, unpublished). The published 1.2.1 package does not contain the exporter; do not install the PyPI release expecting platform delivery. The candidate also contains the Experimental judge adapter, which this procedure does not use. It describes a local, disposable platform: no hosted Gentlity service and no production support are implied (see the [release notes](RELEASE_NOTES_1_3.md)).
+This procedure verifies first evidence delivery from a **locally built distribution of the 1.3 release** (`1.3.0`). Releases before 1.3 (1.2.1 and earlier) do not contain the exporter; do not install them expecting platform delivery. The candidate also contains the Experimental judge adapter, which this procedure does not use. It describes a local, disposable platform: no hosted Gentlity service and no production support are implied (see the [release notes](RELEASE_NOTES_1_3.md)).
 
 ## Prerequisites
 
@@ -8,7 +8,7 @@ Use Python 3.11+, a built wheel from the reviewed commit, and an initialized loc
 
 ```sh
 python -m venv .venv
-.venv/bin/python -m pip install '/absolute/path/to/agent_reliability-1.3.0rc1-py3-none-any.whl[http]'
+.venv/bin/python -m pip install '/absolute/path/to/agent_reliability-1.3.0-py3-none-any.whl[http]'
 .venv/bin/python -c 'import agent_reliability; print(agent_reliability.__version__, agent_reliability.__file__)'
 ```
 

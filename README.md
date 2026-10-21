@@ -8,7 +8,7 @@ It brings evaluations, SLOs, error budgets, burn rates, and measurement
 provenance to agent applications—and refuses to produce a misleading number
 when evaluation methodologies are incompatible.
 
-**Status: GA (`1.2.1` is the latest published release; `1.3.0rc1` is an unpublished release candidate, see [release notes](https://github.com/kamleshd07/agent-reliability/blob/main/docs/RELEASE_NOTES_1_3.md)).** Public APIs documented as stable in
+**Status: GA (`1.3.0` is the latest stable release; the HTTP exporter and the LLM-judge adapter are Experimental, see [release notes](https://github.com/kamleshd07/agent-reliability/blob/main/docs/RELEASE_NOTES_1_3.md)).** Public APIs documented as stable in
 [GA_CONTRACT.md](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/GA_CONTRACT.md) follow Semantic Versioning.
 See [compatibility](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/COMPATIBILITY.md).
 
@@ -168,20 +168,21 @@ assertions for tests and CI.
 The SDK is designed to work standalone. It requires no hosted account,
 API key, or network service, and has zero mandatory runtime dependencies.
 
-**Current published release: 1.2.1** (release candidate `1.3.0rc1` prepared; not published)
+**Current stable release: 1.3.0**
 
 The public API follows semantic versioning, with compatibility and
 installed-artifact verification included in the release process.
 
-The published 1.2.1 package includes no remote ingestion, dashboard, LLM judge, persistence,
-auto-instrumentation, or framework-specific adapter. The 1.3 release candidate adds an optional
-HTTP evidence exporter (`pip install 'agent-reliability[http]'`, see
+Releases before 1.3 include no remote ingestion, dashboard, LLM judge, persistence,
+auto-instrumentation, or framework-specific adapter. Release 1.3 adds an optional
+**Experimental** HTTP evidence exporter (`pip install 'agent-reliability[http]'`, see
 [HTTP exporter](https://github.com/kamleshd07/agent-reliability/blob/main/docs/HTTP_EXPORTER.md)) and an
-experimental LLM-judge adapter (described below); neither is in the published release. See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).
+Experimental LLM-judge adapter (described below); it still has no dashboard, persistence or
+auto-instrumentation. See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).
 
-### LLM-judge evaluators (experimental, unreleased)
+### LLM-judge evaluators (experimental)
 
-`agent_reliability.experimental.judge` is an Experimental, unreleased adapter for model-backed evaluators that call a provider you
+`agent_reliability.experimental.judge` is an Experimental adapter for model-backed evaluators that call a provider you
 supply. It adds no dependency and sends raw content only to your provider. The reference rubrics are uncalibrated examples. See
 [Evaluate](https://github.com/kamleshd07/agent-reliability/blob/main/docs/EVALUATE.md).
 A sync judge's timeout is best effort unless the provider is wrapped in `ExecutorSyncProvider`; the provider's own client timeout is the real bound (see the same page).
