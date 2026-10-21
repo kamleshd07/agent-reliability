@@ -38,6 +38,7 @@ _CONSTRUCTOR = (
     "closure_reserve_bytes",
     "provider_timeout",
     "indicator_allowlist",
+    "allow_unrestricted_indicators",
 )
 _DEFAULTS = {
     "proxy": None,
@@ -53,6 +54,7 @@ _DEFAULTS = {
     "closure_reserve_bytes": 3145728,
     "provider_timeout": 60,
     "indicator_allowlist": None,
+    "allow_unrestricted_indicators": False,
 }
 _METHODS = (
     "close",

@@ -297,6 +297,7 @@ def _bounded(call, seconds: float = 10.0):  # type: ignore[no-untyped-def]
 
 def _sink(server: TlsServer, **kwargs) -> HTTPEventSink:  # type: ignore[no-untyped-def]
     sink = HTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=server.endpoint,
         credential_provider=lambda: TOKEN,
         deployment_id=BINDING,
@@ -532,6 +533,7 @@ def test_resume_endpoint_resets_the_streak() -> None:
 async def test_async_exporter_pauses_on_the_third_failure_and_resumes() -> None:
     server = TlsServer("WWWG")
     sink = AsyncHTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=server.endpoint,
         credential_provider=lambda: TOKEN,
         deployment_id=BINDING,
@@ -652,6 +654,7 @@ async def test_async_exporter_through_an_explicit_proxy_pauses_the_endpoint() ->
     server = TlsServer("WWWG")
     proxy = ConnectProxy(server.port)
     sink = AsyncHTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=server.endpoint,
         credential_provider=lambda: TOKEN,
         deployment_id=BINDING,

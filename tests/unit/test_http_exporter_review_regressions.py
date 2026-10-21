@@ -29,7 +29,7 @@ def options(handler, **kwargs):
         deployment_id=BINDING,
         expected_agent=AGENT,
         _transport=httpx.MockTransport(handler),
-        **kwargs,
+        **{"allow_unrestricted_indicators": True, **kwargs},
     )
 
 
@@ -191,7 +191,15 @@ def test_final_health_is_immutable_after_first_successful_admission(corrected):
         MeasurementHealthReport,
     )
 
-    core = Core(Config("https://example.com", lambda: "secret", BINDING, AGENT))
+    core = Core(
+        Config(
+            "https://example.com",
+            lambda: "secret",
+            BINDING,
+            AGENT,
+            allow_unrestricted_indicators=True,
+        )
+    )
     core.emit(event())
     core.submit_measurement_health(MeasurementHealthReport(), run_id="run-1")
     report = (
@@ -282,6 +290,7 @@ def test_failed_final_health_admission_can_be_retried_and_marker_is_released():
             AGENT,
             max_queue_records=2,
             closure_reserve_records=1,
+            allow_unrestricted_indicators=True,
         )
     )
     core.credential = "secret"

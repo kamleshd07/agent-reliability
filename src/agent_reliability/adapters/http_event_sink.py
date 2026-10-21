@@ -196,6 +196,7 @@ class HTTPEventSink:
         closure_reserve_bytes: int = 3 * 1024 * 1024,
         provider_timeout: float = 60,
         indicator_allowlist: Collection[str] | None = None,
+        allow_unrestricted_indicators: bool = False,
         _transport: httpx.BaseTransport | None = None,
     ) -> None:
         config = Config(
@@ -214,6 +215,7 @@ class HTTPEventSink:
             closure_reserve_bytes,
             provider_timeout,
             frozen_allowlist(indicator_allowlist),
+            allow_unrestricted_indicators,
         )
         options = _client_options(proxy, ca_bundle)
         self._core = Core(config)
@@ -415,6 +417,7 @@ class AsyncHTTPEventSink:
         closure_reserve_bytes: int = 3 * 1024 * 1024,
         provider_timeout: float = 60,
         indicator_allowlist: Collection[str] | None = None,
+        allow_unrestricted_indicators: bool = False,
         _transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self._loop = asyncio.get_running_loop()
@@ -435,6 +438,7 @@ class AsyncHTTPEventSink:
             closure_reserve_bytes,
             provider_timeout,
             frozen_allowlist(indicator_allowlist),
+            allow_unrestricted_indicators,
         )
         self._core = Core(config)
         self._core.provider_dispatch = self._provider_result

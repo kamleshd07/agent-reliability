@@ -134,7 +134,11 @@ def frozen_allowlist(values: Any) -> frozenset[str] | None:
     if isinstance(values, str):
         raise ConfigurationError("indicator_allowlist_invalid")
     try:
-        return frozenset(values)
+        # Exact ``str`` copies: a subclass cannot lie about equality, hash or contents.
+        return frozenset(
+            str.__add__("", v) if isinstance(v, str) and type(v) is not str else v
+            for v in values
+        )
     except TypeError:
         raise ConfigurationError("indicator_allowlist_invalid") from None
 
@@ -182,6 +186,7 @@ class Config:
     closure_reserve_bytes: int = 3 * 1024 * 1024
     provider_timeout: float = 60
     indicator_allowlist: frozenset[str] | None = None
+    allow_unrestricted_indicators: bool = False
 
     def __post_init__(self) -> None:
         if not isinstance(self.endpoint, str) or not (
@@ -232,6 +237,12 @@ class Config:
                 raise ConfigurationError("timeout_invalid")
         if self.max_active_run_age is not None:
             duration(self.max_active_run_age, "run_age_invalid")
+        if type(self.allow_unrestricted_indicators) is not bool:
+            raise ConfigurationError("indicator_policy_invalid")
+        if self.indicator_allowlist is None and not self.allow_unrestricted_indicators:
+            raise ConfigurationError("indicator_policy_required")
+        if self.indicator_allowlist is not None and self.allow_unrestricted_indicators:
+            raise ConfigurationError("indicator_policy_conflict")
         if self.indicator_allowlist is not None:
             try:
                 if not self.indicator_allowlist:

@@ -101,6 +101,7 @@ async def main(out: Path | None) -> None:
         )
 
     sink = HTTPEventSink(
+        indicator_allowlist=["answer-correctness", "groundedness"],
         endpoint="https://capture.invalid/api/v1/evidence/runs",
         credential_provider=lambda: "capture-only",
         deployment_id=DEPLOYMENT,

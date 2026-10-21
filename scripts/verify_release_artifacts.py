@@ -351,6 +351,7 @@ def handler(request):
 
 agent = AgentIdentity("agent", "Agent", "1", "test")
 sink = HTTPEventSink(
+    allow_unrestricted_indicators=True,
     endpoint="https://example.com/api/v1/evidence/runs",
     credential_provider=lambda: "artifact-test-token",
     deployment_id=UUID("00000000-0000-4000-8000-000000000007"),

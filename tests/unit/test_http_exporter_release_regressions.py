@@ -34,7 +34,15 @@ ENDPOINT = "https://platform.example/api/v1/evidence/runs"
 
 
 def _core() -> Core:
-    return Core(Config(ENDPOINT, lambda: "secret", BINDING, AGENT))
+    return Core(
+        Config(
+            ENDPOINT,
+            lambda: "secret",
+            BINDING,
+            AGENT,
+            allow_unrestricted_indicators=True,
+        )
+    )
 
 
 # ---------------------------------------------------------------------- F-5
@@ -73,6 +81,7 @@ def test_request_body_cap_is_exactly_64_kib(monkeypatch: pytest.MonkeyPatch) -> 
 def test_userinfo_endpoints_are_rejected_at_construction(endpoint: str) -> None:
     with pytest.raises(ConfigurationError):
         HTTPEventSink(
+            allow_unrestricted_indicators=True,
             endpoint=endpoint,
             credential_provider=lambda: "secret",
             deployment_id=BINDING,
@@ -121,6 +130,7 @@ def test_a_response_body_trickled_past_the_budget_is_abandoned(
 
     threading.Thread(target=accept, daemon=True).start()
     sink = HTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=f"http://127.0.0.1:{listener.getsockname()[1]}/api/v1/evidence/runs",
         credential_provider=lambda: "secret",
         deployment_id=BINDING,
@@ -184,6 +194,7 @@ def test_idle_workers_do_not_build_status_snapshots() -> None:
     rows) every 10 ms just to see whether the sink was closed (~2.7% of a core)."""
 
     sink = HTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=ENDPOINT,
         credential_provider=lambda: "secret",
         deployment_id=BINDING,

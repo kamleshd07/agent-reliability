@@ -86,6 +86,7 @@ def _options(port: int) -> dict[str, object]:
         "deployment_id": DEPLOYMENT,
         "expected_agent": AGENT,
         "retry_max_attempts": 1,
+        "allow_unrestricted_indicators": True,
     }
 
 
