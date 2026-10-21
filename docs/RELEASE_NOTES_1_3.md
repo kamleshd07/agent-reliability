@@ -81,7 +81,9 @@ sent). A sink given neither raises `ConfigurationError`.
 
 No code change is required: 1.3 is backward compatible. To start sending evidence to a platform:
 install the `http` extra, create an exporter with your endpoint, a credential provider, the
-deployment UUID and your exact `AgentIdentity`, pass it as `sink=` to `AgentReliability`, and call
+deployment UUID, your exact `AgentIdentity` and an **indicator policy** (`indicator_allowlist=[...]`,
+recommended, or the deliberate `allow_unrestricted_indicators=True`; the exporter refuses to start
+without one), pass it as `sink=` to `AgentReliability`, and call
 `exporter.close(timeout=...)` on shutdown. Nothing is sent unless you configure an exporter. Existing
 sinks keep working; the new health capability is optional.
 

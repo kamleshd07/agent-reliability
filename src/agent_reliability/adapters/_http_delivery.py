@@ -139,7 +139,7 @@ def frozen_allowlist(values: Any) -> frozenset[str] | None:
             str.__add__("", v) if isinstance(v, str) and type(v) is not str else v
             for v in values
         )
-    except TypeError:
+    except Exception:  # a hostile iterable must not leak its own message
         raise ConfigurationError("indicator_allowlist_invalid") from None
 
 
@@ -643,7 +643,10 @@ class Core:
         if type(value) is not str and isinstance(value, str):
             # Work on an exact ``str`` copy so a subclass cannot lie about its
             # contents, length or equality between validation and serialisation.
-            value = str.__add__("", value)
+            try:
+                value = str.__add__("", value)
+            except TypeError:  # an object that only claims to be a str
+                raise EventDeliveryRejected("indicator_unsupported") from None
         checked = text(value, 200, "indicator_unsupported")
         allowed = self.config.indicator_allowlist
         if allowed is not None and checked not in allowed:

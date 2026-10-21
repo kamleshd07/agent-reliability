@@ -1,7 +1,7 @@
 {
   "src/agent_reliability/adapters/_http_delivery.py": {
     "previousSha256": "1fa59534acbc75db017a5ba5ea43f1d0d5a4b10146fe3b04c3a140801098eef7",
-    "sha256": "a20b0145955037d369aaed75370dc948de6e196071a3fa4acaeb7b5e23830e4d",
+    "sha256": "7a6837ea003e81b8c7dc45c92f171604231d6b2f523aa6cbc4281085c1e96cdf",
     "reason": "1.3.0: adds the fail-closed indicator policy to the exporter constructors (a required choice of indicator_allowlist or allow_unrestricted_indicators; unapproved indicators are rejected before queueing and never logged); no wire, schema or fixture change. Supersedes the 1.3.0rc1 revision (opt-in allow-list), which stays published unchanged."
   },
   "src/agent_reliability/adapters/http_event_sink.py": {

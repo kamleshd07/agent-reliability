@@ -24,7 +24,12 @@ from agent_reliability.adapters.http_event_sink import (
     HTTPEventSink,
 )
 from agent_reliability.domain import AgentIdentity, EvaluationOutcome
-from agent_reliability.sdk import AgentReliability
+from agent_reliability.evaluation import (
+    ContainsEvaluator,
+    EvaluationExecutionFailure,
+    EvaluatorIdentity,
+)
+from agent_reliability.sdk import AgentReliability, EvaluatorRunner
 
 AGENT = AgentIdentity("agent", "Agent", "1", "test")
 ALLOWED = "task-success"
@@ -394,3 +399,146 @@ def test_a_rejected_indicator_value_is_never_logged_or_exposed(
         assert value.encode() not in b"".join(bodies)
     assert "jane@example.com" not in haystack
     assert "hunter2" not in haystack
+
+
+# ------------------------------------ every path that can put an indicator on the wire
+
+
+def _run_handle(sdk: AgentReliability):  # type: ignore[no-untyped-def]
+    return sdk.run(
+        agent_id=AGENT.agent_id,
+        name=AGENT.name,
+        version=AGENT.version,
+        environment=AGENT.environment,
+    )
+
+
+class _Exploding:
+    identity = EvaluatorIdentity("exploding", "1")
+    deterministic = True
+
+    def evaluate(self, value):  # type: ignore[no-untyped-def]
+        raise ValueError("SENTINEL-EXCEPTION-MESSAGE-MUST-NOT-LEAVE")
+
+
+@pytest.mark.parametrize(
+    "bad", [SENTINEL, _AlwaysEqual(SENTINEL), _LyingBehaviour(SENTINEL)]
+)
+def test_record_evaluation_path_enforces_the_policy(bad: str) -> None:
+    bodies: list[bytes] = []
+    sink = _listed(bodies)
+    runner = EvaluatorRunner()
+    evaluator = ContainsEvaluator(
+        identity=EvaluatorIdentity("mentions-refund", "1"),
+        substring="refund",
+        case_sensitive=False,
+    )
+    with _run_handle(AgentReliability(sink=sink)) as run:
+        result = runner.evaluate(evaluator, "refund approved")
+        run.record_evaluation(indicator=bad, result=result)
+        run.record_evaluation(indicator=ALLOWED, result=result)
+    sink.close(timeout=10)
+    joined = b"".join(bodies)
+    assert SENTINEL.encode() not in joined
+    assert (
+        joined.count(b'"indicator":"task-success"')
+        + joined.count(b'"indicator": "task-success"')
+        == 1
+    )
+
+
+@pytest.mark.parametrize("bad", [SENTINEL, _AlwaysEqual(SENTINEL), _FlipFlop(SENTINEL)])
+def test_record_evaluation_failure_path_enforces_the_policy(bad: str) -> None:
+    bodies: list[bytes] = []
+    sink = _listed(bodies)
+    failure = EvaluatorRunner().evaluate(_Exploding(), "SENTINEL-INPUT-CONTENT")
+    assert isinstance(failure, EvaluationExecutionFailure)
+    with _run_handle(AgentReliability(sink=sink)) as run:
+        run.record_evaluation_failure(failure=failure, indicator=bad)
+        run.record_evaluation_failure(failure=failure, indicator=ALLOWED)
+    snapshot = sink.close(timeout=10)
+    joined = b"".join(bodies)
+    kinds = [json.loads(b)["payload"]["kind"] for b in bodies]
+    assert SENTINEL.encode() not in joined
+    assert b"SENTINEL-EXCEPTION-MESSAGE-MUST-NOT-LEAVE" not in joined
+    assert kinds.count("evaluation_execution_failure") == 1
+    assert snapshot.queue_depth == 0
+
+
+def test_direct_failure_submission_rejects_before_admission_and_keeps_state() -> None:
+    bodies: list[bytes] = []
+    sink = _listed(bodies)
+    failure = EvaluatorRunner().evaluate(_Exploding(), "x")
+    assert isinstance(failure, EvaluationExecutionFailure)
+    with _run_handle(AgentReliability(sink=sink)) as run:
+        before = sink.status
+        with pytest.raises(Exception) as caught:
+            sink.submit_evaluation_failure(
+                failure, run_id=str(run.run_id), indicator=SENTINEL
+            )
+        after = sink.status
+    sink.close(timeout=10)
+    assert "indicator_not_allowed" in str(caught.value)
+    assert SENTINEL not in str(caught.value)
+    assert (after.queue_depth, after.high_water_mark) == (
+        before.queue_depth,
+        before.high_water_mark,
+    )
+    assert SENTINEL.encode() not in b"".join(bodies)
+
+
+class _ForgedHash(str):
+    """Equal to everything, hashing like an *unlisted* name: only a copy defeats it."""
+
+    def __eq__(self, other: object) -> bool:
+        return True
+
+    def __hash__(self) -> int:
+        return hash("other-secret-thing")
+
+
+def test_allowlist_entry_copy_defeats_a_forged_hash_for_an_unlisted_name() -> None:
+    bodies: list[bytes] = []
+    sink = HTTPEventSink(
+        **_options(  # type: ignore[arg-type]
+            bodies, indicator_allowlist=[_ForgedHash(ALLOWED)]
+        )
+    )
+    _run(AgentReliability(sink=sink), "other-secret-thing", ALLOWED)
+    sink.close(timeout=10)
+    joined = b"".join(bodies)
+    assert b"other-secret-thing" not in joined
+    assert ALLOWED.encode() in joined
+
+
+class _OnlyClaimsToBeStr:
+    @property
+    def __class__(self):  # type: ignore[override]
+        return str
+
+
+def test_an_object_that_only_claims_to_be_a_str_is_rejected_with_a_fixed_code() -> None:
+    bodies: list[bytes] = []
+    sink = _listed(bodies)
+    failure = EvaluatorRunner().evaluate(_Exploding(), "x")
+    assert isinstance(failure, EvaluationExecutionFailure)
+    with (
+        _run_handle(AgentReliability(sink=sink)) as run,
+        pytest.raises(Exception) as caught,
+    ):
+        sink.submit_evaluation_failure(
+            failure, run_id=str(run.run_id), indicator=_OnlyClaimsToBeStr()
+        )
+    sink.close(timeout=10)
+    assert "indicator_unsupported" in str(caught.value)
+
+
+def test_a_hostile_allowlist_iterable_cannot_leak_its_own_message() -> None:
+    def hostile():  # type: ignore[no-untyped-def]
+        yield ALLOWED
+        raise RuntimeError("LEAKSECRET-iter")
+
+    with pytest.raises(ConfigurationError) as caught:
+        HTTPEventSink(**_options([], indicator_allowlist=hostile()))  # type: ignore[arg-type]
+    assert "LEAKSECRET" not in str(caught.value)
+    assert "LEAKSECRET" not in repr(caught.value.__cause__)

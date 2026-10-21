@@ -1,6 +1,6 @@
 # First evidence delivery from a local build
 
-This procedure verifies first evidence delivery from a **locally built distribution of the 1.3 release** (`1.3.0`). Releases before 1.3 (1.2.1 and earlier) do not contain the exporter; do not install them expecting platform delivery. The candidate also contains the Experimental judge adapter, which this procedure does not use. It describes a local, disposable platform: no hosted Gentlity service and no production support are implied (see the [release notes](RELEASE_NOTES_1_3.md)).
+This procedure verifies first evidence delivery from a **locally built distribution of the 1.3 release** (`1.3.0`). Releases before 1.3 (1.2.1 and earlier) do not contain the exporter; do not install them expecting platform delivery. This release also contains the Experimental judge adapter, which this procedure does not use. It describes a local, disposable platform: no hosted Gentlity service and no production support are implied (see the [release notes](RELEASE_NOTES_1_3.md)).
 
 ## Prerequisites
 

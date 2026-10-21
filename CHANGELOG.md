@@ -11,8 +11,7 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 A backward-compatible minor release under [docs/VERSIONING.md](docs/VERSIONING.md): an
 optional HTTP evidence exporter and an experimental model-backed evaluator adapter. The
 publication date is the upload date shown by the package index and the GitHub release. The
-`1.3.0rc1` pre-release (a pre-release of this version) is superseded; its published files are
-unchanged. The core installation still has no
+`1.3.0rc1` pre-release is superseded by this release; its published files are unchanged. The core installation still has no
 runtime dependencies, and existing stable public APIs, reliability/SLO semantics and the
 `EventSink` contract are unchanged. See [docs/RELEASE_NOTES_1_3.md](docs/RELEASE_NOTES_1_3.md)
 for migration and rollback guidance and [docs/HTTP_EXPORTER.md](docs/HTTP_EXPORTER.md) for

@@ -65,9 +65,8 @@ provider, agent-framework, hosted-platform, or runtime dependency. LLM-as-judge
 remains deliberately deferred until a later adapter milestone can define its
 privacy, nondeterminism, remote-failure, and provenance semantics explicitly.
 
-P29 (unreleased, Experimental) is that adapter milestone: `agent_reliability.experimental.judge`
-(ADR-0010). It is implemented only in a local working tree and is not part of any release; see
-[EVALUATE.md](EVALUATE.md).
+The adapter milestone is `agent_reliability.experimental.judge` (ADR-0010). It ships in 1.3 as
+Experimental (no calibration or accuracy claim); see [EVALUATE.md](EVALUATE.md).
 
 ## M5 — Local reliability engine
 
