@@ -54,6 +54,9 @@ the exporter.
   releases the exporter's run binding when a run finishes; `CompositeEventSink` fans the
   capability out and isolates each child. Sinks that do not implement it are
   unaffected.
+- Optional `indicator_allowlist` constructor argument pins the only free-text wire field
+  (`indicator`) to known names; unlisted indicators are rejected locally and never sent.
+  Unset by default (no behaviour change).
 - Security posture: certificate and hostname verification are always on; redirects
   are never followed; plaintext HTTP is accepted only for literal loopback
   (`127.0.0.0/8`, `[::1]`); ambient proxy/CA/cookie/netrc configuration is ignored;

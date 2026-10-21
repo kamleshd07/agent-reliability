@@ -33,7 +33,8 @@ credentials or arbitrary metadata, and it has no API to attach them. Keep identi
 (indicator names, evaluator versions and configuration ids, reason codes, exception class names) free of
 sensitive text: they are transmitted as-is within their length/grammar limits — the wire contract allows an
 indicator of up to 200 printable characters, spaces included — and the SDK cannot detect sensitive content
-inside them.
+inside them. To pin the only free-text field, pass `indicator_allowlist=[...]` to the sink: unlisted
+indicators are then rejected locally and never queued or sent (opt-in; default behaviour unchanged).
 
 ## Delivery guarantees (exact)
 

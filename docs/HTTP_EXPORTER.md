@@ -86,6 +86,14 @@ provenance names, reason codes, and the *class name* of an exception that escape
 input, model output, document text or secrets, and do not put credentials in the endpoint URL (HTTPX
 logs URLs at INFO). The SDK cannot detect sensitive content inside an identifier you choose.
 
+Of these, only the `indicator` accepts free text; the others are restricted to a conservative
+identifier character set. To remove the risk of an indicator being built from dynamic content, pass
+`indicator_allowlist=[...]` (a non-empty collection of the exact indicator names you use, each 1-200
+valid characters; copied at construction). An evaluation or failure whose indicator is not in the list
+is rejected locally with `indicator_not_allowed` before anything is queued or sent, and counted in the
+exporter diagnostics. The list is opt-in so that existing integrations are unaffected; with it unset
+the behaviour is exactly as in the release candidate. An invalid list raises `ConfigurationError`.
+
 ## Capacity and time configuration
 
 | Constructor setting | Default |
@@ -98,6 +106,7 @@ logs URLs at INFO). The SDK cannot detect sensitive content inside an identifier
 | `max_throttle_responses` | 3 per record |
 | `provider_timeout` | 60 seconds; configurable |
 | `max_active_run_age` | None; no age eviction |
+| `indicator_allowlist` | None; any valid indicator is sent. Set it to pin the exact indicator names (see below) |
 
 Two workers and ten connections use connect/read/write/pool timeouts of
 5/30/10/5 seconds. Bindings cap at 1,000; terminal diagnostic tombstones cap

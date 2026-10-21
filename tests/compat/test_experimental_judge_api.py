@@ -20,7 +20,7 @@ import pytest
 
 import agent_reliability.experimental as experimental
 import agent_reliability.experimental.judge as judge
-from tests.fakes.p29_baseline import load_baseline
+from tests.fakes.p29_baseline import load_baseline, load_runtime_revisions
 
 pytestmark = pytest.mark.contract
 
@@ -300,9 +300,15 @@ def test_no_existing_source_module_is_modified_by_p29() -> None:
     """P29 adds files under experimental/judge/ only (plan section 4)."""
     baseline = _baseline()
     changed = []
+    revisions = load_runtime_revisions()
     for name, digest in baseline.items():
         if not name.startswith("src/"):
             continue
+        if name in revisions:
+            # Recorded revision (fixtures/documentation/runtime-revisions.json):
+            # baseline == its previous hash; the file == its pinned new hash.
+            assert revisions[name]["previousSha256"] == digest, name
+            digest = revisions[name]["sha256"]
         current = ROOT / name
         if (
             not current.exists()
