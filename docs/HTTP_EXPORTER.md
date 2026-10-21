@@ -14,6 +14,7 @@ from agent_reliability.sdk import AgentReliability
 
 identity = AgentIdentity("support-agent", "Support Agent", "1.4.0", "production")
 exporter = HTTPEventSink(
+    indicator_allowlist=["task-success"],  # required choice; see "Indicator policy"
     endpoint="https://gentlity.example/api/v1/evidence/runs",
     credential_provider=lambda: os.environ["GENTLITY_MACHINE_TOKEN"],
     deployment_id=UUID(os.environ["GENTLITY_DEPLOYMENT_ID"]),
@@ -87,14 +88,25 @@ input, model output, document text or secrets, and do not put credentials in the
 logs URLs at INFO). The SDK cannot detect sensitive content inside an identifier you choose.
 
 Of these, only the `indicator` accepts free text; the others are restricted to a conservative
-identifier character set. To remove the risk of an indicator being built from dynamic content, pass
-`indicator_allowlist=[...]` (a non-empty collection of the exact indicator names you use, each 1-200
-valid characters; copied at construction). An evaluation or failure whose indicator is not in the list
-is rejected locally (`EventDeliveryRejected`, code `indicator_not_allowed`) before anything is queued
-or sent; the SDK isolates sink errors, so the run itself is unaffected, and logs the rejection as an
-instrumentation failure (exception type only, never the rejected text). The rejection is not a delivery
-status and does not appear in the status snapshot, so watch your logs when you first set the list. The list is opt-in so that existing integrations are unaffected; with it unset
-the behaviour is exactly as in the release candidate. An invalid list raises `ConfigurationError`.
+identifier character set. Because the SDK cannot tell a harmless name from sensitive text, the sink
+**fails closed**: you must choose how the indicator is treated when you construct it.
+
+* `indicator_allowlist=[...]` (recommended): a non-empty collection of the exact indicator names you
+  use (each 1-200 valid characters, matched exactly and case-sensitively, copied at construction as
+  plain `str` values). An evaluation or failure whose indicator is not in the list is rejected locally
+  (`EventDeliveryRejected`, code `indicator_not_allowed`) before anything is queued or sent. The SDK
+  isolates sink errors, so the run itself is unaffected; the rejection is logged as an instrumentation
+  failure by exception type only. **The rejected value is never logged**, never sent and never kept. The
+  rejection is not a delivery status and does not appear in the status snapshot, so watch your logs
+  when you first set the list.
+* `allow_unrestricted_indicators=True`: a deliberate, explicit opt-out for integrations whose indicator
+  names are generated but known to be safe. Whatever indicator string your code supplies is sent
+  verbatim. Do not use it with names derived from user input, model output, documents or secrets.
+
+Giving neither raises `ConfigurationError` at construction (code `indicator_policy_required`); giving both,
+or a value other than exactly `True` for the opt-out, is also a `ConfigurationError`. An invalid list
+raises `ConfigurationError` (`indicator_allowlist_invalid`). Migration from the `1.3.0rc1` pre-release is
+described in [RELEASE_NOTES_1_3.md](RELEASE_NOTES_1_3.md).
 
 ## Capacity and time configuration
 
@@ -108,7 +120,7 @@ the behaviour is exactly as in the release candidate. An invalid list raises `Co
 | `max_throttle_responses` | 3 per record |
 | `provider_timeout` | 60 seconds; configurable |
 | `max_active_run_age` | None; no age eviction |
-| `indicator_allowlist` | None; any valid indicator is sent. Set it to pin the exact indicator names (see below) |
+| `indicator_allowlist` / `allow_unrestricted_indicators` | **One is required** (`ConfigurationError` otherwise; both is also an error): the exact indicator names that may be sent, or the deliberate unrestricted opt-out (see "Caller-chosen text") |
 
 Two workers and ten connections use connect/read/write/pool timeouts of
 5/30/10/5 seconds. Bindings cap at 1,000; terminal diagnostic tombstones cap

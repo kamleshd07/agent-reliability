@@ -6,12 +6,12 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
-## [1.3.0rc1] - release candidate (not published)
+## [1.3.0]
 
-Release candidate for **1.3.0**, a backward-compatible minor release under
-[docs/VERSIONING.md](docs/VERSIONING.md): an optional HTTP evidence exporter and an
-experimental model-backed evaluator adapter. Nothing in this section is published; the
-release date is set when publication is approved. The core installation still has no
+A backward-compatible minor release under [docs/VERSIONING.md](docs/VERSIONING.md): an
+optional HTTP evidence exporter and an experimental model-backed evaluator adapter. The
+publication date is the upload date shown by the package index and the GitHub release. The
+`1.3.0rc1` pre-release is superseded by this release; its published files are unchanged. The core installation still has no
 runtime dependencies, and existing stable public APIs, reliability/SLO semantics and the
 `EventSink` contract are unchanged. See [docs/RELEASE_NOTES_1_3.md](docs/RELEASE_NOTES_1_3.md)
 for migration and rollback guidance and [docs/HTTP_EXPORTER.md](docs/HTTP_EXPORTER.md) for
@@ -54,9 +54,12 @@ the exporter.
   releases the exporter's run binding when a run finishes; `CompositeEventSink` fans the
   capability out and isolates each child. Sinks that do not implement it are
   unaffected.
-- Optional `indicator_allowlist` constructor argument pins the only free-text wire field
-  (`indicator`) to known names; unlisted indicators are rejected locally and never sent.
-  Unset by default (no behaviour change).
+- **Fail-closed indicator policy.** The `indicator` is the only free-text wire field, so
+  both sinks now require an explicit choice: `indicator_allowlist=[...]` (only these exact
+  names may leave the process; others are rejected before queueing and never logged) or the
+  deliberate `allow_unrestricted_indicators=True`. A sink given neither raises
+  `ConfigurationError`. This is a behaviour change relative to the `1.3.0rc1` pre-release;
+  see the migration notes in [docs/RELEASE_NOTES_1_3.md](docs/RELEASE_NOTES_1_3.md).
 - Security posture: certificate and hostname verification are always on; redirects
   are never followed; plaintext HTTP is accepted only for literal loopback
   (`127.0.0.0/8`, `[::1]`); ambient proxy/CA/cookie/netrc configuration is ignored;

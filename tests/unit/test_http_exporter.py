@@ -41,7 +41,15 @@ def start(run_id="run-1"):
 
 
 def core(**kwargs):
-    result = Core(Config(ENDPOINT, lambda: "secret", DEPLOYMENT, AGENT, **kwargs))
+    result = Core(
+        Config(
+            ENDPOINT,
+            lambda: "secret",
+            DEPLOYMENT,
+            AGENT,
+            **{"allow_unrestricted_indicators": True, **kwargs},
+        )
+    )
     result.credential = "secret"
     result.generation = 1
     result._backoff = lambda _n: 0
@@ -71,6 +79,7 @@ def error(code):
 
 def sink(handler, **kwargs):
     return HTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=ENDPOINT,
         credential_provider=lambda: "secret",
         deployment_id=DEPLOYMENT,
@@ -320,7 +329,16 @@ def test_provider_hang_single_flight_timeout_and_late_result():
         gate.wait(2)
         return "secret"
 
-    c = Core(Config(ENDPOINT, provider, DEPLOYMENT, AGENT, provider_timeout=0.02))
+    c = Core(
+        Config(
+            ENDPOINT,
+            provider,
+            DEPLOYMENT,
+            AGENT,
+            allow_unrestricted_indicators=True,
+            provider_timeout=0.02,
+        )
+    )
     c.emit(start())
     assert c.take() is None
     time.sleep(0.03)
@@ -339,7 +357,15 @@ def test_provider_hang_single_flight_timeout_and_late_result():
 
 def test_401_refresh_then_403_cannot_resume_until_changed_provider():
     value = ["secret-2"]
-    c = Core(Config(ENDPOINT, lambda: value[0], DEPLOYMENT, AGENT))
+    c = Core(
+        Config(
+            ENDPOINT,
+            lambda: value[0],
+            DEPLOYMENT,
+            AGENT,
+            allow_unrestricted_indicators=True,
+        )
+    )
     c.credential = "secret"
     c.generation = 1
     c.emit(start())
@@ -414,6 +440,7 @@ def test_rejects_unsafe_urls_without_provider_call(url):
     calls = []
     with pytest.raises(ConfigurationError):
         HTTPEventSink(
+            allow_unrestricted_indicators=True,
             endpoint=url,
             credential_provider=lambda: calls.append(1),
             deployment_id=DEPLOYMENT,
@@ -424,6 +451,7 @@ def test_rejects_unsafe_urls_without_provider_call(url):
 
 def test_diagnostics_redaction_and_invalid_credential():
     exporter = HTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=ENDPOINT,
         credential_provider=lambda: "secret\r\nattack",
         deployment_id=DEPLOYMENT,
@@ -447,6 +475,7 @@ async def test_native_async_delivery_and_cross_thread_rules():
         return httpx.Response(201, json=ack(json.loads(request.content)["event_id"]))
 
     exporter = AsyncHTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=ENDPOINT,
         credential_provider=lambda: "secret",
         deployment_id=DEPLOYMENT,
@@ -489,6 +518,7 @@ async def test_async_close_cancels_hung_http_and_preserves_uncertainty():
             cancelled.set()
 
     exporter = AsyncHTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=ENDPOINT,
         credential_provider=lambda: "secret",
         deployment_id=DEPLOYMENT,
@@ -661,7 +691,15 @@ def test_tombstones_bounded_and_close_idempotent():
 
 def test_close_with_current_provider_read_freezes_invalid_label():
     block = threading.Event()
-    c = Core(Config(ENDPOINT, lambda: block.wait(1), DEPLOYMENT, AGENT))
+    c = Core(
+        Config(
+            ENDPOINT,
+            lambda: block.wait(1),
+            DEPLOYMENT,
+            AGENT,
+            allow_unrestricted_indicators=True,
+        )
+    )
     c.emit(start())
     c.take()
     c.begin_close(0)
@@ -679,7 +717,11 @@ def test_403_during_refresh_and_resume_join_or_stored_baseline(join):
         block.wait(1)
         return "changed"
 
-    c = Core(Config(ENDPOINT, provider, DEPLOYMENT, AGENT))
+    c = Core(
+        Config(
+            ENDPOINT, provider, DEPLOYMENT, AGENT, allow_unrestricted_indicators=True
+        )
+    )
     c.credential = "original"
     c.generation = 1
     c.emit(start())
@@ -746,6 +788,7 @@ async def test_async_gate_resumes_and_provider_owner_result():
         )
 
     exporter = AsyncHTTPEventSink(
+        allow_unrestricted_indicators=True,
         endpoint=ENDPOINT,
         credential_provider=lambda: token[0],
         deployment_id=DEPLOYMENT,
@@ -789,7 +832,13 @@ async def test_async_gate_resumes_and_provider_owner_result():
 )
 def test_invalid_config_is_typed_before_workers(kwargs):
     with pytest.raises(ConfigurationError):
-        Config(ENDPOINT, lambda: "secret", DEPLOYMENT, AGENT, **kwargs)
+        Config(
+            ENDPOINT,
+            lambda: "secret",
+            DEPLOYMENT,
+            AGENT,
+            **{"allow_unrestricted_indicators": True, **kwargs},
+        )
 
 
 @pytest.mark.parametrize(

@@ -89,7 +89,7 @@ def test_p29_s00_versioning_and_ga_contract_entries() -> None:
     ga = (ROOT / "docs/GA_CONTRACT.md").read_text()
     assert "agent_reliability.experimental.judge" in versioning
     assert "Experimental namespace: `agent_reliability.experimental.judge`" in ga
-    assert "unreleased" in ga and "EXPERIMENTAL" in ga
+    assert "ships in 1.3" in ga and "EXPERIMENTAL" in ga
 
 
 def test_p29_s12_ac04_user_docs_carry_privacy_pass_meaning_and_non_claims() -> None:
@@ -110,7 +110,7 @@ def test_p29_s12_ac04_user_docs_carry_privacy_pass_meaning_and_non_claims() -> N
     ):
         assert needle in EVALUATE, needle
     readme = (ROOT / "README.md").read_text()
-    assert "experimental, unreleased" in readme and "uncalibrated" in readme
+    assert "(experimental)" in readme and "uncalibrated" in readme
 
 
 def test_p29_con17_cohort_convention_and_plus_hazard_are_documented() -> None:
@@ -238,5 +238,5 @@ def test_review_f13_readme_places_the_p29_paragraph_before_the_license_section()
     None
 ):
     readme = (ROOT / "README.md").read_text()
-    judge = readme.index("### LLM-judge evaluators (experimental, unreleased)")
+    judge = readme.index("### LLM-judge evaluators (experimental)")
     assert judge < readme.index("## Documentation") < readme.index("## License")

@@ -1,12 +1,12 @@
 {
   "src/agent_reliability/adapters/_http_delivery.py": {
     "previousSha256": "1fa59534acbc75db017a5ba5ea43f1d0d5a4b10146fe3b04c3a140801098eef7",
-    "sha256": "0b55a228caa71187e8fa1e262ad750c01258b73d6a651fcb39717398b3bb1b7a",
-    "reason": "1.3.0rc1: adds the optional, opt-in indicator_allowlist constructor argument (default None) that rejects unlisted indicators locally before queueing; no wire, schema, fixture or default-behaviour change. Recorded owner-directed mitigation of the free-text indicator exposure."
+    "sha256": "7a6837ea003e81b8c7dc45c92f171604231d6b2f523aa6cbc4281085c1e96cdf",
+    "reason": "1.3.0: adds the fail-closed indicator policy to the exporter constructors (a required choice of indicator_allowlist or allow_unrestricted_indicators; unapproved indicators are rejected before queueing and never logged); no wire, schema or fixture change. Supersedes the 1.3.0rc1 revision (opt-in allow-list), which stays published unchanged."
   },
   "src/agent_reliability/adapters/http_event_sink.py": {
     "previousSha256": "41fd7e56c87111119595909e74b9a5052edfa31d0a7aef94e7551cf3970a659d",
-    "sha256": "2a3e124f2ded23efbff038d4d0e6c12b4ae75bb3ee2b199e511871e94db74bbb",
-    "reason": "1.3.0rc1: adds the optional, opt-in indicator_allowlist constructor argument (default None) that rejects unlisted indicators locally before queueing; no wire, schema, fixture or default-behaviour change. Recorded owner-directed mitigation of the free-text indicator exposure."
+    "sha256": "afefa574a2fad514caf6ae273e6be147bd3d0f5ee68df501a0ddfc3608d4f82f",
+    "reason": "1.3.0: adds the fail-closed indicator policy to the exporter constructors (a required choice of indicator_allowlist or allow_unrestricted_indicators; unapproved indicators are rejected before queueing and never logged); no wire, schema or fixture change. Supersedes the 1.3.0rc1 revision (opt-in allow-list), which stays published unchanged."
   }
 }

@@ -256,11 +256,10 @@ the acknowledgement) is defined by the platform's published contract and is vers
 separately from this Python API. The exporter is promoted to **STABLE** only by a later
 documented decision after hosted validation.
 
-### Experimental namespace: `agent_reliability.experimental.judge` (unreleased)
+### Experimental namespace: `agent_reliability.experimental.judge` (Experimental)
 
 Contract class **EXPERIMENTAL** (see Contract classes above; not part of 1.0,
-not part of any stable inventory). Not released: it exists only in an
-unpublished working tree. It follows the Experimental policy in
+not part of any stable inventory). It ships in 1.3 and follows the Experimental policy in
 [VERSIONING.md](VERSIONING.md) and may change in a minor release with release
 notes. Its documented names are the
 `__all__` of `agent_reliability.experimental.judge`, snapshotted by

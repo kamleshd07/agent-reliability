@@ -27,6 +27,8 @@ def main() -> int:
         os.environ["GENTLITY_ENVIRONMENT_KEY"],
     )
     sink = HTTPEventSink(
+        # Only these indicator names may leave the process (fail-closed policy).
+        indicator_allowlist=["task-success"],
         endpoint=os.environ["GENTLITY_EVIDENCE_URL"],
         credential_provider=lambda: os.environ["GENTLITY_MACHINE_TOKEN"],
         deployment_id=UUID(os.environ["GENTLITY_DEPLOYMENT_ID"]),

@@ -1,9 +1,9 @@
 # Agent Reliability SDK 1.3 — release notes
 
-**Status: release candidate `1.3.0rc1` — not published.** Install an exact built artifact if you
-want to evaluate it; do not expect `pip install agent-reliability` to return 1.3 until the release
-is approved and published. This file is final for the candidate; the version line and date are
-updated only when the release is approved.
+**Status: stable release `1.3.0`** (`pip install agent-reliability`; the exporter needs the
+`http` extra). The HTTP exporter and the LLM-judge adapter are **Experimental** and may change in a
+minor release with release notes. The `1.3.0rc1` pre-release published earlier is superseded by this
+release and is not modified. The release date is the upload date shown by the package index.
 
 ## What 1.3 adds
 
@@ -33,8 +33,20 @@ credentials or arbitrary metadata, and it has no API to attach them. Keep identi
 (indicator names, evaluator versions and configuration ids, reason codes, exception class names) free of
 sensitive text: they are transmitted as-is within their length/grammar limits — the wire contract allows an
 indicator of up to 200 printable characters, spaces included — and the SDK cannot detect sensitive content
-inside them. To pin the only free-text field, pass `indicator_allowlist=[...]` to the sink: unlisted
-indicators are then rejected locally and never queued or sent (opt-in; default behaviour unchanged).
+inside them. The only free-text field, the indicator, is therefore guarded by a **required, fail-closed
+policy**: construct the sink with `indicator_allowlist=[...]` (recommended; unlisted indicators are
+rejected locally, never queued or sent, and never logged) or with the deliberate
+`allow_unrestricted_indicators=True` (you accept that whatever indicator string your code supplies is
+sent). A sink given neither raises `ConfigurationError`.
+
+### Migrating the indicator policy
+
+* From **1.2.1**: no change unless you adopt the exporter; new sinks must choose a policy.
+* From the **`1.3.0rc1` pre-release**: sinks built without a policy now raise `ConfigurationError` at
+  construction. Add `indicator_allowlist=["your-indicator", ...]` (list every indicator you record, exact
+  match, case-sensitive) or `allow_unrestricted_indicators=True` to keep the previous behaviour. The wire
+  format, platform contract and delivery semantics are unchanged.
+* Setting both raises `ConfigurationError`; `allow_unrestricted_indicators` must be exactly `True`.
 
 ## Delivery guarantees (exact)
 
@@ -69,7 +81,9 @@ indicators are then rejected locally and never queued or sent (opt-in; default b
 
 No code change is required: 1.3 is backward compatible. To start sending evidence to a platform:
 install the `http` extra, create an exporter with your endpoint, a credential provider, the
-deployment UUID and your exact `AgentIdentity`, pass it as `sink=` to `AgentReliability`, and call
+deployment UUID, your exact `AgentIdentity` and an **indicator policy** (`indicator_allowlist=[...]`,
+recommended, or the deliberate `allow_unrestricted_indicators=True`; the exporter refuses to start
+without one), pass it as `sink=` to `AgentReliability`, and call
 `exporter.close(timeout=...)` on shutdown. Nothing is sent unless you configure an exporter. Existing
 sinks keep working; the new health capability is optional.
 
@@ -83,9 +97,9 @@ is not recoverable after process exit (see above). There is no data migration on
 
 | Context | Status |
 |---|---|
-| Local development against a disposable platform | Verified for this candidate (installed distribution → disposable PostgreSQL-backed platform → reliability and SLO read). |
+| Local development against a disposable platform | Verified for this release (installed distribution → disposable PostgreSQL-backed platform → reliability and SLO read). |
 | A hosted Gentlity service | **Not claimed.** No customer-hosted environment is part of this release; hosted availability, capacity and customer credentials need a separate decision and validation. |
-| Production support | **Not claimed.** No service-level commitment accompanies this candidate. |
+| Production support | **Not claimed.** No service-level commitment accompanies this release. |
 
 ## Known limitations
 

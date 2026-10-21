@@ -82,6 +82,7 @@ class Wire:
 
     def sink(self) -> HTTPEventSink:
         return HTTPEventSink(
+            allow_unrestricted_indicators=True,
             endpoint=ENDPOINT,
             credential_provider=lambda: "secret",
             deployment_id=DEPLOYMENT,
