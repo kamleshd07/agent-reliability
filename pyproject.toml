@@ -41,7 +41,7 @@ Documentation = "https://github.com/kamleshd07/agent-reliability/tree/main/docs"
 Changelog = "https://github.com/kamleshd07/agent-reliability/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
-http = ["httpx>=0.28.1,<1"]
+http = ["httpx>=0.28.1,<0.29"]
 otel = ["opentelemetry-api>=1.44,<2"]
 otel-test = ["opentelemetry-sdk>=1.44,<2"]
 dev = [

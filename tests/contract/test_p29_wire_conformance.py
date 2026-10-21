@@ -42,7 +42,7 @@ from agent_reliability.experimental.judge import (
 from agent_reliability.experimental.judge.testing import FakeProvider, judge_reply
 from agent_reliability.sdk import AgentReliability, SdkDiagnostic
 from agent_reliability.sdk.evaluator_runner import EvaluatorRunner
-from tests.fakes.p29_baseline import load_baseline
+from tests.fakes.p29_baseline import load_baseline, load_runtime_revisions
 from tests.fakes.p29_judge import load_fixture, steps_from_vector
 from tests.fakes.sinks import RecordingSink
 
@@ -391,11 +391,19 @@ def test_p29_s09_ac06_p28_fixtures_and_contract_documents_are_byte_identical() -
         (ROOT / "tests/fixtures/documentation/editorial-revisions.json").read_text()
     )
     assert set(revisions) == {"docs/HTTP_EXPORTER.md"}
+    runtime_revisions = load_runtime_revisions()
+    assert set(runtime_revisions) <= {
+        "src/agent_reliability/adapters/_http_delivery.py",
+        "src/agent_reliability/adapters/http_event_sink.py",
+    }
     for name in guarded:
         expected = baseline[name]
         if name in revisions:
             assert revisions[name]["previousSha256"] == expected, name
             expected = revisions[name]["sha256"]
+        if name in runtime_revisions:
+            assert runtime_revisions[name]["previousSha256"] == expected, name
+            expected = runtime_revisions[name]["sha256"]
         digest = hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
         assert digest == expected, name
 

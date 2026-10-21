@@ -6,23 +6,29 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
-P28 HTTP evidence exporter (additive; no release date or version assigned, and
-nothing here is released or published). The core installation still has no runtime
-dependencies, and existing public APIs, reliability/SLO semantics and the
-`EventSink` contract are unchanged. See [docs/HTTP_EXPORTER.md](docs/HTTP_EXPORTER.md).
+## [1.3.0rc1] - release candidate (not published)
 
-### Added (P29, experimental, unreleased)
+Release candidate for **1.3.0**, a backward-compatible minor release under
+[docs/VERSIONING.md](docs/VERSIONING.md): an optional HTTP evidence exporter and an
+experimental model-backed evaluator adapter. Nothing in this section is published; the
+release date is set when publication is approved. The core installation still has no
+runtime dependencies, and existing stable public APIs, reliability/SLO semantics and the
+`EventSink` contract are unchanged. See [docs/RELEASE_NOTES_1_3.md](docs/RELEASE_NOTES_1_3.md)
+for migration and rollback guidance and [docs/HTTP_EXPORTER.md](docs/HTTP_EXPORTER.md) for
+the exporter.
+
+### Added (experimental)
 
 - `agent_reliability.experimental.judge`: an EXPERIMENTAL adapter for model-backed (LLM-judge)
-  evaluators that call a provider you supply (ADR-0010). Raw judged content stays on your side:
-  only typed members (outcome, reason code, provenance, failure class, health) reach the P28
+  evaluators that call a provider you supply. Raw judged content stays on your side:
+  only typed members (outcome, reason code, provenance, failure class, health) reach the
   exporter; no new wire field and no new core dependency. Reference rubrics are uncalibrated
-  examples; no accuracy or calibration claim is made. Pilot safeguards are described in
-  `docs/P29_PILOT_SAFEGUARDS.md` (all not satisfied until a pilot exists).
+  examples; no accuracy or calibration claim is made. It may change in a minor release with
+  release notes (see the Experimental policy in docs/VERSIONING.md).
 
 ### Added
 
-- Optional `agent-reliability[http]` extra (`httpx>=0.28.1,<1`) and the
+- Optional `agent-reliability[http]` extra (`httpx>=0.28.1,<0.29`) and the
   `agent_reliability.adapters.http_event_sink` module with `HTTPEventSink`
   (thread-safe, two daemon delivery workers) and `AsyncHTTPEventSink`. Both export
   evidence to one complete platform POST URL using a machine credential obtained
@@ -48,13 +54,17 @@ dependencies, and existing public APIs, reliability/SLO semantics and the
   releases the exporter's run binding when a run finishes; `CompositeEventSink` fans the
   capability out and isolates each child. Sinks that do not implement it are
   unaffected.
+- Optional `indicator_allowlist` constructor argument pins the only free-text wire field
+  (`indicator`) to known names; unlisted indicators are rejected locally and never sent.
+  Unset by default (no behaviour change).
 - Security posture: certificate and hostname verification are always on; redirects
   are never followed; plaintext HTTP is accepted only for literal loopback
   (`127.0.0.0/8`, `[::1]`); ambient proxy/CA/cookie/netrc configuration is ignored;
   explicit `proxy` and `ca_bundle` options; credentials, URLs and evidence never
   appear in diagnostics.
-- Data-only P28 contract fixtures (`tests/fixtures/p28/`), `scripts/verify_p28_fixtures.py`
-  and a Node reference check (`scripts/verify_p28_reference.mjs`).
+- Data-only exporter contract fixtures under `tests/fixtures/`, with a Python verifier
+  (`scripts/verify_p28_fixtures.py`) and a Node reference check
+  (`scripts/verify_p28_reference.mjs`).
 
 ### Fixed
 
@@ -73,11 +83,11 @@ dependencies, and existing public APIs, reliability/SLO semantics and the
 
 ### Changed
 
-- Documentation: the exporter is classified INTERNAL under `docs/GA_CONTRACT.md` (no
-  compatibility promise beyond that policy; the documented consumer entry points are named in
-  `docs/HTTP_EXPORTER.md`).
+- Documentation: the exporter classification is recorded in `docs/GA_CONTRACT.md`
+  (see that file for the authoritative class; the documented consumer entry points are
+  named in `docs/HTTP_EXPORTER.md`).
 - The source distribution no longer includes `CLAUDE.md`, `AGENTS.md` or the internal
-  `docs/P28_*` review/execution reports. `verify_release_artifacts.py` now also fails if either
+  internal review/execution reports. `verify_release_artifacts.py` now also fails if either
   artifact contains private-key material (PEM/PGP blocks, key-like file names), local developer
   paths (Unix, macOS temp and Windows forms), or internal instruction/report files, and it is
   covered by planted-case tests. Public documentation, the licence and all packaging inputs remain.

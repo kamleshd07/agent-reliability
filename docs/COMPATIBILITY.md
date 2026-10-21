@@ -38,6 +38,15 @@ This public addition ships in 1.1.0 as a backward-compatible minor release.
 The patch release adds tests, examples, documentation, and artifact checks only; the `1.1.1`
 release leaves the `1.1.0` public and semantic contract unchanged.
 
+## Additive HTTP exporter extension (1.3.0, candidate)
+
+1.3 adds the optional `agent-reliability[http]` extra and the HTTP exporter entry points,
+classed EXPERIMENTAL (see [GA_CONTRACT.md](GA_CONTRACT.md)), plus the experimental judge
+adapter. Existing 1.0-1.2 stable export sets, callable signatures, enum semantics, event
+payloads and SLO/reliability calculations are unchanged, and base runtime dependencies remain
+zero. This ships as a backward-compatible minor release (`1.3.0`); the current candidate is
+`1.3.0rc1` and is not published. Migration and rollback: [RELEASE_NOTES_1_3.md](RELEASE_NOTES_1_3.md).
+
 ## Additive developer-adoption extension
 
 The developer-adoption extension adds built-in evaluators and an `EvaluationOutcome`

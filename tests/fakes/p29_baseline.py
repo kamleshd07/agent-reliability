@@ -27,3 +27,11 @@ def load_baseline() -> dict[str, str]:
                 entries[file_name] = digest
             return entries
     pytest.skip("workspace baseline manifest not present")
+
+
+def load_runtime_revisions() -> dict[str, dict[str, str]]:
+    """Recorded revisions of frozen runtime files (previousSha256 -> sha256)."""
+    import json
+
+    path = ROOT / "tests/fixtures/documentation/runtime-revisions.json"
+    return json.loads(path.read_text()) if path.exists() else {}

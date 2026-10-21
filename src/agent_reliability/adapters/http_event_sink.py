@@ -12,7 +12,7 @@ import os
 import ssl
 import threading
 import time
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Callable, Collection
 from http.cookiejar import Cookie, CookieJar, DefaultCookiePolicy
 from pathlib import Path
 from typing import Any
@@ -38,6 +38,7 @@ from agent_reliability.adapters._http_delivery import (
     ExporterClosed,
     Record,
     duration,
+    frozen_allowlist,
 )
 from agent_reliability.adapters._http_protocol import valid_https_endpoint
 from agent_reliability.domain import AgentIdentity
@@ -194,6 +195,7 @@ class HTTPEventSink:
         closure_reserve_records: int = 50,
         closure_reserve_bytes: int = 3 * 1024 * 1024,
         provider_timeout: float = 60,
+        indicator_allowlist: Collection[str] | None = None,
         _transport: httpx.BaseTransport | None = None,
     ) -> None:
         config = Config(
@@ -211,6 +213,7 @@ class HTTPEventSink:
             closure_reserve_records,
             closure_reserve_bytes,
             provider_timeout,
+            frozen_allowlist(indicator_allowlist),
         )
         options = _client_options(proxy, ca_bundle)
         self._core = Core(config)
@@ -411,6 +414,7 @@ class AsyncHTTPEventSink:
         closure_reserve_records: int = 50,
         closure_reserve_bytes: int = 3 * 1024 * 1024,
         provider_timeout: float = 60,
+        indicator_allowlist: Collection[str] | None = None,
         _transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self._loop = asyncio.get_running_loop()
@@ -430,6 +434,7 @@ class AsyncHTTPEventSink:
             closure_reserve_records,
             closure_reserve_bytes,
             provider_timeout,
+            frozen_allowlist(indicator_allowlist),
         )
         self._core = Core(config)
         self._core.provider_dispatch = self._provider_result

@@ -1,6 +1,6 @@
 # First evidence delivery from a local build
 
-This procedure is for controlled local verification of the **unreleased** HTTP exporter. The published 1.2.1 package does not contain it; do not install the PyPI release expecting platform delivery. Current main's locally built distribution also reports 1.2.1 and includes the Experimental judge. It is not a 1.3 release candidate. See the release-readiness record before customer exposure.
+This procedure verifies first evidence delivery from a **locally built distribution of the 1.3 release candidate** (`1.3.0rc1`, unpublished). The published 1.2.1 package does not contain the exporter; do not install the PyPI release expecting platform delivery. The candidate also contains the Experimental judge adapter, which this procedure does not use. It describes a local, disposable platform: no hosted Gentlity service and no production support are implied (see the [release notes](RELEASE_NOTES_1_3.md)).
 
 ## Prerequisites
 
@@ -8,13 +8,13 @@ Use Python 3.11+, a built wheel from the reviewed commit, and an initialized loc
 
 ```sh
 python -m venv .venv
-.venv/bin/python -m pip install '/absolute/path/to/agent_reliability-1.2.1-py3-none-any.whl[http]'
+.venv/bin/python -m pip install '/absolute/path/to/agent_reliability-1.3.0rc1-py3-none-any.whl[http]'
 .venv/bin/python -c 'import agent_reliability; print(agent_reliability.__version__, agent_reliability.__file__)'
 ```
 
 The path is an artifact path, not a public package version recommendation. Confirm the module comes from this environment's `site-packages`, not a source checkout. Do not set `PYTHONPATH` to SDK source for installation verification.
 
-An authorized platform administrator must create an organization, workspace, environment, agent, version and deployment, and issue a machine credential with only `evidence:ingest`. Use the platform's existing security bootstrap/runbook and authenticated registry/security APIs; do not enable development tenant-header authentication for hosted use. The deployment must belong to the credential's organization. Its agent key, display name, version and environment key must exactly match the values below. Never use customer data for the demonstration. Human read/SLO-authoring permissions are separate from the machine credential.
+An authorized platform operator/administrator must create an organization (an operator-only step: the organization-creation API is available only in the platform's local development-header mode), bootstrap its first administrator with the platform's operator bootstrap command, then use authenticated registry APIs to create a workspace, environment, agent, version and deployment, and issue a machine credential with only `evidence:ingest`. Do not enable development tenant-header authentication for hosted use. The deployment must belong to the credential's organization. Its agent key, display name, version and environment key must exactly match the values below. Never use customer data for the demonstration. Human read/SLO-authoring permissions are separate from the machine credential.
 
 ## Run the synthetic example
 
@@ -36,6 +36,14 @@ The example creates one run and one synthetic `task-success=PASS` evaluation, fo
 As a human member of the same organization, read `/api/v1/evidence/runs?deployment_id=<uuid>` and that run's evaluations. Query `/api/v1/reliability/deployment/<uuid>/summary` with `indicator=task-success` and UTC `start`/`end` bracketing the run. Expect one pass and no failures for a fresh deployment, not a seed-derived number. Historical `as_of` can change visibility. Create a deployment-scoped SLO through `POST /api/v1/slos` with an effective revision before the run, an explicit target and window; read `/api/v1/slos/<id>/evaluation?evaluation_time=<UTC instant>`. The SLO's measurement must match the same persisted evidence and correct time window. Machine credentials cannot authorize these read/authoring operations.
 
 For a reproducible negative demonstration, a second run recording FAIL for the same indicator yields pass 1 / fail 1 and reliability 0.5 in a fresh scope. A 0.99 target then violates compliance. Compare stored canonical digests and use a second synthetic tenant to verify foreign deployment/read denial. Retrying the *same serialized event* is idempotent; rerunning this example creates a new run/events and correctly increases totals.
+
+## What this example guarantees (and does not)
+
+Delivery is best-effort with idempotent acknowledgement, not exactly-once and not durable: each record
+gets a few jittered attempts (under about 2 s in total by default), so a platform outage longer than that
+loses the affected evidence unless you raise `retry_max_attempts`; loss is reported in the delivery
+status, never silent. Indicator names and other identifiers you choose are sent verbatim: never derive
+them from user input, model output or secrets. Details: [HTTP exporter](HTTP_EXPORTER.md).
 
 ## Troubleshooting and bounded behavior
 

@@ -239,15 +239,22 @@ are internal. Direct imports are unsupported.
 `agent_reliability.experimental` exports nothing in 1.0. No experimental
 Python functionality is invented for GA.
 
-### HTTP evidence exporter (unreleased): INTERNAL
+### HTTP evidence exporter (1.3): EXPERIMENTAL entry points, INTERNAL implementation
 
-`agent_reliability.adapters.http_event_sink` and everything behind it
-(`_http_delivery`, `_http_protocol`) are **INTERNAL**; no Beta
-class exists. [HTTP_EXPORTER.md](HTTP_EXPORTER.md) names the documented consumer entry
-points (the exporter classes, the delivery status types and local exceptions, the optional
-`HealthEvidenceSink` protocol and the `indicator=` argument of
-`RunHandle.record_evaluation_failure`); everything else is an implementation detail. No
-stable compatibility promise is made beyond the policy above.
+The documented consumer entry points of the optional HTTP exporter are **EXPERIMENTAL** in
+1.3: `HTTPEventSink`, `AsyncHTTPEventSink`, `DeliveryStatusSnapshot`, `DeliveryDisposition`,
+`DeliveryRecordStatus`, the local exceptions `ConfigurationError`, `ConfigurationFailedError`,
+`EventDeliveryRejected` and `ExporterClosed` (all exported by
+`agent_reliability.adapters.http_event_sink`), the optional `HealthEvidenceSink` protocol
+(`agent_reliability.ports.event_sink`) and the `indicator=` argument of
+`RunHandle.record_evaluation_failure`. They are public and documented in
+[HTTP_EXPORTER.md](HTTP_EXPORTER.md), and may change in a minor release with release notes;
+`tests/compat/test_experimental_http_exporter_api.py` makes any change visible. The
+implementation modules (`_http_delivery`, `_http_protocol`), every underscore-prefixed name
+and the `_transport` test seam are **INTERNAL**. The **wire contract** (schema version 2 and
+the acknowledgement) is defined by the platform's published contract and is versioned
+separately from this Python API. The exporter is promoted to **STABLE** only by a later
+documented decision after hosted validation.
 
 ### Experimental namespace: `agent_reliability.experimental.judge` (unreleased)
 

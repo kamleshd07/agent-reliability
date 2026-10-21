@@ -2,7 +2,7 @@
 
 Install the optional transport with `pip install 'agent-reliability[http]'`.
 Core installation still has no runtime dependencies. HTTPX is constrained to
-`>=0.28.1,<1`; importing normal SDK APIs does not import it.
+`>=0.28.1,<0.29`; importing normal SDK APIs does not import it.
 
 ```python
 import os
@@ -61,6 +61,41 @@ measurement id. Retries reuse the exact serialized body and identifiers.
 The canonical digest preserves v1 bytes and adds exactly the documented v2
 identity/version inputs; canonical serialization is distinct from wire JSON.
 
+## Delivery guarantee (summary)
+
+Delivery is **best-effort with idempotent acknowledgement; it is not exactly-once and not durable.**
+Per record the exporter makes at most `retry_max_attempts` (default 3) ordinary attempts with
+full-jitter backoff (under about 2 s in total for a refused connection), within the active/absolute
+deadlines below; records still undelivered then end as `retry_exhausted` or `permanently_failed`
+and are **reported** in the status snapshot, never silently dropped. A platform outage longer than the
+retry window loses the affected evidence unless you raise `retry_max_attempts` (bounded by
+`active_delivery_seconds`). The queue is in memory only: pending evidence is lost if the process
+exits or is killed, and local admission (`emit`) is not delivery. A request that may have left the
+process stays flagged `may_have_committed` until acknowledged, so an unacknowledged record can
+already be committed on the platform. Retrying identical bytes and event ids makes duplicate
+delivery safe: the platform answers `200 duplicate` for a replay.
+
+## Caller-chosen text
+
+The SDK has no API to attach prompts, responses, tool arguments/results, documents, exception
+messages or arbitrary metadata, and none are sent. A few fields, however, are strings you choose and
+that are transmitted **verbatim**: the `indicator` (the published wire contract allows 1-200 printable
+characters, including spaces and non-ASCII text), evaluator `version` and `configuration_id`,
+provenance names, reason codes, and the *class name* of an exception that escapes a run
+(`exception_type`; the message is never sent). Treat these as identifiers: never derive them from user
+input, model output, document text or secrets, and do not put credentials in the endpoint URL (HTTPX
+logs URLs at INFO). The SDK cannot detect sensitive content inside an identifier you choose.
+
+Of these, only the `indicator` accepts free text; the others are restricted to a conservative
+identifier character set. To remove the risk of an indicator being built from dynamic content, pass
+`indicator_allowlist=[...]` (a non-empty collection of the exact indicator names you use, each 1-200
+valid characters; copied at construction). An evaluation or failure whose indicator is not in the list
+is rejected locally (`EventDeliveryRejected`, code `indicator_not_allowed`) before anything is queued
+or sent; the SDK isolates sink errors, so the run itself is unaffected, and logs the rejection as an
+instrumentation failure (exception type only, never the rejected text). The rejection is not a delivery
+status and does not appear in the status snapshot, so watch your logs when you first set the list. The list is opt-in so that existing integrations are unaffected; with it unset
+the behaviour is exactly as in the release candidate. An invalid list raises `ConfigurationError`.
+
 ## Capacity and time configuration
 
 | Constructor setting | Default |
@@ -73,6 +108,7 @@ identity/version inputs; canonical serialization is distinct from wire JSON.
 | `max_throttle_responses` | 3 per record |
 | `provider_timeout` | 60 seconds; configurable |
 | `max_active_run_age` | None; no age eviction |
+| `indicator_allowlist` | None; any valid indicator is sent. Set it to pin the exact indicator names (see below) |
 
 Two workers and ten connections use connect/read/write/pool timeouts of
 5/30/10/5 seconds. Bindings cap at 1,000; terminal diagnostic tombstones cap
@@ -230,9 +266,11 @@ event loop or this diagnostic. Mutations require the creating loop/thread;
 
 ## Stability status
 
-**Classification: INTERNAL** under [the compatibility contract](GA_CONTRACT.md). INTERNAL means "unsupported implementation detail;
-it may change in any release; importability does not create a promise". No compatibility
-promise beyond that existing policy is made, and no release version is promised here.
+**Classification: EXPERIMENTAL** (entry points) under [the compatibility contract](GA_CONTRACT.md):
+public and documented, but it may change in a minor release with release notes
+([VERSIONING.md](VERSIONING.md)). It ships in the 1.3 release line. The implementation
+modules are INTERNAL (below). Promotion to STABLE requires a later documented decision after
+hosted validation.
 
 Intended consumer entry points (the names this document describes; use them rather than
 anything else in the modules):
@@ -248,7 +286,7 @@ anything else in the modules):
 Internal implementation modules (never import from them): `_http_delivery`,
 `_http_protocol`, and every underscore-prefixed or undocumented name, including the
 test seams `_transport` and `_core`. Pin the SDK version and read the CHANGELOG before
-upgrading. The published wire contract (schema version 2 and the acknowledgement) is defined
+upgrading; experimental names may change in a minor release. The published wire contract (schema version 2 and the acknowledgement) is defined
 by the platform's OpenAPI and fixtures, not by this module, and is not affected by this
 classification.
 

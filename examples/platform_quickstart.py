@@ -1,6 +1,7 @@
 """Send synthetic, content-free evidence using an explicitly configured deployment.
 
-Requires the unreleased HTTP exporter build; see docs/PLATFORM_QUICKSTART.md.
+Requires the optional HTTP exporter (`pip install 'agent-reliability[http]'`); see
+docs/PLATFORM_QUICKSTART.md.
 """
 
 from __future__ import annotations

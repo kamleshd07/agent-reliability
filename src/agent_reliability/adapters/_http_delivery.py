@@ -127,6 +127,18 @@ def text(value: Any, limit: int, code: str) -> str:
     return value
 
 
+def frozen_allowlist(values: Any) -> frozenset[str] | None:
+    """Snapshot an optional indicator allow-list so later mutation cannot widen it."""
+    if values is None:
+        return None
+    if isinstance(values, str):
+        raise ConfigurationError("indicator_allowlist_invalid")
+    try:
+        return frozenset(values)
+    except TypeError:
+        raise ConfigurationError("indicator_allowlist_invalid") from None
+
+
 def opaque(value: Any, code: str) -> str:
     if not isinstance(value, str) or not _OPAQUE.fullmatch(value):
         raise EventDeliveryRejected(code)
@@ -169,6 +181,7 @@ class Config:
     closure_reserve_records: int = 50
     closure_reserve_bytes: int = 3 * 1024 * 1024
     provider_timeout: float = 60
+    indicator_allowlist: frozenset[str] | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.endpoint, str) or not (
@@ -219,6 +232,14 @@ class Config:
                 raise ConfigurationError("timeout_invalid")
         if self.max_active_run_age is not None:
             duration(self.max_active_run_age, "run_age_invalid")
+        if self.indicator_allowlist is not None:
+            try:
+                if not self.indicator_allowlist:
+                    raise EventDeliveryRejected("indicator_allowlist_invalid")
+                for name in self.indicator_allowlist:
+                    text(name, 200, "indicator_allowlist_invalid")
+            except (EventDeliveryRejected, TypeError):
+                raise ConfigurationError("indicator_allowlist_invalid") from None
 
 
 @dataclass(repr=False)
@@ -586,9 +607,7 @@ class Core:
                     payload = {
                         "kind": "evaluation_outcome",
                         "evaluation_id": "eval_" + uuid4().hex,
-                        "indicator": text(
-                            event.indicator, 200, "indicator_unsupported"
-                        ),
+                        "indicator": self._indicator(event.indicator),
                         "outcome": event.outcome.value,
                         "recorded_at": instant(at),
                         "provenance": provenance,
@@ -608,6 +627,18 @@ class Core:
                 "run_released" if run_id in self.tombstones else "unknown_run"
             )
         return self.bindings[run_id][0]
+
+    def _indicator(self, value: Any) -> str:
+        if type(value) is not str and isinstance(value, str):
+            # Work on an exact ``str`` copy so a subclass cannot lie about its
+            # contents, length or equality between validation and serialisation.
+            value = str.__add__("", value)
+        checked = text(value, 200, "indicator_unsupported")
+        allowed = self.config.indicator_allowlist
+        if allowed is not None and checked not in allowed:
+            self.counters["indicator_not_allowed"] += 1
+            raise EventDeliveryRejected("indicator_not_allowed")
+        return checked
 
     def _exception(self, name: str) -> str:
         if not _EXCEPTION.fullmatch(name):
@@ -692,7 +723,7 @@ class Core:
                 "evaluation_id": opaque(evaluation_id, "evaluation_id_unsupported")
                 if evaluation_id is not None
                 else "eval_" + uuid4().hex,
-                "indicator": text(indicator, 200, "indicator_unsupported"),
+                "indicator": self._indicator(indicator),
                 "stage": failure.stage.value,
                 "exception_type": self._exception(failure.exception_type),
                 "occurred_at": instant(at),
