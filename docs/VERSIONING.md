@@ -65,6 +65,11 @@ fixtures and compat snapshot make such a change visible. It is promoted to a
 stable namespace only by a later documented decision after pilot calibration.
 Importing it adds no runtime dependency and no network access.
 
+The second Experimental namespace is `agent_reliability.experimental.calibration` (judge calibration and
+evidence admission, Session 4). It has the same terms and additionally ships three file-format JSON Schemas;
+see [p29-calibration](p29-calibration/README.md). The additive admission hook in `experimental.judge` follows the
+same experimental terms.
+
 ## Supported Python and dependencies
 
 The 1.0 support matrix is Python 3.11, 3.12, and 3.13. Dropping a supported

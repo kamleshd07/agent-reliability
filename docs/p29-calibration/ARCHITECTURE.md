@@ -155,8 +155,8 @@ repeatability, `run_index_used`, `runs_available`, `heldout_attempt` (caller-sup
 against one held-out set is uncontrolled multiple testing), `created_at`, and an `integrity` member: a plain sha-256 over the canonical document, plus an
 **optional HMAC-SHA256** (`sign(key)` / `verify(key)`, stdlib `hmac`) that is the only forgery-resistant form; an unsigned or unverified assessment is labelled
 `integrity: unverified` in every decision. Only the **held-out** split may be assessed (train/calibration tune prompts, rubrics and thresholds and would inflate
-every metric); assessing requires `expected_manifest_sha256` from the caller so the held-out data was pinned **before** running. The loader refuses a dataset
-with cross-split leakage.
+every metric); assessing requires `expected_manifest_sha256` from the caller so the held-out data was pinned **before** running. The assessment records the leakage findings (`leakage_clean`) and the status then refuses to calibrate
+(`insufficient_reference_evidence`).
 
 **Leakage** is reported with **counts and `case_id`s only** (no digests, which are dictionary-reversible for short content): duplicate `case_id` within/across
 splits; identical canonical content; identical content after NFKC + case-fold + whitespace collapse. Near-duplicate and rubric/few-shot copying from held-out
@@ -227,13 +227,13 @@ deterministic evaluators and history untouched; `MeasurementHealth` untouched (O
 
 * **Pure function** `assess_admission(assessment, current_fingerprint, policy, now) -> AdmissionDecision(admissible, status, reasons, policy_summary,
   integrity, assessment_digest)` and `AdmissionDecision.explain()` (content-free text for application dashboards).
-* **Generic hook (calibration-agnostic, in `coordinator.py`).** `Admission` is a protocol with two methods: `bound_to(evaluator) -> bool` and `decide(indicator, evaluator) -> AdmissionVerdict` (`allow` or `skip(reason_code)`, a
+* **Generic hook (calibration-agnostic, in `coordinator.py`).** `EvidenceAdmission` is a protocol with two methods: `bound_to(evaluator) -> bool` and `decide(indicator, evaluator) -> AdmissionVerdict` (`allow` or `skip(reason_code)`, a
   bounded closed reason string). **`IndicatorBinding` rejects (ValueError) any admission whose `bound_to(evaluator)` is false** (N-1), so a gate built for judge X
-  cannot be attached to judge Y; the hook receives the bound evaluator, not just its identity. `IndicatorBinding(admission=...)` accepts an `Admission`, `None` (today's behaviour) or the
+  cannot be attached to judge Y; the hook receives the bound evaluator, not just its identity. `IndicatorBinding(admission=...)` accepts an `EvidenceAdmission`, `None` (today's behaviour) or the
   explicit `UNGATED` sentinel. The calibration package implements it as `CalibrationGate`. New generic disposition `SKIPPED_BY_ADMISSION` and report kind
   `skipped_admission`; **calibration vocabulary never enters the judge enums**. Evaluation order in `_prepare`: run-not-recording skip, then admission, then sampling (tested) (so ineligible
   runs sampled out are still counted as admission skips and the magnitude is visible); **the admission status is recomputed with the clock on every call** (N-2), so an expired calibration stops being admissible at the moment it expires; only the
-  fingerprint, the integrity verification and constants are cached. The hook runs under the scope lock and must be non-blocking (documented, tested). **A hook
+  fingerprint, the integrity verification and constants are cached. The hook runs **outside** the scope's recording gate (foreign code never runs inside it), on the caller's thread or event loop, so it must be fast and non-blocking (documented, tested). **A hook
   that raises (Exception) fails closed** (N-13): the call is skipped with reason `admission_error`, counted and reported, and the exception is never propagated into
   the run or logged with content; `BaseException` propagates as elsewhere. A skip makes **no provider call, records no evidence and no failure**, so run health is
   unchanged and `attempted`/reliability exclude it; a new per-indicator `admission_skipped` counter (every call skipped by an admission, any reason) and observer report make it locally visible. Counter semantics
@@ -281,7 +281,7 @@ the held-out set reused on every attempt (`heldout_attempt`).
 ## 11. Compatibility
 
 Unchanged: `EvaluatorIdentity`, `EvaluationRecorded`, P28 schemas/fixtures, `MeasurementHealth`, rubrics, prompt `jp1`, `calibration-case/1`,
-`calibration-report/1`, the judge `__all__` (new names are added to it deliberately and to the compat snapshot: `Admission`, `AdmissionVerdict`, `UNGATED`, `JudgeBehaviour`, `template_digest`, `wilson_interval`, the `behaviour` property,
+`calibration-report/1`, the judge `__all__` (new names are added to it deliberately and to the compat snapshot: `EvidenceAdmission`, `AdmissionVerdict`, `UNGATED`, `JudgeBehaviour`, `template_digest`, `wilson_interval`, the `behaviour` property,
 `EvaluationDisposition.SKIPPED_BY_ADMISSION`, report kind `skipped_admission`, `IndicatorBinding.admission`, `IndicatorCoverage.admission_skipped`, `IndicatorCoverage.ungated_model_backed`, `IndicatorCoverage.explicitly_ungated`). A new snapshot of the `IndicatorBinding` and `EvaluationDisposition` shapes is added in the same change (none existed).
 Python 3.11-3.13; zero runtime dependencies.
 
@@ -305,3 +305,15 @@ every additive change to the judge package; N-4 per-criterion slices and the exp
 `min_human_fraction`; N-6 preset wording; N-7 counter semantics; N-8 `Undefined` is `inconclusive`; N-9 GAP_ASSESSMENT corrected; N-10 provenance is the weakest case value
 per assessed split, `min_human_fraction` and `min_multi_labeled_fraction` removed; N-11 the indeterminate set is named distinctly from the `ambiguous` difficulty stratum; N-12 `require_verified_integrity`;
 N-13 fail-closed hook; N-14 breadth acknowledged (`compare_judges` and HMAC are the first cuts if the slice must shrink).
+
+## 14. As built: deviations from v2.1 (recorded honestly)
+
+1. The hook protocol is `EvidenceAdmission` (the coordinator already has a private `_Admission` concurrency class). The binding field is `admission`.
+2. The hook runs **outside** the scope's recording gate rather than under it (section 8 originally said under the lock).
+3. Provenance is declared **per split** in the manifest (`splits.<name>.label_provenance`), not once per dataset; it must equal the weakest case provenance of that split.
+4. The skip reason for `insufficient_reference_evidence` is `calibration_no_evidence` (reason codes are bounded to 64 characters of `[a-z0-9_]`).
+5. Status order is implemented exactly as section 6: a measured rate violation yields `uncalibrated` even if the fingerprint also differs (both are listed in the criteria).
+6. The exact (Clopper-Pearson) interval is used by policy; the Wilson interval is displayed. Wilson is not always the narrower or the more optimistic of the two (for example 0/46: Wilson upper 0.0771, exact 0.0770), so the property "exact is never narrower" was **not** adopted.
+7. The assessment is validated against its published JSON Schema and its fingerprint is checked for internal consistency at parse time. A hostile-mutation test found one case where a tampered fingerprint raised `ValueError` out of the decision instead of yielding a status; the consistency check at parse time closed it.
+8. The judgment table is indexed. The first version scanned all rows per lookup and made `split_metrics` quadratic (5.8 s for 36 000 judgments, 0.046 s after the fix); see [PERFORMANCE.md](PERFORMANCE.md).
+9. `compare_judges` and HMAC integrity were kept (the reviewer named them as first cuts if the slice had to shrink); the CLI, approval attestation and live drift statistics were not built.

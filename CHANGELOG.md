@@ -6,6 +6,25 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Added (experimental): judge calibration and evidence admission (P29, Session 4)
+
+- New Experimental namespace `agent_reliability.experimental.calibration` (stdlib only; no network; no
+  provider calls of its own): versioned reference datasets with train/calibration/held-out splits, leakage and
+  provenance checks; calibration metrics with explicit undefined values, exact and Wilson intervals,
+  coverage, abstention, F1, FPR/FNR (conditional and effective); repeatability and judge-disagreement analysis;
+  a judge fingerprint derived from the bound evaluator; a caller-supplied calibration policy and a status
+  (`calibrated`, `uncalibrated`, `insufficient_reference_evidence`, `calibration_expired`, `incompatible`);
+  deterministic drift indicators; JSON Schemas for the file formats. "Calibrated" means "meets the caller's
+  policy on a named held-out dataset for this configuration at that time", never production accuracy.
+  See [docs/p29-calibration](docs/p29-calibration/README.md).
+- `agent_reliability.experimental.judge`: additive only. A calibration-agnostic admission hook on
+  `IndicatorBinding` (`admission=`, `EvidenceAdmission`, `AdmissionVerdict`, `UNGATED`), the disposition
+  `SKIPPED_BY_ADMISSION` and report kind `skipped_admission`, coverage counters `admission_skipped`,
+  `ungated_model_backed` and `explicitly_ungated`, a read-only `behaviour` property and `template_digest()`, and
+  `wilson_interval` exported. **Default behaviour is unchanged**: a binding without `admission=` records
+  judge outcomes exactly as before and they are uncalibrated unless the application proves otherwise.
+- No stable API, wire contract, evaluator identity or measurement-health semantics changed.
+
 ### Added (experimental)
 
 - Opt-in LangChain Core Runnable instrumentation through the optional `langchain`

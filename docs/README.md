@@ -15,6 +15,8 @@ Follow these in order for a first integration: [Quickstart](QUICKSTART.md) →
 - [Integration guide](INTEGRATIONS.md): sync, async, frameworks, and OTel
 - [Evaluate](EVALUATE.md): built-in evaluators, UNKNOWN, and the
   `evaluate_reliability_or_raise` convenience API
+- [Judge calibration and evidence admission](p29-calibration/README.md) (Experimental): measure a
+  judge against labelled data, decide whether its evidence may feed SLO windows.
 - [Measure reliability locally](MEASURE_RELIABILITY_LOCALLY.md): human and
   machine-readable report presentation
 - [Test reliability](TEST_RELIABILITY.md): asserting an SLO in your own
