@@ -22,6 +22,11 @@ def _run(*arguments: str) -> str:
         cwd=ROOT,
         capture_output=True,
         text=True,
+        env={
+            **os.environ,
+            "LANGSMITH_TRACING": "false",
+            "LANGCHAIN_TRACING_V2": "false",
+        },
     )
     if completed.returncode:
         raise RuntimeError(
@@ -75,6 +80,8 @@ def _inspect_artifacts(wheel: Path, sdist: Path) -> str:
         "agent_reliability/measurement/__init__.py",
         "agent_reliability/py.typed",
         f"agent_reliability-{version}.dist-info/licenses/LICENSE",
+        "agent_reliability/experimental/instrumentation/__init__.py",
+        "agent_reliability/adapters/langchain_instrumentation.py",
         "agent_reliability/experimental/judge/__init__.py",
         "agent_reliability/experimental/judge/schemas/calibration-case.schema.json",
         "agent_reliability/experimental/judge/schemas/calibration-report.schema.json",
@@ -153,7 +160,7 @@ def _assert_no_internal_files(
         relative = name[len(prefix) :] if name.startswith(prefix) else name
         if (
             _INTERNAL_NAME.search(relative)
-            or relative.startswith("docs/evidence/")
+            or relative.startswith(("docs/evidence/", "docs/p30/"))
             or (
                 _MILESTONE_DOC.match(relative)
                 and relative not in _ALLOWED_PUBLIC_MILESTONE_DOCS
@@ -270,7 +277,10 @@ def _verify_base(python: Path, wheel: Path, version: str) -> None:
         "-c",
         "import importlib.util; "
         "from agent_reliability.sdk import AgentReliability; "
-        "assert importlib.util.find_spec('httpx') is None",
+        "assert importlib.util.find_spec('httpx') is None; "
+        "from agent_reliability.experimental.instrumentation import CaptureLimits; "
+        "assert CaptureLimits().max_spans == 1000; "
+        "assert importlib.util.find_spec('langchain_core') is None",
     )
     _run(
         str(python),
@@ -367,6 +377,18 @@ print("HTTP-extra installed-wheel mocked delivery: ok")
     print(_run(str(python), "-c", probe), end="")
 
 
+def _verify_langchain(python: Path, wheel: Path, version: str) -> None:
+    _run(str(python), "-m", "pip", "install", f"{wheel}[langchain]")
+    _probe(python, version, expect_otel=False)
+    output = _run(str(python), str(ROOT / "examples" / "automatic_instrumentation.py"))
+    if (
+        "outcome reliability has not been measured" not in output
+        or "One explicit outcome evaluation recorded" not in output
+    ):
+        raise AssertionError("installed instrumentation example changed")
+    print("LangChain-extra installed-wheel sync/async and explicit evaluation: ok")
+
+
 def verify(
     wheel: Path,
     sdist: Path,
@@ -380,6 +402,7 @@ def verify(
         _verify_base(_create_environment(root / "base"), wheel, version)
         _verify_sdist(_create_environment(root / "sdist"), sdist, version)
         _verify_http(_create_environment(root / "http"), wheel, version)
+        _verify_langchain(_create_environment(root / "langchain"), wheel, version)
         if include_otel:
             _verify_otel(_create_environment(root / "otel"), wheel, version)
         if include_typing:

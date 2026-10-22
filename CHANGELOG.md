@@ -6,6 +6,15 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Added (experimental)
+
+- Opt-in LangChain Core Runnable instrumentation through the optional `langchain`
+  extra (tested 1.6.13): bounded local run/tool/model/step traces, explicit token
+  availability, sync/async and enable/disable lifecycle. No raw content capture,
+  automatic outcome evaluation, cost calculation or new HTTP schema/export path.
+  Existing stable APIs and zero mandatory runtime dependencies are unchanged.
+  See [automatic instrumentation](docs/AUTOMATIC_INSTRUMENTATION.md).
+
 ## [1.3.0]
 
 A backward-compatible minor release under [docs/VERSIONING.md](docs/VERSIONING.md): an

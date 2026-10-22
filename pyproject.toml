@@ -41,6 +41,8 @@ Documentation = "https://github.com/kamleshd07/agent-reliability/tree/main/docs"
 Changelog = "https://github.com/kamleshd07/agent-reliability/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
+# Experimental automatic instrumentation: one exactly tested hook surface.
+langchain = ["langchain-core==1.6.13"]
 http = ["httpx>=0.28.1,<0.29"]
 otel = ["opentelemetry-api>=1.44,<2"]
 otel-test = ["opentelemetry-sdk>=1.44,<2"]
@@ -79,6 +81,7 @@ exclude = [
     "/docs/P29_TEST_EVIDENCE.md",
     "/docs/P29_WORKSPACE_BASELINE*",
     "/docs/evidence",
+    "/docs/p30",
 ]
 
 [tool.hatch.version]

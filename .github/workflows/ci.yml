@@ -29,7 +29,7 @@ jobs:
           cache: "pip"
 
       - name: Install package with dev dependencies
-        run: python -m pip install -e ".[dev,http]"
+        run: python -m pip install -e ".[dev,http,langchain]"
 
       - name: Lint (ruff check)
         run: ruff check .
@@ -59,7 +59,7 @@ jobs:
           cache: "pip"
 
       - name: Install package with test dependencies
-        run: python -m pip install -e ".[dev,otel-test,http]"
+        run: python -m pip install -e ".[dev,otel-test,http,langchain]"
 
       - name: Verify P28 fixture manifest
         run: python scripts/verify_p28_fixtures.py
