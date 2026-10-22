@@ -16,13 +16,14 @@ import collections
 import enum
 import inspect
 import math
+import re
 import threading
 import time
 import weakref
 from collections.abc import Callable, Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Literal, Protocol, runtime_checkable
+from typing import Any, Final, Literal, Protocol, runtime_checkable
 
 from agent_reliability.domain import EvaluationOutcome
 from agent_reliability.evaluation import (
@@ -47,9 +48,12 @@ from agent_reliability.sdk.context import RunHandle
 from agent_reliability.sdk.evaluator_runner import EvaluatorRunner
 
 __all__ = [
+    "UNGATED",
+    "AdmissionVerdict",
     "CoverageReport",
     "EvaluationDisposition",
     "EvaluationScope",
+    "EvidenceAdmission",
     "IndicatorBinding",
     "IndicatorCoverage",
     "JudgeCoordinator",
@@ -58,8 +62,15 @@ __all__ = [
 ]
 
 ReportKind = Literal[
-    "result", "failure", "skipped_unsampled", "skipped_run_not_recording", "cancelled"
+    "result",
+    "failure",
+    "skipped_unsampled",
+    "skipped_run_not_recording",
+    "skipped_admission",
+    "cancelled",
 ]
+
+_REASON_CODE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
 
 
 class EvaluationDisposition(enum.Enum):
@@ -67,6 +78,9 @@ class EvaluationDisposition(enum.Enum):
     RECORDED_FAILURE = "recorded_failure"
     SKIPPED_UNSAMPLED = "skipped_unsampled"
     SKIPPED_RUN_NOT_RECORDING = "skipped_run_not_recording"
+    #: A binding's admission hook declined the evaluation: no provider call, no
+    #: evidence, no failure (so run health is unchanged). Missing evidence, not PASS.
+    SKIPPED_BY_ADMISSION = "skipped_by_admission"
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,6 +113,63 @@ class JudgeObserver(Protocol):
     def on_report(self, report: JudgeInvocationReport) -> None: ...
 
 
+class _Ungated:
+    """Sentinel: the application explicitly chose to run without an admission gate."""
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return "UNGATED"
+
+
+#: Explicit choice to bind a model-backed evaluator with no admission hook. Counted
+#: separately from an unset (``None``) admission so the choice is visible.
+UNGATED: Final = _Ungated()
+
+
+@dataclass(frozen=True, slots=True)
+class AdmissionVerdict:
+    """Allow, or skip with a bounded closed reason code (``[a-z][a-z0-9_]{0,63}``)."""
+
+    allowed: bool
+    reason_code: str | None = None
+
+    def __post_init__(self) -> None:
+        if type(self.allowed) is not bool:
+            raise TypeError("allowed must be a bool")
+        if self.allowed:
+            if self.reason_code is not None:
+                raise ValueError("an allowing verdict carries no reason_code")
+        elif not isinstance(self.reason_code, str) or not _REASON_CODE.fullmatch(
+            self.reason_code
+        ):
+            raise ValueError("a skipping verdict needs a bounded reason_code")
+
+    @classmethod
+    def allow(cls) -> AdmissionVerdict:
+        return cls(True, None)
+
+    @classmethod
+    def skip(cls, reason_code: str) -> AdmissionVerdict:
+        return cls(False, reason_code)
+
+
+@runtime_checkable
+class EvidenceAdmission(Protocol):
+    """Calibration-agnostic hook deciding whether an evaluator may produce evidence.
+
+    ``bound_to`` is checked once when the binding is built: an admission made for
+    one evaluator cannot be attached to another. ``decide`` is called per
+    evaluation, outside the scope's recording gate, on the caller's thread or event
+    loop, so it must be fast and must not block. If it raises ``Exception`` the
+    evaluation is skipped with reason ``admission_error`` (fail closed).
+    """
+
+    def bound_to(self, evaluator: Any) -> bool: ...
+
+    def decide(self, indicator: str, evaluator: Any) -> AdmissionVerdict: ...
+
+
 @dataclass(frozen=True, slots=True)
 class IndicatorBinding:
     """``indicator -> evaluator`` (+ sampling). No registry, no import by string."""
@@ -106,6 +177,7 @@ class IndicatorBinding:
     indicator: str
     evaluator: Any
     sampling: SamplingPolicy = field(default_factory=SamplingPolicy)
+    admission: Any = None
 
     def __post_init__(self) -> None:
         if (
@@ -130,6 +202,14 @@ class IndicatorBinding:
             )
         if deterministic and _is_model_backed(evaluator):
             raise ValueError("a model-backed evaluator cannot be deterministic")
+        admission = self.admission
+        if admission is not None and admission is not UNGATED:
+            if not isinstance(admission, EvidenceAdmission):
+                raise TypeError(
+                    "admission must be an EvidenceAdmission, UNGATED or None"
+                )
+            if not admission.bound_to(evaluator):
+                raise ValueError("admission is not bound to this evaluator")
         if deterministic and self.indicator == "task-completion-evidence":
             raise ValueError(
                 "task-completion-evidence is never an authoritative outcome and "
@@ -171,6 +251,12 @@ class IndicatorCoverage:
     cancelled: int = 0
     late_discarded: int = 0
     provider_calls: int = 0
+    #: Evaluations skipped by the binding's admission hook (any reason).
+    admission_skipped: int = 0
+    #: Recorded evaluations of a model-backed evaluator bound with ``admission=None``.
+    ungated_model_backed: int = 0
+    #: Recorded evaluations of a model-backed evaluator bound with ``UNGATED``.
+    explicitly_ungated: int = 0
 
     @property
     def determinate(self) -> int:
@@ -203,7 +289,9 @@ class IndicatorCoverage:
             f"execution failures {pct(self.failure_rate)}, unknown "
             f"{pct(self.unknown_rate)}); unsampled {self.unsampled}, skipped "
             f"{self.skipped_run_not_recording}, cancelled {self.cancelled}, "
-            f"late discarded {self.late_discarded}"
+            f"late discarded {self.late_discarded}, admission skipped "
+            f"{self.admission_skipped}, ungated model-backed "
+            f"{self.ungated_model_backed}, explicitly ungated {self.explicitly_ungated}"
         )
 
 
@@ -236,6 +324,9 @@ class CoverageReport:
             cancelled=sum(i.cancelled for i in self.indicators),
             late_discarded=sum(i.late_discarded for i in self.indicators),
             provider_calls=sum(i.provider_calls for i in self.indicators),
+            admission_skipped=sum(i.admission_skipped for i in self.indicators),
+            ungated_model_backed=sum(i.ungated_model_backed for i in self.indicators),
+            explicitly_ungated=sum(i.explicitly_ungated for i in self.indicators),
         )
 
     def describe(self) -> str:
@@ -248,7 +339,14 @@ class CoverageReport:
 
 
 class _Counters:
-    def __init__(self, indicators: Sequence[str]) -> None:
+    def __init__(
+        self,
+        indicators: Sequence[str],
+        ungated: frozenset[str] = frozenset(),
+        explicit: frozenset[str] = frozenset(),
+    ) -> None:
+        self._ungated = ungated
+        self._explicit = explicit
         self._lock = threading.Lock()
         self._data: dict[str, dict[str, Any]] = {
             i: {
@@ -263,6 +361,9 @@ class _Counters:
                 "cancelled": 0,
                 "late": 0,
                 "calls": 0,
+                "admission": 0,
+                "ungated": 0,
+                "explicit": 0,
             }
             for i in indicators
         }
@@ -276,6 +377,11 @@ class _Counters:
             if late:
                 d["late"] += 1
                 return
+            if report.kind in ("result", "failure"):
+                if report.indicator in self._ungated:
+                    d["ungated"] += 1
+                elif report.indicator in self._explicit:
+                    d["explicit"] += 1
             if report.kind == "result":
                 d["attempted"] += 1
                 if report.outcome is EvaluationOutcome.PASS:
@@ -295,6 +401,8 @@ class _Counters:
                 d["unsampled"] += 1
             elif report.kind == "skipped_run_not_recording":
                 d["skipped"] += 1
+            elif report.kind == "skipped_admission":
+                d["admission"] += 1
             elif report.kind == "cancelled":
                 d["cancelled"] += 1
 
@@ -318,6 +426,9 @@ class _Counters:
                     cancelled=d["cancelled"],
                     late_discarded=d["late"],
                     provider_calls=d["calls"],
+                    admission_skipped=d["admission"],
+                    ungated_model_backed=d["ungated"],
+                    explicitly_ungated=d["explicit"],
                 )
                 for name, d in self._data.items()
             )
@@ -693,6 +804,21 @@ class EvaluationScope:
         identity: EvaluatorIdentity = binding.evaluator.identity
         skip: JudgeInvocationReport | None = None
         entry: _Inflight | None = None
+        # Admission is consulted outside the recording gate (foreign code never runs
+        # inside it) and fails closed; it is applied after the run-not-recording
+        # check and before sampling, so inadmissible runs are counted as such even if
+        # sampling would also have dropped them.
+        verdict: AdmissionVerdict | None = None
+        if binding.admission is not None and binding.admission is not UNGATED:
+            try:
+                decided = binding.admission.decide(indicator, binding.evaluator)
+                verdict = (
+                    decided
+                    if isinstance(decided, AdmissionVerdict)
+                    else AdmissionVerdict.skip("admission_error")
+                )
+            except Exception:
+                verdict = AdmissionVerdict.skip("admission_error")
         with self._locked():
             if self._state != "open":
                 raise RuntimeError("evaluation scope is not open")
@@ -706,6 +832,10 @@ class EvaluationScope:
                 skip = self._skip_report(
                     indicator, identity, "skipped_run_not_recording"
                 )
+            elif verdict is not None and not verdict.allowed:
+                skip = self._skip_report(
+                    indicator, identity, "skipped_admission", verdict.reason_code
+                )
             elif not binding.sampling.decide(run_id):
                 skip = self._skip_report(indicator, identity, "skipped_unsampled")
             else:
@@ -714,20 +844,23 @@ class EvaluationScope:
                     self._inflight[id(entry)] = entry
         if skip is not None:
             self._c._emit(skip)
-            return (
-                EvaluationDisposition.SKIPPED_RUN_NOT_RECORDING
-                if skip.kind == "skipped_run_not_recording"
-                else EvaluationDisposition.SKIPPED_UNSAMPLED
-            )
+            if skip.kind == "skipped_run_not_recording":
+                return EvaluationDisposition.SKIPPED_RUN_NOT_RECORDING
+            if skip.kind == "skipped_admission":
+                return EvaluationDisposition.SKIPPED_BY_ADMISSION
+            return EvaluationDisposition.SKIPPED_UNSAMPLED
         assert entry is not None
         return binding, entry, 0
 
     @staticmethod
     def _skip_report(
-        indicator: str, identity: EvaluatorIdentity, kind: ReportKind
+        indicator: str,
+        identity: EvaluatorIdentity,
+        kind: ReportKind,
+        reason_code: str | None = None,
     ) -> JudgeInvocationReport:
         return JudgeInvocationReport(
-            indicator, identity, kind, None, None, None, 0, 0, None, None, 0, 0
+            indicator, identity, kind, None, reason_code, None, 0, 0, None, None, 0, 0
         )
 
     def _failure_report(
@@ -979,7 +1112,19 @@ class JudgeCoordinator:
         self._drain_timeout = float(drain_timeout_seconds)
         self._observer = observer
         self._admission = _Admission(max_concurrency, max_pending)
-        self._counters = _Counters(names)
+        self._counters = _Counters(
+            names,
+            frozenset(
+                b.indicator
+                for b in bindings
+                if _is_model_backed(b.evaluator) and b.admission is None
+            ),
+            frozenset(
+                b.indicator
+                for b in bindings
+                if _is_model_backed(b.evaluator) and b.admission is UNGATED
+            ),
+        )
 
     def scope(self, run: RunHandle) -> EvaluationScope:
         if not isinstance(run, RunHandle) and not hasattr(run, "record_evaluation"):
