@@ -32,7 +32,7 @@ characters and punctuation (hardened; homoglyphs/paraphrase remain undetectable 
 ## Evidence (validated independently at `58e4507`; later changes are listed under "Validation delta")
 
 * SDK suite: **2056 passed, 1 skipped on each of Python 3.11, 3.12, 3.13** (validator, at `58e4507`); the author's final head runs **2061 / 1 skipped** on all three (five tests added since). Baseline before any change: 1802 / 1 skipped.
-  Baseline before any change: 1802 / 1 skipped. ruff, ruff format, mypy: clean.
+   ruff, ruff format, mypy: clean.
 * Build, `verify_release_artifacts.py` (sdist + wheel install, HTTP/LangChain/OTel extras, strict downstream mypy), Node reference (76 + 74 vectors): pass.
   The sdist excludes the internal reports. A clean no-extras wheel install shows only extra-conditional requirements; the calibration package, schemas and a
   minimal end-to-end run work from the wheel alone. `dependencies = []`.

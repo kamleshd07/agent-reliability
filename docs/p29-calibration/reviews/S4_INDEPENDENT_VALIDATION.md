@@ -227,3 +227,95 @@ Conditions: the py3.11 CI job must finish green (see item 11), and the stale num
 | F-R1 | MEDIUM (CI) | The py3.11 CI job had not finished after more than 11 minutes, against about 3.5 min for 3.12 and 3.13. It may be a stuck runner, but it must be green. | Re-run the job if it is hung; confirm green. |
 | F-R2 | LOW | COMPATIBILITY_REPORT.md and GO_NO_GO.md carry stale numbers (1985 / 1983+, platform "140"). The author already plans to update them. | Replace with 2056 on 3.11/3.12/3.13 and the platform numbers (130 passed, 1 xfailed for the five files). |
 | F-R3 | LOW | The shared judge validator `judge/_jsonschema.py` changed: a trailing newline now fails an anchored (`$`) pattern. It is documented as an ECMA-262 alignment and tested, but it is a change to existing behaviour of the validator for every user of the experimental judge. | Mention it explicitly in CHANGELOG, if it is not already there. |
+
+
+---
+
+# Targeted recheck at bcca7ec
+
+Head bcca7ec3cc02d126a2aad2fd58de212b5162fd4c (fresh `git archive` extract; I computed `git diff 58e4507 bcca7ec` myself). The code under test made no network use. The earlier sections above are unchanged.
+
+## Verdict: GO for owner review (not for merge)
+
+One item is not independently executed: `scripts/verify_release_artifacts.py` could not run here because PyPI is unreachable from my sandbox (see 2). CI has run it green on this exact head. Minor documentation nits are listed under "Findings".
+
+## 1. The delta, computed by me
+
+`git diff --stat 58e4507 bcca7ec`: 15 files, +1398 / -59.
+
+| Category | Paths |
+|---|---|
+| Docs (11 files, all under `docs/p29-calibration/`) | COMPATIBILITY_REPORT.md, FUTURE_CALIBRATION_PLAN.md (new), GO_NO_GO.md, OWNER_DECISIONS_S4.md (new), PLATFORM_PROPOSAL.md, README.md, TRACEABILITY_MATRIX.md, and `reviews/` with 4 new files |
+| Config (1) | `pyproject.toml`: exactly two added sdist `exclude` lines, `/docs/p29-calibration/OWNER_DECISIONS_S4.md` and `/docs/p29-calibration/FUTURE_CALIBRATION_PLAN.md`. Dependencies unchanged (`dependencies = []`). |
+| Tests (3) | `test_admission.py` (+20), `test_dataset.py` (+13), `test_docs.py` (+2/-1) |
+
+- **No change** under `src/`, `scripts/`, `examples/`, `.github/` or `tests/fixtures/`: `git diff --name-only 58e4507 bcca7ec -- src scripts examples .github tests/fixtures` printed 0 paths.
+- Against `origin/main`, there are no non-`experimental/` source changes. Nothing changed under `evaluation/`, `domain/` or `sdk/`.
+- **Reviewer reports:** the four files in `docs/p29-calibration/reviews/` are byte-identical (`cmp`) to my copies in `/Users/kamleshdigarse/Development/gentlity-s4-evidence/`. The architecture, implementation and security reports were not edited by the author. Caveat: the copied `S4_INDEPENDENT_VALIDATION.md` is the 229-line version, before this section. Once I append this section the repo copy is stale. The author must re-copy it for GO_NO_GO's "unedited reports" claim to stay true. GO_NO_GO also says the targeted recheck "is recorded in reviews/S4_INDEPENDENT_VALIDATION.md".
+- **Tests added:**
+  - `test_symlinks_are_refused_by_lstat_where_o_nofollow_does_not_exist` (test_dataset.py).
+  - `test_the_decision_records_the_policy_identity_and_configuration` (test_admission.py).
+  - `test_the_assessment_itself_is_independent_of_the_policy` (test_admission.py).
+  - `test_docs.py`: the sdist-exclusion loop gains the two new file names.
+  - No existing assertion was removed or weakened (diff is additions only, apart from the extended tuple in test_docs.py).
+- The suite count rose from 2056 to 2061. I measured that figure; 3 new functions plus the docs-link parametrisations account for it.
+
+## 2. Packaging
+
+- `pip` build isolation needs PyPI, which was unreachable (`curl` returned 000, so isolated builds and installs fail). I ran `python -m build --no-isolation` with `hatchling==1.32.4` installed from the local uv cache (`uv pip install --offline`). Both artifacts built: `agent_reliability-1.3.0.tar.gz` and `agent_reliability-1.3.0-py3-none-any.whl`.
+- **`python scripts/verify_release_artifacts.py`: NOT RUN to completion.** It failed at its first pip step because it needs PyPI for build requirements, extras and mypy. This is an environment limit, not a code failure. CI "Release artifacts, extras, examples, and typing" passed on this exact head. I did the offline-possible parts myself:
+  - **Sdist contents:** under `docs/p29-calibration/` only ARCHITECTURE, DATASET_SCHEMA, PERFORMANCE, PROVENANCE_SPEC, README and SECURITY_AND_PRIVACY. Zero `reviews` entries. OWNER_DECISIONS_S4 and FUTURE_CALIBRATION_PLAN are excluded.
+  - **Wheel:** contains the calibration package (`__init__`, `_json`, `_schemas`, `_stats`, `admission`, `analysis`, `assessment`, `dataset`, `drift`, `fingerprint`, `judgments`, `metrics`, `policy`) and all 3 schemas (calibration-assessment, reference-case, reference-dataset).
+  - **Clean no-extras wheel install** (offline): there are no requirements without an `extra ==` marker. The minimal end-to-end run (dataset, scripted judge, assessment, status) gives `insufficient_reference_evidence`, admissible False, integrity verified.
+  - **Sdist install** (`--no-deps`, offline): imports fine.
+  - **Walkthrough:** two runs from the wheel with network calls patched to raise: rc 0, byte-identical to each other and to the first-run output at ba2523d.
+
+## 3. Test and tool results (editable installs from this extract, installed offline)
+
+- Full suite, `pytest --cov --cov-report=term-missing`: **2061 passed, 1 skipped on each of 3.11, 3.12 and 3.13** (71 s, 61 s, 63 s). Coverage 96%.
+- `ruff check .`: All checks passed. `ruff format --check .`: 354 files already formatted. `mypy src`: no issues in 84 files.
+- Node reference check: 76 canonical vectors and 74 acknowledgement vectors passed.
+- `verify_p28_fixtures.py --platform-root <platform checkout>`: 4 fixture hashes verified, platform comparison True. (The platform tests with PostgreSQL were not re-run, because no src changed; the last run at 58e4507 gave 130 passed, 1 xfailed.)
+- contract + compat + judge + security: 1090 passed, 1 skipped. The contract suite alone: 479 passed, 1 skipped. HTTP/exporter tests (`-k "http or exporter"`): 469 passed.
+- Flakiness: calibration tests, property tests and admission-hook tests, 3 runs: 255 passed each.
+- My first attempt at the suite ran against stale editable installs, because the PyPI timeout made the reinstall fail (coverage showed 0%). I discarded those results and re-ran after reinstalling offline. The numbers above are from the valid run.
+
+## 4. Documentation review (read in full)
+
+- **(a) No production or customer readiness claim.**
+  - GO_NO_GO opens with "Nothing here is a production-readiness or customer-readiness claim" and gives NO-GO for customer or hosted readiness.
+  - OWNER_DECISIONS states the decisions authorise "documentation and merge-readiness assessment only".
+  - PLATFORM_PROPOSAL and FUTURE_CALIBRATION_PLAN are marked design only / not executed / not authorised.
+  - I found no overclaim. The merge-readiness row says "GO, subject to explicit owner merge approval ... and green required CI on the exact final head", which is properly conditional.
+- **(b) No misstatement of the code found:**
+  - Policy identity: `as_dict()["policy"]` carries `policy_digest`, the full `policy` configuration and `below_starting_point`. The new test passes, and the assessment document has no `policy` key (also tested).
+  - "policy.py is byte-identical to the validated version": confirmed, since no `src/` path differs between 58e4507 and bcca7ec.
+  - Skip keeps run health healthy: the test `test_a_skip_makes_no_provider_call_records_nothing_and_keeps_run_health` exists, and the walkthrough prints "run health healthy".
+  - `configuration_id` coverage: `compose_configuration_id` encodes model label, template id, min confidence, repeats and citation rule. It does not encode limits, engine revision or template digest. PLATFORM_PROPOSAL's statement is accurate.
+  - The SDK skip codes listed in the proposal match `_SKIP_CODES`, plus `admission_error` from the coordinator.
+  - The PLATFORM_PROPOSAL text that cites the `heldout_attempt`, mean pairwise agreement and `JudgeBudget` names matches the code (`heldout_attempt` exists in `assessment.py`).
+  - Every test name cited in GO_NO_GO resolves to a real test function. "upper/lower_bound_criterion_operators" is shorthand for two real tests.
+  - The GO_NO_GO counts I could check match: contract 479 passed, and the diff against `origin/main` contains no non-`experimental/` source and nothing under evaluation, domain or sdk.
+- **(c) P29-D10:** OWNER_DECISIONS says the primary record is missing and "does not reconstruct or reinterpret that original". OD-S4-1 is framed as a new decision. GO_NO_GO repeats "the missing P29-D10 record is not reconstructed". Confirmed.
+- **(d) No instruction to implement platform work in this PR.** PLATFORM_PROPOSAL states it is design only and changes no wire, platform code, schema or API. It lists the decisions and reviews needed before any implementation, with "Nothing in this document is scheduled". OD-S4-3, OD-S4-4 and OD-S4-5 are explicitly deferred or design-only.
+
+## 5. CI for this exact head
+
+`gh pr view` confirms head bcca7ec, still a draft and OPEN. The workflow run 39749880397 (head sha bcca7ec) is completed with conclusion success. `gh pr checks 10`:
+- Lint, format, and type-check: pass (28 s).
+- Test stable contracts py3.11: pass (3m40s); py3.12: pass (2m16s); py3.13: pass (3m42s).
+- Independent Node reference check of the P28 contract fixtures: pass.
+- Release artifacts, extras, examples, and typing: pass (51 s).
+
+The py3.11 job that had been pending at 58e4507 finished green.
+
+## Findings
+
+| ID | Severity | Finding | Fix |
+|---|---|---|---|
+| F-T1 | LOW | `reviews/S4_INDEPENDENT_VALIDATION.md` in the repo is byte-identical to my report only up to this section. After this append the repo copy is stale, while GO_NO_GO says the recheck is recorded there and that reports are unedited. | Re-copy the final report into `reviews/` unchanged. |
+| F-T2 | LOW | GO_NO_GO's Evidence section repeats the sentence "Baseline before any change: 1802 / 1 skipped." (copy-paste duplicate). | Delete the duplicate. |
+| F-T3 | INFO | `verify_release_artifacts.py` was not executed by me at this head (PyPI unreachable in my sandbox). Coverage comes from the green CI job on the same head, plus the offline checks above. | None. |
+| F-T4 | INFO | The GO_NO_GO statement that the "35 selected by name" tests passed together was not re-run as one selection. All named tests exist and the full suite passes. | None. |
+
+Earlier findings F-R1 (py3.11 CI pending) is closed; F-R2 (stale numbers) is closed. COMPATIBILITY_REPORT now reports 2057 for the author's code head and 2056 for my validated head, and the platform line shows 130 passed, 1 xfailed (140 for the author's wider run), which is consistent with what I measured. The latest head runs 2061, as noted in GO_NO_GO. F-R3 (the `_jsonschema.py` behaviour change) was not rechecked in the CHANGELOG at this head.
