@@ -1,6 +1,6 @@
-# Compatibility report (author-run; independent re-execution is the validator's, see `reviews/`)
+# Compatibility report (author-run, then independently re-executed: see `reviews/S4_INDEPENDENT_VALIDATION.md`)
 
-Head under test: see the PR. Baseline: SDK `origin/main` b887999 (1802 passed, 1 skipped on Python 3.11 before any change).
+Head validated independently: 58e4507df2a814f84fb8db1c51bf2044e6ea07b2 (later commits add one test, documentation and the copied review reports). Baseline: SDK `origin/main` b887999 (1802 passed, 1 skipped on Python 3.11 before any change).
 
 ## What changed in existing code (all additive, all Experimental)
 
@@ -13,13 +13,13 @@ member was touched. `EvaluatorIdentity`, `EvaluationRecorded`, `MeasurementHealt
 
 | Check | Result |
 |---|---|
-| SDK suite, Python 3.11 / 3.12 / 3.13 | 1985 / 1983+ / 1983+ passed, 1 skipped each (see the final run recorded in `GO_NO_GO.md`) |
+| SDK suite, Python 3.11 / 3.12 / 3.13 (author, final code head) | 2057 / 2057 / 2057 passed, 1 skipped each; the independent validator reproduced 2056 on each of the three at the validated head (one test was added afterwards) |
 | `ruff check .`, `ruff format --check .`, `mypy src` | clean |
 | `python -m build`; `scripts/verify_release_artifacts.py` (sdist + wheel install, HTTP/LangChain/OTel extras, strict downstream mypy) | passed; schemas are shipped in the wheel |
 | Clean install of the built wheel with no extras | `requires` lists only extra-conditional requirements; calibration package and schemas import |
 | `node scripts/verify_p28_reference.mjs` | 76 canonical vectors; 74 acknowledgement vectors passed |
 | `scripts/verify_p28_fixtures.py --platform-root <platform main>` | 4 fixture hashes verified; platform comparison True |
-| Platform `origin/main` 805b9c7 with this SDK installed editable (fresh disposable PostgreSQL database): `test_oss_evidence`, `test_oss_v1_1_contract`, `test_oss_e2e`, `test_postgres_p28_pc1`, `test_postgres_p28_pc2`, Session 2 `operational_semantics` / `operational_loop` | 140 passed, 1 xfailed |
+| Platform `origin/main` 805b9c7 with this SDK installed editable (fresh disposable PostgreSQL database): `test_oss_evidence`, `test_oss_v1_1_contract`, `test_oss_e2e`, `test_postgres_p28_pc1`, `test_postgres_p28_pc2` | 130 passed, 1 xfailed (independent validator, own PostgreSQL). The author's wider run (adding Session 2 `operational_semantics` / `operational_loop`) gave 140 passed, 1 xfailed |
 | Platform unit + contracts trees with this SDK | only the 6 known default-settings tests fail, and only when `ARE_*` variables are exported (same on unmodified platform `main`) |
 | Existing HTTP exporter regression tests and P29 contract vectors | part of the full SDK suite; unchanged and passing |
 

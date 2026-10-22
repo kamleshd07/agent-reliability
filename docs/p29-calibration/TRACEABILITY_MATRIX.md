@@ -33,7 +33,7 @@ Test paths are under `tests/`. "Brief" = the owner's Session 4 brief; AC = its a
 | 26 | Pure Python API + offline demonstration; documentation (brief 11, 14) | `examples/judge_calibration_offline.py`, README, docs | `test_example_and_fixtures.py`, `test_docs.py` | Done |
 | 27 | Tests: perfect, all wrong, imbalance, single class, empty, missing labels, abstentions, malformed, undefined, repeatability, disagreement, conflicting identities, rubric mismatch, leakage, expiry, insufficient sample, drift, errors/timeouts, privacy, compatibility, health (brief 12) | see rows above | the files above; property tests | Done |
 | 28 | SDK suite on 3.11/3.12/3.13, ruff, mypy, build, clean install, HTTP exporter regression, P29 vectors, platform compatibility | see `COMPATIBILITY_REPORT.md` | full suite on three Pythons; `scripts/verify_release_artifacts.py`; platform runs | Done |
-| 29 | Three independent reviews and a separate validator; reports unedited (brief 13) | `reviews/` | (review documents) | See `GO_NO_GO.md` |
+| 29 | Three independent reviews and a separate validator; reports unedited (brief 13) | `reviews/` | (review documents) | Done: all four reports in [reviews/](reviews/); decision in [GO_NO_GO.md](GO_NO_GO.md) |
 | 30 | Zero mandatory runtime dependencies; no stable wire change | `dependencies = []`; no stable file changed | `tests/compat/test_experimental_judge_api.py::test_core_dependencies_remain_empty...`; clean-install check | Done |
 | 31 | Performance and resource limits report | `PERFORMANCE.md`, `scripts/p29_calibration_benchmark.py` | `test_scaling.py` | Done |
 | - | Hosted workflows, human-review UI, automatic dataset collection, provider-backed benchmarking | not built | - | Deferred |

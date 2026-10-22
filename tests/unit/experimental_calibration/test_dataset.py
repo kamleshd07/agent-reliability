@@ -431,3 +431,16 @@ def test_trailing_newline_does_not_satisfy_an_anchored_schema_pattern() -> None:
     doc["case_id"] = "ok\n"
     with pytest.raises(ValueError):
         check(doc, "reference-case")
+
+
+def test_symlinks_are_refused_by_lstat_where_o_nofollow_does_not_exist(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path, _ = write_dataset(tmp_path, {"heldout": heldout_cases()})
+    target = tmp_path / "real.jsonl"
+    (tmp_path / "heldout.jsonl").rename(target)
+    os.symlink(target, tmp_path / "heldout.jsonl")
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    monkeypatch.delattr(dataset_module.os, "O_NOFOLLOW", raising=False)  # as on Windows
+    with pytest.raises(DatasetError, match="symlink"):
+        load_reference_dataset(path, expected_manifest_sha256=digest)
