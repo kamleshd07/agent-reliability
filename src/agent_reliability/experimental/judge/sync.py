@@ -21,6 +21,10 @@ from agent_reliability.experimental.judge._engine import (
     Response,
     Sleep,
 )
+from agent_reliability.experimental.judge.behaviour import (
+    JudgeBehaviour,
+    behaviour_of,
+)
 from agent_reliability.experimental.judge.budget import BudgetTracker
 from agent_reliability.experimental.judge.judge import build_engine
 from agent_reliability.experimental.judge.provider import (
@@ -73,6 +77,7 @@ class SyncLLMJudge:
         )
         self._provider = provider
         self._rubric = rubric
+        self._behaviour = behaviour_of(rubric, policy, limits)
         self._monotonic = monotonic
         self._sleep = sleep
 
@@ -87,6 +92,11 @@ class SyncLLMJudge:
     @property
     def rubric(self) -> Rubric:
         return self._rubric
+
+    @property
+    def behaviour(self) -> JudgeBehaviour:
+        """Content-free description of what determines this judge's behaviour."""
+        return self._behaviour
 
     def __repr__(self) -> str:
         return f"SyncLLMJudge(identity={self._identity!r})"

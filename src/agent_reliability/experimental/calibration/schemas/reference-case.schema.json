@@ -1,0 +1,131 @@
+{
+  "$id": "gentlity.reference-case/1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adjudication": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": [
+            "none",
+            "majority",
+            "third_reviewer",
+            "unresolved"
+          ]
+        }
+      },
+      "required": [
+        "method"
+      ],
+      "type": "object"
+    },
+    "case_id": {
+      "pattern": "^[A-Za-z0-9._-]{1,128}$",
+      "type": "string"
+    },
+    "difficulty": {
+      "enum": [
+        "clear",
+        "borderline",
+        "adversarial",
+        "ambiguous"
+      ]
+    },
+    "dimension": {
+      "enum": [
+        "answer-correctness",
+        "groundedness",
+        "instruction-adherence",
+        "safety-policy",
+        "task-completion-evidence"
+      ]
+    },
+    "human_label": {
+      "enum": [
+        "pass",
+        "fail",
+        "unknown"
+      ]
+    },
+    "label_provenance": {
+      "enum": [
+        "synthetic",
+        "human_single",
+        "human_multi",
+        "human_adjudicated"
+      ]
+    },
+    "labels": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "enum": [
+              "pass",
+              "fail",
+              "unknown"
+            ]
+          },
+          "labeler": {
+            "pattern": "^[A-Za-z0-9._-]{1,64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "labeler",
+          "label"
+        ],
+        "type": "object"
+      },
+      "maxItems": 16,
+      "type": "array"
+    },
+    "parts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "enum": [
+              "question",
+              "answer",
+              "reference",
+              "context",
+              "instructions",
+              "policy",
+              "task_evidence"
+            ]
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "text"
+        ],
+        "type": "object"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema": {
+      "const": "gentlity.reference-case/1"
+    },
+    "source": {
+      "maxLength": 200,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "case_id",
+    "dimension",
+    "parts",
+    "human_label",
+    "difficulty"
+  ],
+  "title": "gentlity.reference-case/1",
+  "type": "object"
+}

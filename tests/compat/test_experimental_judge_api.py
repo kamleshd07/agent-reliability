@@ -27,6 +27,12 @@ pytestmark = pytest.mark.contract
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 EXPECTED_ALL = [
+    "UNGATED",
+    "AdmissionVerdict",
+    "EvidenceAdmission",
+    "JudgeBehaviour",
+    "template_digest",
+    "wilson_interval",
     "BudgetTracker",
     "CallableProvider",
     "CallableSyncProvider",
@@ -317,3 +323,63 @@ def test_no_existing_source_module_is_modified_by_p29() -> None:
         ):
             changed.append(name)
     assert changed == []
+
+
+def test_coordinator_admission_hook_shapes_snapshot() -> None:
+    """Session 4 (P29 calibration) additions to the coordinator, all additive."""
+    assert list(_fields(judge.IndicatorBinding)) == [
+        "indicator",
+        "evaluator",
+        "sampling",
+        "admission",
+    ]
+    assert [m.value for m in judge.EvaluationDisposition] == [
+        "recorded_result",
+        "recorded_failure",
+        "skipped_unsampled",
+        "skipped_run_not_recording",
+        "skipped_by_admission",
+    ]
+    assert list(_fields(judge.IndicatorCoverage)) == [
+        "indicator",
+        "attempted",
+        "passed",
+        "failed",
+        "unknown",
+        "execution_failures",
+        "failures_by_class",
+        "unsampled",
+        "skipped_run_not_recording",
+        "cancelled",
+        "late_discarded",
+        "provider_calls",
+        "admission_skipped",
+        "ungated_model_backed",
+        "explicitly_ungated",
+    ]
+    assert repr(judge.UNGATED) == "UNGATED"
+    assert list(_fields(judge.AdmissionVerdict)) == ["allowed", "reason_code"]
+    assert list(_fields(judge.JudgeBehaviour)) == [
+        "limits",
+        "limits_digest",
+        "repeats",
+        "min_confidence",
+        "capture_reason",
+        "require_citations",
+        "template_id",
+        "template_digest",
+        "engine_revision",
+    ]
+
+
+def test_template_digest_is_pinned_to_the_golden_prompt_fixture() -> None:
+    """A template edit that forgets to change TEMPLATE_ID changes this digest.
+
+    The digest is computed at runtime from the real prompt builder (fixtures are not
+    shipped in the wheel). The value below was recorded with template ``jp1``; the
+    golden fixture test (``test_p29_s02_ac01``) pins the builder's bytes, so the two
+    move together and a change to either one fails CI.
+    """
+    assert judge.template_digest() == (
+        "9cabfba1017f99dba3cc20186e4e2d00793410437d4eafb9061096c5075f7d83"
+    )

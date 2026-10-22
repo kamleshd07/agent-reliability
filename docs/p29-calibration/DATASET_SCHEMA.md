@@ -1,0 +1,80 @@
+# Reference datasets: formats, splits, labelling process
+
+Published JSON Schemas (stdlib-validated): `gentlity.reference-dataset/1`, `gentlity.reference-case/1`,
+`gentlity.calibration-assessment/1` under `src/agent_reliability/experimental/calibration/schemas/`. The Python loader is an
+implementation of these formats, not their definition.
+
+## Manifest `gentlity.reference-dataset/1`
+
+```json
+{
+  "schema": "gentlity.reference-dataset/1",
+  "dataset_id": "synthetic-refund-demo",
+  "dataset_version": "1",
+  "created_at": "2026-10-01T00:00:00+00:00",
+  "license": "CC0-1.0",
+  "description": "SYNTHETIC demonstration data. Labels are not human ground truth.",
+  "rubric": {"rubric_id": "judge-answer-correctness", "rubric_version": "2026-10.r1", "dimension": "answer-correctness"},
+  "splits": {
+    "train":       {"file": "train.jsonl",       "sha256": "<hex>", "case_count": 10, "label_provenance": "synthetic"},
+    "calibration": {"file": "calibration.jsonl", "sha256": "<hex>", "case_count": 10, "label_provenance": "synthetic"},
+    "heldout":     {"file": "heldout.jsonl",     "sha256": "<hex>", "case_count": 68, "label_provenance": "synthetic"}
+  }
+}
+```
+
+* `created_at` must carry a UTC offset. `dataset_version` is opaque (never edit data under an existing version).
+* Split files are plain names **beside** the manifest: no `..`, no separators, no symlinks.
+* Limits checked **before** reading: manifest 64 KiB; 8 MiB per split file; 25 MiB per dataset; 20 000 cases per split; 64 KiB per
+  line; nesting depth 8. JSON is parsed strictly (duplicate members, NaN and Infinity are rejected).
+* **The caller must pass `expected_manifest_sha256`.** The held-out data is pinned before any judge runs: otherwise whoever can
+  edit the files can edit the manifest to match.
+
+## Case `gentlity.reference-case/1` (one JSON object per line)
+
+`calibration-case/1` (case id, dimension, role-tagged `parts`, `human_label` pass/fail/unknown, `difficulty`
+clear/borderline/adversarial/ambiguous, per-labeler `labels`, `source`) plus optional:
+
+* `label_provenance`: `synthetic` < `human_single` < `human_multi` < `human_adjudicated`
+* `adjudication`: `{"method": "none" | "majority" | "third_reviewer" | "unresolved"}`
+
+Rules enforced at load (violations raise `DatasetError`; messages never contain case content):
+
+1. Labeler ids are role identifiers, unique within a case (no personal names).
+2. `human_single` needs at least one labeler entry; `human_multi` and `human_adjudicated` need two; `human_adjudicated` needs a method.
+3. Unanimous labels and no adjudication: `human_label` must equal them.
+4. Labelers disagree: an adjudication method is required. `majority` requires the strict majority label; `third_reviewer`
+   names an outside decision (the third label is not stored); `unresolved` requires `human_label = "unknown"` and at least two *disagreeing* labels.
+5. An `unresolved` case, and any `unknown` case, is **indeterminate**: excluded from accuracy and error rates, reported separately.
+6. **Derived provenance:** a split's provenance is the *weakest* case provenance; the declared `label_provenance` must equal it.
+   One synthetic case makes a split `synthetic`. Provenance is an attestation by whoever wrote the file: it is made visible and
+   consistent, not proven.
+
+## Splits and leakage
+
+* `train`: few-shot examples, prompt development. `calibration`: rubric/threshold tuning. `heldout`: the **only** split an
+  assessment may use; fix and hash it before running, do not tune against it, and count attempts (`heldout_attempt`).
+* Leakage is reported as counts and `case_id`s only: duplicate ids within or across splits, identical canonical content, and
+  identical content after NFKC + case-folding + whitespace collapse. The comparison form folds NFKC and case, drops format/control/combining characters and punctuation, collapses whitespace and ignores part order.
+  Homoglyph substitution (for example a Cyrillic letter), near-duplicates, rubric text or few-shot examples copied from held-out
+  cases, paraphrases and translations are **not** detectable: "clean" means *no detected* overlap. Any leakage makes the status `insufficient_reference_evidence`.
+* **Leakage is only checked against the other splits that are present.** A held-out-only dataset cannot show the absence of overlap with
+  training material, so its status is `insufficient_reference_evidence` (criterion `leakage_checked_against_other_splits`). Provide the
+  `train`/`calibration` splits (or accept that status). The criterion is satisfied by the *presence* of another split, not by its size or relevance: a one-case unrelated `train` split passes it, so the reviewer of a calibration must look at what the other splits contain.
+* Use **one example per source** (conversation, document): the intervals assume independent trials.
+
+## Genuine human labelling (the process the framework supports)
+
+1. Fix the rubric text and version first. Write label guidance with examples that are not in the dataset.
+2. At least two independent labelers per case; labelers never see judge output. Record roles, not people.
+3. Measure inter-labeler agreement first (`inter_labeler_agreement`); if it is low, fix the rubric or guidance, not the model.
+4. Disagreements: a third reviewer or a documented majority rule; keep every individual label in `labels`. Unresolved cases stay
+   `unknown`/`unresolved` rather than being forced.
+5. Hash and version the dataset; never edit a labelled dataset under the same version.
+6. Retention: the SDK stores nothing. Keep datasets on the customer side, access-controlled, delete per the data owner's rule.
+   Real customer content must not enter this repository or any public fixture.
+
+## Synthetic data
+
+`tests/fixtures/p29_calibration/demo/` is generated by `scripts/p29_calibration_demo_data.py`, is declared `synthetic`, and exists to
+exercise the machinery. Public synthetic data may appear in future model training sets: **never use it to gauge a real model**.

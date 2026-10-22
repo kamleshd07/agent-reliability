@@ -1,0 +1,806 @@
+{
+  "$defs": {
+    "number": {
+      "additionalProperties": false,
+      "properties": {
+        "undefined_reason": {
+          "enum": [
+            "zero_denominator",
+            "single_class",
+            "no_judgments"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "type": "object"
+    },
+    "proportion": {
+      "additionalProperties": false,
+      "properties": {
+        "clopper_pearson_95": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "denominator": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "numerator": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "undefined_reason": {
+          "enum": [
+            "zero_denominator",
+            "single_class",
+            "no_judgments"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "wilson_95": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator",
+        "value",
+        "wilson_95",
+        "clopper_pearson_95"
+      ],
+      "type": "object"
+    },
+    "slice": {
+      "additionalProperties": false,
+      "properties": {
+        "accuracy_by_declared_confidence": {
+          "additionalProperties": false,
+          "properties": {
+            "high": {
+              "$ref": "#/$defs/proportion"
+            },
+            "low": {
+              "$ref": "#/$defs/proportion"
+            },
+            "medium": {
+              "$ref": "#/$defs/proportion"
+            }
+          },
+          "required": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "type": "object"
+        },
+        "agreement_with_human": {
+          "additionalProperties": false,
+          "properties": {
+            "judged_pairs": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "kappa": {
+              "$ref": "#/$defs/number"
+            },
+            "note": {
+              "type": "string"
+            },
+            "raw": {
+              "$ref": "#/$defs/proportion"
+            }
+          },
+          "required": [
+            "judged_pairs",
+            "raw",
+            "kappa",
+            "note"
+          ],
+          "type": "object"
+        },
+        "counts": {
+          "additionalProperties": false,
+          "properties": {
+            "abstained": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "answered": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "fail_abstained": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "fail_failed": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "fail_missing": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "failed": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "fn": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "fp": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "judged": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "missing": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "pass_abstained": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "pass_failed": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "pass_missing": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "support_fail": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "support_pass": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "tn": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "tp": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "tp",
+            "fn",
+            "fp",
+            "tn",
+            "answered",
+            "abstained",
+            "failed",
+            "missing",
+            "judged",
+            "support_fail",
+            "support_pass",
+            "fail_abstained",
+            "pass_abstained",
+            "fail_failed",
+            "pass_failed",
+            "fail_missing",
+            "pass_missing"
+          ],
+          "type": "object"
+        },
+        "f1": {
+          "additionalProperties": false,
+          "properties": {
+            "fail": {
+              "$ref": "#/$defs/number"
+            },
+            "pass": {
+              "$ref": "#/$defs/number"
+            }
+          },
+          "required": [
+            "fail",
+            "pass"
+          ],
+          "type": "object"
+        },
+        "indeterminate": {
+          "additionalProperties": false,
+          "properties": {
+            "abstention_rate_on_indeterminate": {
+              "$ref": "#/$defs/proportion"
+            },
+            "commit_rate_on_indeterminate": {
+              "$ref": "#/$defs/proportion"
+            },
+            "indeterminate_fraction": {
+              "$ref": "#/$defs/proportion"
+            },
+            "n": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "n",
+            "indeterminate_fraction",
+            "commit_rate_on_indeterminate",
+            "abstention_rate_on_indeterminate",
+            "note"
+          ],
+          "type": "object"
+        },
+        "n_labelled": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "rates": {
+          "additionalProperties": false,
+          "properties": {
+            "abstention_rate": {
+              "$ref": "#/$defs/proportion"
+            },
+            "accuracy_conditional": {
+              "$ref": "#/$defs/proportion"
+            },
+            "accuracy_effective": {
+              "$ref": "#/$defs/proportion"
+            },
+            "committed_coverage": {
+              "$ref": "#/$defs/proportion"
+            },
+            "failure_rate": {
+              "$ref": "#/$defs/proportion"
+            },
+            "fnr_conditional": {
+              "$ref": "#/$defs/proportion"
+            },
+            "fnr_effective": {
+              "$ref": "#/$defs/proportion"
+            },
+            "fpr_conditional": {
+              "$ref": "#/$defs/proportion"
+            },
+            "fpr_effective": {
+              "$ref": "#/$defs/proportion"
+            },
+            "missing_rate": {
+              "$ref": "#/$defs/proportion"
+            },
+            "precision_fail": {
+              "$ref": "#/$defs/proportion"
+            },
+            "precision_pass": {
+              "$ref": "#/$defs/proportion"
+            },
+            "recall_fail": {
+              "$ref": "#/$defs/proportion"
+            },
+            "recall_pass": {
+              "$ref": "#/$defs/proportion"
+            },
+            "verdict_rate": {
+              "$ref": "#/$defs/proportion"
+            }
+          },
+          "required": [
+            "verdict_rate",
+            "committed_coverage",
+            "abstention_rate",
+            "failure_rate",
+            "missing_rate",
+            "accuracy_conditional",
+            "accuracy_effective",
+            "fnr_conditional",
+            "fnr_effective",
+            "fpr_conditional",
+            "fpr_effective",
+            "precision_fail",
+            "precision_pass",
+            "recall_fail",
+            "recall_pass"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "n_labelled",
+        "counts",
+        "rates",
+        "f1",
+        "agreement_with_human",
+        "accuracy_by_declared_confidence",
+        "indeterminate"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "gentlity.calibration-assessment/1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "created_at": {
+      "maxLength": 40,
+      "minLength": 20,
+      "type": "string"
+    },
+    "dataset": {
+      "additionalProperties": false,
+      "properties": {
+        "adjudicated_cases": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "attested": {
+          "const": true
+        },
+        "case_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "dataset_version": {
+          "type": "string"
+        },
+        "label_provenance": {
+          "enum": [
+            "synthetic",
+            "human_single",
+            "human_multi",
+            "human_adjudicated"
+          ]
+        },
+        "leakage": {
+          "additionalProperties": false,
+          "properties": {
+            "case_ids": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 100000,
+              "type": "array"
+            },
+            "cross_split": {
+              "type": "boolean"
+            },
+            "duplicate_case_ids": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "identical_content_groups": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "identical_normalized_groups": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "duplicate_case_ids",
+            "identical_content_groups",
+            "identical_normalized_groups",
+            "cross_split",
+            "case_ids"
+          ],
+          "type": "object"
+        },
+        "leakage_checked_against": {
+          "items": {
+            "enum": [
+              "train",
+              "calibration",
+              "heldout"
+            ]
+          },
+          "maxItems": 3,
+          "type": "array"
+        },
+        "leakage_clean": {
+          "type": "boolean"
+        },
+        "manifest_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "multi_labelled_cases": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "provenance_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "human_adjudicated": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "human_multi": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "human_single": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "synthetic": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "synthetic",
+            "human_single",
+            "human_multi",
+            "human_adjudicated"
+          ],
+          "type": "object"
+        },
+        "rubric": {
+          "additionalProperties": false,
+          "properties": {
+            "dimension": {
+              "type": "string"
+            },
+            "rubric_id": {
+              "type": "string"
+            },
+            "rubric_version": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "rubric_id",
+            "rubric_version",
+            "dimension"
+          ],
+          "type": "object"
+        },
+        "rubric_matches_fingerprint": {
+          "type": "boolean"
+        },
+        "split": {
+          "enum": [
+            "train",
+            "calibration",
+            "heldout"
+          ]
+        }
+      },
+      "required": [
+        "dataset_id",
+        "dataset_version",
+        "manifest_sha256",
+        "created_at",
+        "split",
+        "case_count",
+        "label_provenance",
+        "attested",
+        "provenance_counts",
+        "multi_labelled_cases",
+        "adjudicated_cases",
+        "rubric",
+        "rubric_matches_fingerprint",
+        "leakage",
+        "leakage_clean",
+        "leakage_checked_against"
+      ],
+      "type": "object"
+    },
+    "fingerprint": {
+      "additionalProperties": false,
+      "properties": {
+        "behaviour_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "capture_reason": {
+          "type": "boolean"
+        },
+        "configuration_id": {
+          "type": "string"
+        },
+        "dimension": {
+          "type": "string"
+        },
+        "engine_revision": {
+          "maxLength": 32,
+          "minLength": 1,
+          "type": "string"
+        },
+        "implementation_version": {
+          "type": "string"
+        },
+        "limits_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "min_confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "model": {
+          "additionalProperties": false,
+          "properties": {
+            "model_id": {
+              "type": "string"
+            },
+            "model_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "provider": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "provider",
+            "model_id",
+            "model_version"
+          ],
+          "type": "object"
+        },
+        "repeats": {
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "require_citations": {
+          "type": "boolean"
+        },
+        "rubric_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "rubric_id": {
+          "type": "string"
+        },
+        "rubric_version": {
+          "type": "string"
+        },
+        "template_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "template_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "rubric_id",
+        "rubric_version",
+        "rubric_fingerprint",
+        "dimension",
+        "template_id",
+        "template_digest",
+        "limits_digest",
+        "repeats",
+        "min_confidence",
+        "capture_reason",
+        "require_citations",
+        "configuration_id",
+        "implementation_version",
+        "behaviour_digest",
+        "model",
+        "engine_revision"
+      ],
+      "type": "object"
+    },
+    "heldout_attempt": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "hmac_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "metrics": {
+      "additionalProperties": false,
+      "properties": {
+        "borderline": {
+          "const": "reported_only"
+        },
+        "headline": {
+          "$ref": "#/$defs/slice"
+        },
+        "inter_labeler_agreement": {
+          "additionalProperties": false,
+          "properties": {
+            "cases_with_two_or_more_labelers": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "mean_pairwise_agreement": {
+              "$ref": "#/$defs/number"
+            }
+          },
+          "required": [
+            "cases_with_two_or_more_labelers",
+            "mean_pairwise_agreement"
+          ],
+          "type": "object"
+        },
+        "run_index_used": {
+          "const": 0
+        },
+        "runs_available": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "strata": {
+          "additionalProperties": false,
+          "properties": {
+            "adversarial": {
+              "$ref": "#/$defs/slice"
+            },
+            "ambiguous": {
+              "$ref": "#/$defs/slice"
+            },
+            "borderline": {
+              "$ref": "#/$defs/slice"
+            },
+            "clear": {
+              "$ref": "#/$defs/slice"
+            }
+          },
+          "required": [
+            "clear",
+            "ambiguous",
+            "borderline",
+            "adversarial"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "run_index_used",
+        "runs_available",
+        "headline",
+        "strata",
+        "borderline",
+        "inter_labeler_agreement"
+      ],
+      "type": "object"
+    },
+    "repeatability": {
+      "additionalProperties": false,
+      "properties": {
+        "cases_compared": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "caveat": {
+          "type": "string"
+        },
+        "excluded_for_failures": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "flip_kinds": {
+          "additionalProperties": false,
+          "properties": {
+            "involving_unknown": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "pass_fail": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "pass_fail",
+            "involving_unknown"
+          ],
+          "type": "object"
+        },
+        "mean_pairwise_agreement": {
+          "$ref": "#/$defs/number"
+        },
+        "repetitions": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "single_run_cases": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "unstable": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "unstable_rate": {
+          "$ref": "#/$defs/proportion"
+        },
+        "unstable_rate_worst_case": {
+          "$ref": "#/$defs/proportion"
+        }
+      },
+      "required": [
+        "repetitions",
+        "cases_compared",
+        "unstable",
+        "unstable_rate",
+        "excluded_for_failures",
+        "unstable_rate_worst_case",
+        "flip_kinds",
+        "mean_pairwise_agreement",
+        "caveat",
+        "single_run_cases"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "gentlity.calibration-assessment/1"
+    }
+  },
+  "required": [
+    "schema",
+    "created_at",
+    "fingerprint",
+    "dataset",
+    "metrics",
+    "repeatability",
+    "heldout_attempt",
+    "integrity"
+  ],
+  "title": "gentlity.calibration-assessment/1",
+  "type": "object"
+}

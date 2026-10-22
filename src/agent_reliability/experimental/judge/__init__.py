@@ -10,6 +10,10 @@ object and is never retained, logged, serialized or exported.
 
 from __future__ import annotations
 
+from agent_reliability.experimental.judge.behaviour import (
+    JudgeBehaviour,
+    template_digest,
+)
 from agent_reliability.experimental.judge.budget import BudgetTracker
 from agent_reliability.experimental.judge.calibration import (
     CalibrationCase,
@@ -20,11 +24,15 @@ from agent_reliability.experimental.judge.calibration import (
     load_cases,
     run_calibration,
     run_calibration_async,
+    wilson_interval,
 )
 from agent_reliability.experimental.judge.coordinator import (
+    UNGATED,
+    AdmissionVerdict,
     CoverageReport,
     EvaluationDisposition,
     EvaluationScope,
+    EvidenceAdmission,
     IndicatorBinding,
     IndicatorCoverage,
     JudgeCoordinator,
@@ -89,6 +97,8 @@ __all__ = [
     "FAILURE_CLASS_NAMES",
     "REFERENCE_RUBRIC_IDS",
     "TEMPLATE_ID",
+    "UNGATED",
+    "AdmissionVerdict",
     "BudgetTracker",
     "CalibrationCase",
     "CalibrationReport",
@@ -103,10 +113,12 @@ __all__ = [
     "EvaluationDisposition",
     "EvaluationRequest",
     "EvaluationScope",
+    "EvidenceAdmission",
     "ExecutorSyncProvider",
     "FlippedCase",
     "IndicatorBinding",
     "IndicatorCoverage",
+    "JudgeBehaviour",
     "JudgeBudget",
     "JudgeBudgetExceededError",
     "JudgeCoordinator",
@@ -146,6 +158,8 @@ __all__ = [
     "load_reference_rubric",
     "run_calibration",
     "run_calibration_async",
+    "template_digest",
     "validate_identity_value",
     "validate_model_label",
+    "wilson_interval",
 ]

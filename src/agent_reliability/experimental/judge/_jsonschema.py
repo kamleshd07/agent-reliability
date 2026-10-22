@@ -66,7 +66,12 @@ def _check(value: Any, schema: dict[str, Any], root: dict[str, Any], path: str) 
     ):
         raise _fail(path, "not an allowed value")
     if isinstance(value, str):
-        if "pattern" in schema and re.search(schema["pattern"], value) is None:
+        if "pattern" in schema and (
+            re.search(schema["pattern"], value) is None
+            # ECMA-262 `$` (no multiline flag) does not match before a trailing
+            # newline, but Python's does; keep both readings identical.
+            or (schema["pattern"].endswith("$") and value.endswith("\n"))
+        ):
             raise _fail(path, "does not match the pattern")
         if len(value) < schema.get("minLength", 0) or len(value) > schema.get(
             "maxLength", 10**9
