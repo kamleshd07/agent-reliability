@@ -60,7 +60,7 @@ Rules enforced at load (violations raise `DatasetError`; messages never contain 
   cases, paraphrases and translations are **not** detectable: "clean" means *no detected* overlap. Any leakage makes the status `insufficient_reference_evidence`.
 * **Leakage is only checked against the other splits that are present.** A held-out-only dataset cannot show the absence of overlap with
   training material, so its status is `insufficient_reference_evidence` (criterion `leakage_checked_against_other_splits`). Provide the
-  `train`/`calibration` splits (or accept that status).
+  `train`/`calibration` splits (or accept that status). The criterion is satisfied by the *presence* of another split, not by its size or relevance: a one-case unrelated `train` split passes it, so the reviewer of a calibration must look at what the other splits contain.
 * Use **one example per source** (conversation, document): the intervals assume independent trials.
 
 ## Genuine human labelling (the process the framework supports)
