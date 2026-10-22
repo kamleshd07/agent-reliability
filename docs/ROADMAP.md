@@ -112,3 +112,18 @@ The longer-term "AI Reliability Control Plane" direction referenced in
 [VISION.md](VISION.md): diagnosis and recommendation, and eventually
 guarded control actions. Explicitly not scoped or designed in detail
 until the milestones above exist and are in real use.
+
+
+## P30 initial automatic instrumentation — Session 3 development slice
+
+The Session 3 owner instruction authorizes one focused experimental LangChain Core
+Runnable adapter. Existing M0–M10 identities remain unchanged; this is the initial
+P30 slice and overlaps M8's adapter direction without completing that broader item.
+Optional extras keep the core dependency-free; no stable API or platform wire change.
+
+Run/tool/model/chain execution capture is local and bounded. Explicit outcome
+evaluations and the existing lifecycle/evaluation HTTP exporter remain separate.
+P18/P20 producer transport, state/memory capture, additional frameworks, streaming,
+pricing and semantic auto-evaluation are deferred. See [the guide](AUTOMATIC_INSTRUMENTATION.md).
+Design/review/validation evidence is under `docs/p30/` and excluded from distributed artifacts.
+No merge or release approval is implied. D14 OPEN; Phase B NO-GO.

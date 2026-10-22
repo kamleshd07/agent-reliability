@@ -146,3 +146,10 @@ def test_the_public_milestone_documents_are_allowed() -> None:
         },
         PREFIX,
     )
+
+
+def test_internal_instrumentation_review_directory_is_rejected() -> None:
+    with pytest.raises(AssertionError, match="internal files"):
+        _guards()._assert_no_internal_files(
+            set(), {PREFIX + "docs/p30/reviews/report.md"}, PREFIX
+        )

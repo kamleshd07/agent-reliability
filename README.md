@@ -187,6 +187,15 @@ supply. It adds no dependency and sends raw content only to your provider. The r
 [Evaluate](https://github.com/kamleshd07/agent-reliability/blob/main/docs/EVALUATE.md).
 A sync judge's timeout is best effort unless the provider is wrapped in `ExecutorSyncProvider`; the provider's own client timeout is the real bound (see the same page).
 
+### Automatic execution instrumentation (experimental, unreleased)
+
+This development branch adds opt-in LangChain Runnable instrumentation for run, tool,
+model and framework-step events. Core runtime dependencies remain empty. Detailed
+traces stay local; execution completion never manufactures a correct outcome.
+See the [guide and offline example](https://github.com/kamleshd07/agent-reliability/blob/main/docs/AUTOMATIC_INSTRUMENTATION.md) for the tested
+optional dependency, explicit enable/disable lifecycle, privacy boundaries and limits.
+This feature is not present in the published 1.3.0 package until a later release is approved.
+
 ## Documentation
 
 - New developer: [Quickstart](https://github.com/kamleshd07/agent-reliability/blob/main/docs/QUICKSTART.md) → [Concepts](https://github.com/kamleshd07/agent-reliability/blob/main/docs/CONCEPTS.md)
