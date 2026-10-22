@@ -23,6 +23,10 @@ from agent_reliability.experimental.judge._engine import (
     Response,
     Sleep,
 )
+from agent_reliability.experimental.judge.behaviour import (
+    JudgeBehaviour,
+    behaviour_of,
+)
 from agent_reliability.experimental.judge.budget import BudgetTracker
 from agent_reliability.experimental.judge.identity import (
     compose_identity,
@@ -139,6 +143,7 @@ class LLMJudge:
         )
         self._provider = provider
         self._rubric = rubric
+        self._behaviour = behaviour_of(rubric, policy, limits)
 
     @property
     def identity(self) -> EvaluatorIdentity:
@@ -151,6 +156,11 @@ class LLMJudge:
     @property
     def rubric(self) -> Rubric:
         return self._rubric
+
+    @property
+    def behaviour(self) -> JudgeBehaviour:
+        """Content-free description of what determines this judge's behaviour."""
+        return self._behaviour
 
     def __repr__(self) -> str:
         return f"LLMJudge(identity={self._identity!r})"

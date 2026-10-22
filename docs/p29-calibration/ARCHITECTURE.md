@@ -167,14 +167,14 @@ cases are not detectable (documented).
 `CalibrationPolicy` is a frozen dataclass where **every field is required (no defaults)** (OD-S4-1): `min_examples`, `min_per_class`, `min_adversarial_fail`,
 `min_committed_coverage`, `max_abstention_rate`, `max_failure_rate`, `max_missing_rate`, `max_fnr`, `fn_basis` (`conditional`|`effective`), `max_fpr`,
 `fp_basis`, `max_adversarial_pass_on_fail` (count, normally 0), `max_unstable_rate`, `min_repeat_cases`, `max_indeterminate_fraction`,
-`min_inter_labeler_agreement` (nullable), `accepted_label_provenance` (set), `min_human_fraction`, `min_multi_labeled_fraction`, `validity_days`,
+`min_inter_labeler_agreement` (nullable), `accepted_label_provenance` (set), `require_verified_integrity`, `validity_days`,
 `max_dataset_age_days`, `demonstration_only` (bool). `CalibrationPolicy.starting_point()` is an explicit, caller-invoked preset:
 min_examples 400, min_per_class 150, min_adversarial_fail 30, committed coverage >= 0.80, abstention <= 0.20, failure <= 0.02, missing <= 0.02,
 `max_fnr` 0.05 (effective), `max_fpr` 0.10 (conditional), adversarial FAIL-case passes = 0, unstable <= 0.05 over >= 150 repeat cases, indeterminate fraction
-<= 0.20, inter-labeler agreement >= 0.80, accepted provenance {human_multi, human_adjudicated}, human fraction 1.0, multi-labelled fraction >= 0.5,
+<= 0.20, inter-labeler agreement >= 0.80, accepted provenance {human_multi, human_adjudicated}, verified integrity required,
 validity 90 days, dataset age 365 days. These are the proposals of `P28_P29_CALIBRATION_PREPARATION.md` section 10 made **sample-size-coherent**
 (an upper bound of 0.05 needs 72 error-free cases; 150 allows two errors) - they are **adapted from, not identical to,** that document: its inter-labeler kappa became mean pairwise agreement, its `precision(pass)` criterion is not used (prevalence-dependent), its over-confidence criterion is reported as `commit_rate_on_indeterminate` (informational) with an indeterminate-fraction cap, and its repeatability and failure criteria use the exact upper bound. They make no safety claim.
-**Coherence check:** construction rejects a policy whose `min_per_class` (or `min_repeat_cases`) cannot satisfy a rate bound even with zero errors (computed
+**Coherence check:** construction rejects a policy whose size minima cannot satisfy their rate bound even with zero errors - `min_per_class` vs `max_fnr`/`max_fpr`, `min_repeat_cases` vs `max_unstable_rate`, `min_examples` vs `max_failure_rate`/`max_missing_rate`/`max_abstention_rate` and `min_committed_coverage`, and `min_adversarial_fail` being at least 1 when the adversarial criterion is used (computed
 with the exact bound), and rejects non-positive sizes, rates outside (0,1], and aware-UTC violations. Every decision prints the full policy summary and a
 `policy_below_starting_point` flag (not a block, so D10 is respected).
 
@@ -187,7 +187,7 @@ expected to disagree. The size minima (`min_examples`, `min_per_class`) apply to
 **Construction rules tying synthetic, demonstration and calibrated (N-5).** `synthetic` may appear in `accepted_label_provenance` only if `demonstration_only=True`;
 a `demonstration_only` policy can only yield `demonstration` (on any data, including human data), never `calibrated`; `calibrated` requires
 `demonstration_only=False`, `accepted_label_provenance` a subset of {human_single, human_multi, human_adjudicated}, and a derived dataset provenance (the weakest
-case value, so one synthetic case makes the dataset `synthetic`) inside that set. `min_human_fraction` is therefore removed (it was redundant, N-10).
+case value, so one synthetic case makes the dataset `synthetic`) inside that set. There is no human-fraction field. The dataset provenance is derived **per assessed split** (so a synthetic `train` case does not downgrade a fully human held-out set); the loader reports every split's provenance.
 
 **Integrity requirement (N-12).** `require_verified_integrity` (bool, required field; `starting_point()` sets it true) makes status depend on a verified HMAC:
 an unsigned or unverified assessment can then only be `uncalibrated`. When false, an unverified assessment may be admissible and every decision says
@@ -202,11 +202,10 @@ an unsigned or unverified assessment can then only be `uncalibrated`. When false
    criterion is `violated`.
 2. `incompatible` - the current fingerprint's `behaviour_digest` or model declaration differs from the assessed one, or the rubric id/version/dimension differs
    from the dataset binding (reasons name the components).
-3. `insufficient_reference_evidence` - dataset too small, a class or adversarial stratum below minimum, provenance not accepted or below the human/multi-labelled
-   fractions, leakage found, inter-labeler agreement below minimum, indeterminate fraction too high, or **any criterion `inconclusive`** (the data cannot show the
+3. `insufficient_reference_evidence` - dataset too small, a class or adversarial stratum below minimum, provenance not accepted, leakage found, inter-labeler agreement below minimum, indeterminate fraction too high, or **any criterion `inconclusive`** (the data cannot show the
    judge is within the limit). The reasons separate "not provably good" from "measurably bad".
 4. `calibration_expired` - everything passes but `now - created_at > validity_days` or the dataset is older than `max_dataset_age_days`.
-5. `demonstration` - a `demonstration_only` policy on synthetic data passes; **never admissible**.
+5. `demonstration` - a `demonstration_only` policy whose criteria all pass, on any data (including human data); **never admissible**.
 6. `calibrated` - all criteria `met`, current, compatible. Meaning: *meets the caller's stated policy on the named held-out dataset for exactly this behaviour
    digest and model declaration at that time.* Not a statement about production accuracy. A vacuous caller policy still yields `calibrated`, which is why the
    policy summary and flag accompany it.
@@ -232,7 +231,7 @@ deterministic evaluators and history untouched; `MeasurementHealth` untouched (O
   bounded closed reason string). **`IndicatorBinding` rejects (ValueError) any admission whose `bound_to(evaluator)` is false** (N-1), so a gate built for judge X
   cannot be attached to judge Y; the hook receives the bound evaluator, not just its identity. `IndicatorBinding(admission=...)` accepts an `Admission`, `None` (today's behaviour) or the
   explicit `UNGATED` sentinel. The calibration package implements it as `CalibrationGate`. New generic disposition `SKIPPED_BY_ADMISSION` and report kind
-  `skipped_admission`; **calibration vocabulary never enters the judge enums**. Evaluation order in `_prepare`: admission first, then sampling (so ineligible
+  `skipped_admission`; **calibration vocabulary never enters the judge enums**. Evaluation order in `_prepare`: run-not-recording skip, then admission, then sampling (tested) (so ineligible
   runs sampled out are still counted as admission skips and the magnitude is visible); **the admission status is recomputed with the clock on every call** (N-2), so an expired calibration stops being admissible at the moment it expires; only the
   fingerprint, the integrity verification and constants are cached. The hook runs under the scope lock and must be non-blocking (documented, tested). **A hook
   that raises (Exception) fails closed** (N-13): the call is skipped with reason `admission_error`, counted and reported, and the exception is never propagated into
@@ -245,8 +244,8 @@ deterministic evaluators and history untouched; `MeasurementHealth` untouched (O
   caller-supplied and it is displayed in every decision.
 * **What this does and does not guarantee (H-1).** The brief's requirement - an uncalibrated judge must not silently produce trusted semantic SLO evidence - is
   satisfied **for gated bindings only**. These paths bypass any gate and remain ungated: using `LLMJudge`/`SyncLLMJudge` directly through
-  `EvaluatorRunner`, calling `run.record_evaluation` yourself, and any `IndicatorBinding` left at `None`. Mitigations in this slice: (a) `CoverageReport` gains an
-  `ungated_model_backed` count so ungated judge evidence is visible locally; (b) the docs and SG checklist state that an ungated judge's outcomes are
+  `EvaluatorRunner`, calling `run.record_evaluation` yourself, and any `IndicatorBinding` left at `None`. Mitigations in this slice: (a) `IndicatorCoverage` gains an
+  `ungated_model_backed` count (summed in `CoverageReport.total`) so ungated judge evidence is visible locally; (b) the docs and SG checklist state that an ungated judge's outcomes are
   uncalibrated unless the application proves otherwise; (c) **owner decision OD-S4-2:** make an explicit choice (a gate or `UNGATED`) mandatory for model-backed
   evaluators in the next minor release (acceptable on an Experimental API, changelog entry), or keep `None` as the default. This slice keeps `None` and does not
   silently change recording behaviour.
@@ -304,5 +303,5 @@ Scope cuts adopted: no CLI, drift reduced to three indicators, no approval attes
 **Re-check of v2 (N-1..N-14):** N-1 hook receives the evaluator and `IndicatorBinding` enforces `bound_to` (section 8); N-2 status recomputed per call; N-3 section 2 and 11 list
 every additive change to the judge package; N-4 per-criterion slices and the explicit `borderline: reported_only` line (section 6); N-5 construction rules and removal of
 `min_human_fraction`; N-6 preset wording; N-7 counter semantics; N-8 `Undefined` is `inconclusive`; N-9 GAP_ASSESSMENT corrected; N-10 provenance is the weakest case value
-across the loaded splits, `min_human_fraction` removed; N-11 the indeterminate set is named distinctly from the `ambiguous` difficulty stratum; N-12 `require_verified_integrity`;
+per assessed split, `min_human_fraction` and `min_multi_labeled_fraction` removed; N-11 the indeterminate set is named distinctly from the `ambiguous` difficulty stratum; N-12 `require_verified_integrity`;
 N-13 fail-closed hook; N-14 breadth acknowledged (`compare_judges` and HMAC are the first cuts if the slice must shrink).
