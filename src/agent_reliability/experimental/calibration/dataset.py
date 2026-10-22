@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Any, Final
 
 from agent_reliability.experimental.calibration._json import canonical, strict_loads
+from agent_reliability.experimental.calibration._schemas import check
 from agent_reliability.experimental.judge import CalibrationCase, JudgeDimension
 
 __all__ = [
@@ -236,6 +237,10 @@ def _parse_case(
 ) -> ReferenceCase:
     _require(isinstance(document, dict), "a case must be a JSON object")
     _require(document.get("schema") == CASE_SCHEMA, "unexpected case schema")
+    try:
+        check(document, "reference-case")
+    except ValueError:
+        raise DatasetError("a case does not satisfy the case schema") from None
     base = {k: v for k, v in document.items() if k not in _EXTRA_CASE_KEYS}
     base["schema"] = _CASE_V1
     try:
@@ -386,6 +391,10 @@ def load_reference_dataset(
         raise DatasetError("manifest is not valid strict JSON") from None
     _require(isinstance(manifest, dict), "manifest must be an object")
     _require(set(manifest) <= _MANIFEST_KEYS, "manifest has unknown members")
+    try:
+        check(manifest, "reference-dataset")
+    except ValueError:
+        raise DatasetError("manifest does not satisfy the manifest schema") from None
     _require(manifest.get("schema") == MANIFEST_SCHEMA, "unexpected manifest schema")
     for key in (
         "dataset_id",

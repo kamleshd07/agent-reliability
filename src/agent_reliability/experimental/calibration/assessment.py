@@ -17,6 +17,7 @@ from datetime import UTC, datetime
 from typing import Any, Final
 
 from agent_reliability.experimental.calibration._json import canonical, strict_loads
+from agent_reliability.experimental.calibration._schemas import check
 from agent_reliability.experimental.calibration.analysis import repeatability
 from agent_reliability.experimental.calibration.dataset import (
     LabelProvenance,
@@ -69,11 +70,14 @@ class CalibrationAssessment:
         missing = [k for k in _REQUIRED if k not in copied]
         if missing or copied.get("schema") != ASSESSMENT_SCHEMA:
             raise AssessmentError("not a calibration assessment document")
-        integrity = copied["integrity"]
-        if not isinstance(integrity, dict) or not isinstance(
-            integrity.get("sha256"), str
-        ):
-            raise AssessmentError("assessment integrity member is invalid")
+        try:
+            check(copied, "calibration-assessment")
+        except ValueError:
+            raise AssessmentError("assessment does not satisfy its schema") from None
+        try:
+            JudgeFingerprint.from_dict(copied["fingerprint"])
+        except (ValueError, KeyError, TypeError):
+            raise AssessmentError("assessment fingerprint is inconsistent") from None
         self._document = copied
 
     # -- access --------------------------------------------------------------

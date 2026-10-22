@@ -1,0 +1,117 @@
+{
+  "$id": "gentlity.reference-dataset/1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "created_at": {
+      "maxLength": 40,
+      "minLength": 20,
+      "type": "string"
+    },
+    "dataset_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "dataset_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$",
+      "type": "string"
+    },
+    "description": {
+      "maxLength": 1000,
+      "type": "string"
+    },
+    "license": {
+      "maxLength": 100,
+      "minLength": 1,
+      "type": "string"
+    },
+    "rubric": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "enum": [
+            "answer-correctness",
+            "groundedness",
+            "instruction-adherence",
+            "safety-policy",
+            "task-completion-evidence"
+          ]
+        },
+        "rubric_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "rubric_version": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "rubric_id",
+        "rubric_version",
+        "dimension"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "gentlity.reference-dataset/1"
+    },
+    "splits": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "case_count": {
+            "maximum": 20000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "file": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "label_provenance": {
+            "enum": [
+              "synthetic",
+              "human_single",
+              "human_multi",
+              "human_adjudicated"
+            ]
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "sha256",
+          "case_count",
+          "label_provenance"
+        ],
+        "type": "object"
+      },
+      "propertyNames": {
+        "enum": [
+          "train",
+          "calibration",
+          "heldout"
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "dataset_id",
+    "dataset_version",
+    "created_at",
+    "license",
+    "rubric",
+    "splits"
+  ],
+  "title": "gentlity.reference-dataset/1",
+  "type": "object"
+}
