@@ -23,6 +23,7 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
   `ungated_model_backed` and `explicitly_ungated`, a read-only `behaviour` property and `template_digest()`, and
   `wilson_interval` exported. **Default behaviour is unchanged**: a binding without `admission=` records
   judge outcomes exactly as before and they are uncalibrated unless the application proves otherwise.
+- The shared stdlib JSON-Schema validator used by the experimental judge schemas now treats a trailing newline as not matching an anchored `$` pattern (as ECMA-262 validators do); a value ending in a newline that was previously accepted is now rejected.
 - No stable API, wire contract, evaluator identity or measurement-health semantics changed.
 
 ### Added (experimental)

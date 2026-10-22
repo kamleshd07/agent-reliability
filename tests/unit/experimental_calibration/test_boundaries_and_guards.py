@@ -354,3 +354,20 @@ def test_a_fingerprint_whose_digest_does_not_match_its_components_is_refused() -
     document["limits_digest"] = "0" * 64  # components changed, digest not recomputed
     with pytest.raises(ValueError, match="digest"):
         JudgeFingerprint.from_dict(document)
+
+
+def test_an_empty_other_split_checks_nothing(tmp_path: Path) -> None:
+    # An empty split cannot be written through the helper, so replace it in memory.
+    base = human_dataset(tmp_path)
+    emptied = dataclasses.replace(base, splits={**base.splits, Split.TRAIN: ()})
+    a = assess(emptied)
+    assert a.document["dataset"]["leakage_checked_against"] == []
+    d = decide(a)
+    assert d.status is S.INSUFFICIENT_REFERENCE_EVIDENCE
+    assert "leakage_checked_against_other_splits" in verdicts(d, INCONCLUSIVE)
+
+
+def test_day_windows_beyond_timedelta_are_refused_by_the_policy() -> None:
+    for name in ("validity_days", "max_dataset_age_days"):
+        with pytest.raises(PolicyError):
+            human_policy(**{name: 10**9})

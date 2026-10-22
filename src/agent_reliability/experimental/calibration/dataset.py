@@ -353,6 +353,11 @@ def _read_bounded(directory: Path, name: object, limit: int) -> bytes:
         "split files must be plain names beside the manifest",
     )
     path = directory / name
+    if not hasattr(os, "O_NOFOLLOW"):  # e.g. Windows: refuse symlinks by lstat instead
+        try:
+            _require(not stat.S_ISLNK(os.lstat(path).st_mode), "symlinks are refused")
+        except OSError:
+            raise DatasetError("a dataset file cannot be read") from None
     flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
     flags |= getattr(os, "O_CLOEXEC", 0)
     try:

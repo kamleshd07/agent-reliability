@@ -36,10 +36,11 @@ from agent_reliability.experimental.judge.values import (
 __all__ = ["ENGINE_REVISION", "JudgeBehaviour", "behaviour_of", "template_digest"]
 
 #: Code-owned revision of the judge's behaviour that the template digest cannot see:
-#: reply parsing, verdict mapping, repeat aggregation, repair and retry logic. Bump it
-#: whenever one of those changes behaviour (a test pins the source of the parser and
-#: mapping functions, so a change cannot go unnoticed). It is part of the calibration
-#: fingerprint, so an SDK patch release that changes behaviour invalidates calibrations.
+#: reply parsing, verdict mapping, repeat aggregation (pinned by the source of those
+#: functions in core.py) and the whole of _engine.py (retries, repair, attempts,
+#: deadlines, budgets), so a change cannot go unnoticed. Bump it whenever they
+#: change. It is part of the calibration fingerprint, so an SDK patch release that
+#: changes behaviour invalidates calibrations.
 ENGINE_REVISION: Final = "1"
 
 _PROBE_NONCE: Final = "0123456789abcdef"

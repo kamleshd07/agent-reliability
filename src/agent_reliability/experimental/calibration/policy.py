@@ -51,6 +51,7 @@ class PolicyError(ValueError):
 
 
 MAX_SIZE = 10**9
+MAX_DAYS = 36_500  # one hundred years: far inside timedelta's range
 
 
 def _is_number(value: object) -> bool:
@@ -104,8 +105,9 @@ class CalibrationPolicy:
     def __post_init__(self) -> None:
         for name in _POSITIVE_INTS:
             value = getattr(self, name)
-            if type(value) is not int or not 1 <= value <= MAX_SIZE:
-                raise PolicyError(f"{name} must be an int in 1..{MAX_SIZE}")
+            limit = MAX_DAYS if name.endswith("_days") else MAX_SIZE
+            if type(value) is not int or not 1 <= value <= limit:
+                raise PolicyError(f"{name} must be an int in 1..{limit}")
         if (
             type(self.max_adversarial_pass_on_fail) is not int
             or not 0 <= self.max_adversarial_pass_on_fail <= MAX_SIZE

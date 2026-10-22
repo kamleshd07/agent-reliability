@@ -284,8 +284,11 @@ def build_assessment(
             },
             "rubric_matches_fingerprint": rubric_matches,
             "leakage": dataset.leakage.as_dict(),
+            # Only non-empty other splits count: an empty split checks nothing.
             "leakage_checked_against": sorted(
-                s.value for s in dataset.splits if s is not split
+                s.value
+                for s, other in dataset.splits.items()
+                if s is not split and len(other) > 0
             ),
             "leakage_clean": dataset.leakage.clean,
         },
