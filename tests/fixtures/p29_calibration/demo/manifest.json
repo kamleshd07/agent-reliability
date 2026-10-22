@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-10-01T00:00:00+00:00",
+  "dataset_id": "synthetic-refund-demo",
+  "dataset_version": "1",
+  "description": "SYNTHETIC demonstration data. Labels are not human ground truth.",
+  "license": "CC0-1.0",
+  "rubric": {
+    "dimension": "answer-correctness",
+    "rubric_id": "judge-answer-correctness",
+    "rubric_version": "2026-10.r1"
+  },
+  "schema": "gentlity.reference-dataset/1",
+  "splits": {
+    "calibration": {
+      "case_count": 10,
+      "file": "calibration.jsonl",
+      "label_provenance": "synthetic",
+      "sha256": "66555c41bad8abc232659b5f97766dc539c68d8a5cc6140103dafaf0e2d720c0"
+    },
+    "heldout": {
+      "case_count": 68,
+      "file": "heldout.jsonl",
+      "label_provenance": "synthetic",
+      "sha256": "1c622cffe8ee5c67366d8a7752b89b19f5d7ace00f763104e49a77ea75429a36"
+    },
+    "train": {
+      "case_count": 10,
+      "file": "train.jsonl",
+      "label_provenance": "synthetic",
+      "sha256": "8fd56952b7da843abf42fdbf46d9e44949d9dd1d46227c8f8b0ec09fde32ecab"
+    }
+  }
+}

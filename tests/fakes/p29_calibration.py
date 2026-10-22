@@ -1,3 +1,4 @@
+# ruff: noqa: E501 -- long assertion and data lines are kept readable.
 """Helpers for the Session 4 calibration tests (no network, no model)."""
 
 from __future__ import annotations
@@ -193,13 +194,14 @@ def demo_policy(**overrides: Any) -> CalibrationPolicy:
 
 def human_policy(**overrides: Any) -> CalibrationPolicy:
     """A small coherent policy that CAN reach ``calibrated`` (human provenance)."""
-    return demo_policy(
-        accepted_label_provenance=frozenset(
+    values: dict[str, Any] = {
+        "accepted_label_provenance": frozenset(
             {LabelProvenance.HUMAN_MULTI, LabelProvenance.HUMAN_ADJUDICATED}
         ),
-        demonstration_only=False,
-        **overrides,
-    )
+        "demonstration_only": False,
+    }
+    values.update(overrides)
+    return demo_policy(**values)
 
 
 def heldout_cases(

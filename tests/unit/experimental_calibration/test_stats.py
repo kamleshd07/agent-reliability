@@ -1,3 +1,4 @@
+# ruff: noqa: E501 -- long assertion and data lines are kept readable.
 """Statistics: exact intervals, explicit undefined values, no silent division."""
 
 from __future__ import annotations
