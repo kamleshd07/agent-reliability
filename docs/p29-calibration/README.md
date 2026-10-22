@@ -37,17 +37,32 @@ policy, the coordinator gate skipping an inadmissible judge, and drift indicator
 
 ```python
 from agent_reliability.experimental.calibration import (
-    CalibrationGate, CalibrationPolicy, ModelDeclaration, Split,
-    build_assessment, collect_judgments, load_reference_dataset,
+    CalibrationGate,
+    CalibrationPolicy,
+    ModelDeclaration,
+    Split,
+    build_assessment,
+    collect_judgments,
+    load_reference_dataset,
 )
 
-dataset = load_reference_dataset("ds/manifest.json", expected_manifest_sha256=PINNED)   # pin BEFORE running
-model = ModelDeclaration("my-provider", "my-model", "2026-09")     # a declaration, not an observation
-table = collect_judgments(judge, model, dataset.cases(Split.HELDOUT), repetitions=3)   # your judge, your provider
+dataset = load_reference_dataset(
+    "ds/manifest.json", expected_manifest_sha256=PINNED
+)  # pin BEFORE running
+model = ModelDeclaration(
+    "my-provider", "my-model", "2026-09"
+)  # a declaration, not an observation
+table = collect_judgments(
+    judge, model, dataset.cases(Split.HELDOUT), repetitions=3
+)  # your judge, your provider
 assessment = build_assessment(dataset, Split.HELDOUT, table, now=now).sign(KEY)
-policy = CalibrationPolicy(...)            # every threshold explicit; or CalibrationPolicy.starting_point()
+policy = CalibrationPolicy(
+    ...
+)  # every threshold explicit; or CalibrationPolicy.starting_point()
 gate = CalibrationGate(judge, model, assessment, policy, hmac_key=KEY)
-binding = IndicatorBinding("answer-correctness", judge, admission=gate)   # opt-in; default is unchanged
+binding = IndicatorBinding(
+    "answer-correctness", judge, admission=gate
+)  # opt-in; default is unchanged
 ```
 
 `collect_judgments` is the only function that can reach a provider, and only through the judge you supply (its opt-in,

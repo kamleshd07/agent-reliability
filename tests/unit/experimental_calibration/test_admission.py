@@ -473,3 +473,35 @@ def test_no_artefact_contains_case_content(tmp_path: Path) -> None:
     ]  # fmt: skip
     for blob in blobs:
         assert CANARY not in blob
+
+
+def test_the_failure_rate_cap_is_enforced_on_its_own(tmp_path: Path) -> None:
+    ds = human_dataset(tmp_path)
+    outcomes = perfect_outcomes(ds)
+    for k in [k for k in outcomes if k.startswith("p")][:10]:
+        outcomes[k] = "FAILURE"  # 10 of 24 labelled evaluations failed
+    a = assessed(ds, runs(outcomes))
+    d = decide(a, human_policy(max_failure_rate=0.2))
+    assert "failure_rate" in names(d, "violated") and d.status is S.UNCALIBRATED
+    assert "failure_rate" not in names(
+        decide(a, human_policy(max_failure_rate=0.9)), "violated"
+    )
+
+
+def test_cross_split_leakage_is_found_when_identical_content_has_different_case_ids(
+    tmp_path: Path,
+) -> None:
+    held = heldout_cases(provenance="human_multi", multi=True)
+    clone = dict(held[0], case_id="renamed-clone")  # same content, new id
+    ds = load(
+        tmp_path,
+        {"heldout": held, "calibration": [clone]},
+        provenance={"heldout": "human_multi", "calibration": "human_multi"},
+    )
+    assert ds.leakage.cross_split and not ds.leakage.duplicate_case_ids
+    assert ("f00", "renamed-clone") in ds.leakage.identical_content
+    d = decide(assessed(ds, runs(perfect_outcomes(ds))))
+    assert (
+        d.status is S.INSUFFICIENT_REFERENCE_EVIDENCE
+        and "no_split_leakage" in names(d, "violated")
+    )

@@ -29,6 +29,6 @@ then times each stage. No network, no judge.
 | assessment document accepted by `from_json` | 1 MiB |
 | gate decision | recomputed per evaluated call (about 0.8 ms); it runs outside the recording gate on the caller's thread or event loop |
 
-The byte cap binds before the case cap for cases of roughly 420 bytes or more (20 000 cases of the benchmark's size is 10.6 MB and is refused).
+The byte cap binds before the case cap for cases of roughly 420 bytes or more (20 000 cases of the benchmark's size is about 8.8 MB and is refused).
 Provider-backed runs are bounded by the judge's own `JudgeBudget`, `JudgeLimits` and `max_concurrency`; this package adds none and the offline path
 makes no provider call.

@@ -1,3 +1,4 @@
+# ruff: noqa: E501 -- the printed docstring and figures are kept readable.
 """Bounded local benchmark of the calibration package (a measurement, not a claim).
 
 Builds a synthetic held-out split near the package's caps (8 MiB per split file, 20 000 cases), then times
@@ -26,7 +27,6 @@ from agent_reliability.experimental.calibration import (
     JudgeFingerprint,
     Judgment,
     JudgmentTable,
-    LabelProvenance,
     ModelDeclaration,
     Outcome,
     Split,
@@ -142,7 +142,9 @@ def main() -> int:
     _, seconds = timed(lambda: repeatability(cases, table))
     figures["repeatability_seconds"] = seconds
     assessment, seconds = timed(
-        lambda: build_assessment(dataset, Split.HELDOUT, table, now=NOW - timedelta(days=1))
+        lambda: build_assessment(
+            dataset, Split.HELDOUT, table, now=NOW - timedelta(days=1)
+        )
     )
     figures["build_assessment_seconds"] = seconds
     figures["assessment_bytes"] = len(assessment.to_json().encode())
@@ -159,7 +161,9 @@ def main() -> int:
         "p95": round(sorted(samples)[int(len(samples) * 0.95)] * 1000, 3),
     }
     usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    figures["peak_rss_mib"] = round(usage / (1024 * 1024 if sys.platform == "darwin" else 1024), 1)
+    figures["peak_rss_mib"] = round(
+        usage / (1024 * 1024 if sys.platform == "darwin" else 1024), 1
+    )
     figures["headline_n"] = metrics["headline"]["n_labelled"]
     print(json.dumps(figures, indent=2))
     return 0
