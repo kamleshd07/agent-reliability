@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import enum
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Final
 
 from agent_reliability.experimental.calibration.dataset import ReferenceCase
@@ -85,38 +85,45 @@ class Judgment:
 class JudgmentTable:
     fingerprint: JudgeFingerprint
     rows: tuple[Judgment, ...]
+    _index: dict[tuple[str, int], Judgment] = field(
+        init=False, repr=False, compare=False, hash=False
+    )
+    _by_example: dict[str, tuple[Judgment, ...]] = field(
+        init=False, repr=False, compare=False, hash=False
+    )
 
     def __post_init__(self) -> None:
-        keys = [(r.example_id, r.run_index) for r in self.rows]
-        if len(set(keys)) != len(keys):
-            raise ValueError("duplicate (example, run) judgment")
-
-    def runs(self, example_id: str) -> tuple[Judgment, ...]:
-        return tuple(
-            sorted(
-                (r for r in self.rows if r.example_id == example_id),
-                key=lambda r: r.run_index,
-            )
+        index: dict[tuple[str, int], Judgment] = {}
+        grouped: dict[str, list[Judgment]] = {}
+        for row in self.rows:
+            key = (row.example_id, row.run_index)
+            if key in index:
+                raise ValueError("duplicate (example, run) judgment")
+            index[key] = row
+            grouped.setdefault(row.example_id, []).append(row)
+        object.__setattr__(self, "_index", index)
+        object.__setattr__(
+            self,
+            "_by_example",
+            {
+                k: tuple(sorted(v, key=lambda r: r.run_index))
+                for k, v in grouped.items()
+            },
         )
 
+    def runs(self, example_id: str) -> tuple[Judgment, ...]:
+        return self._by_example.get(example_id, ())
+
     def outcome(self, example_id: str, run_index: int = 0) -> Outcome:
-        for row in self.rows:
-            if row.example_id == example_id and row.run_index == run_index:
-                return row.outcome
-        return Outcome.MISSING
+        row = self._index.get((example_id, run_index))
+        return Outcome.MISSING if row is None else row.outcome
 
     def row(self, example_id: str, run_index: int = 0) -> Judgment | None:
-        for candidate in self.rows:
-            if candidate.example_id == example_id and candidate.run_index == run_index:
-                return candidate
-        return None
+        return self._index.get((example_id, run_index))
 
     @property
     def runs_available(self) -> int:
-        counts: dict[str, int] = {}
-        for r in self.rows:
-            counts[r.example_id] = counts.get(r.example_id, 0) + 1
-        return max(counts.values(), default=0)
+        return max((len(v) for v in self._by_example.values()), default=0)
 
 
 def _validate(
