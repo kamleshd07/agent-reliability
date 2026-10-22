@@ -16,6 +16,7 @@ from agent_reliability.experimental.calibration import (
     CalibrationAssessment,
     CalibrationStatus,
     ModelDeclaration,
+    PolicyError,
     ReferenceDataset,
     Split,
     assess_admission,
@@ -35,6 +36,7 @@ from tests.fakes.p29_calibration import (
     load,
     perfect_outcomes,
     table,
+    train_cases,
 )
 
 pytestmark = pytest.mark.unit
@@ -45,8 +47,11 @@ S = CalibrationStatus
 def human_dataset(tmp_path: Path, **kw: Any) -> ReferenceDataset:
     return load(
         tmp_path,
-        {"heldout": heldout_cases(provenance="human_multi", multi=True)},
-        provenance={"heldout": "human_multi"},
+        {
+            "heldout": heldout_cases(provenance="human_multi", multi=True),
+            "train": train_cases(),
+        },
+        provenance={"heldout": "human_multi", "train": "human_multi"},
         **kw,
     )
 
@@ -59,16 +64,18 @@ def assessed(
     dataset: ReferenceDataset, outcomes: dict[str, Any] | None = None, **kw: Any
 ) -> CalibrationAssessment:
     data = outcomes if outcomes is not None else runs(perfect_outcomes(dataset))
-    return build_assessment(
+    signed = kw.pop("signed", True)
+    built = build_assessment(
         dataset,
         Split.HELDOUT,
         table(data, fp=kw.pop("fp", None)),
         now=CREATED + timedelta(days=1),
         **kw,
     )
+    return built.sign(KEY) if signed else built
 
 
-def decide(assessment, policy=None, *, now=NOW, fp=None, key=None):  # type: ignore[no-untyped-def]
+def decide(assessment, policy=None, *, now=NOW, fp=None, key=KEY):  # type: ignore[no-untyped-def]
     return assess_admission(
         assessment, fp or fingerprint(), policy or human_policy(), now, hmac_key=key
     )
@@ -86,7 +93,7 @@ def test_a_perfect_judge_on_human_labelled_held_out_data_is_calibrated(
 ) -> None:
     decision = decide(assessed(human_dataset(tmp_path)))
     assert decision.status is S.CALIBRATED and decision.admissible
-    assert decision.integrity == "unverified"
+    assert decision.integrity == "verified"
     assert not decision.failing()
     assert (
         decision.model
@@ -94,16 +101,51 @@ def test_a_perfect_judge_on_human_labelled_held_out_data_is_calibrated(
     )
 
 
+def test_a_calibrating_policy_must_require_verified_integrity(tmp_path: Path) -> None:
+    with pytest.raises(PolicyError, match="verified integrity"):
+        human_policy(require_verified_integrity=False)
+    assert demo_policy().require_verified_integrity is False  # demonstration only
+
+
 def test_verified_integrity_policy_requires_the_hmac(tmp_path: Path) -> None:
-    a = assessed(human_dataset(tmp_path))
-    policy = human_policy(require_verified_integrity=True)
-    assert decide(a, policy).status is S.UNCALIBRATED  # no key at all
-    assert decide(a, policy, key=KEY).status is S.UNCALIBRATED  # unsigned assessment
-    signed = a.sign(KEY)
-    assert decide(signed, policy, key=KEY).status is S.CALIBRATED
-    assert decide(signed, policy, key=KEY).integrity == "verified"
+    unsigned = assessed(human_dataset(tmp_path), signed=False)
+    policy = human_policy()
+    assert decide(unsigned, policy, key=None).status is S.UNCALIBRATED  # no key at all
+    assert decide(unsigned, policy).status is S.UNCALIBRATED  # unsigned assessment
+    signed = unsigned.sign(KEY)
+    assert decide(signed, policy).status is S.CALIBRATED
+    assert decide(signed, policy).integrity == "verified"
     assert decide(signed, policy, key=b"x" * 32).status is S.UNCALIBRATED  # wrong key
-    assert decide(signed, policy).status is S.UNCALIBRATED  # key not supplied
+    assert decide(signed, policy, key=None).status is S.UNCALIBRATED  # key not supplied
+
+
+def test_forging_an_unsigned_record_cannot_calibrate_under_a_calibrating_policy(
+    tmp_path: Path,
+) -> None:
+    """Editing the counts and recomputing the public SHA-256 is not enough."""
+    ds = human_dataset(tmp_path)
+    outcomes = {
+        k: ("PASS" if k.startswith(("f", "a")) else v)
+        for k, v in perfect_outcomes(ds).items()
+    }
+    honest = assessed(ds, runs(outcomes), signed=False)  # a bad judge
+    document = honest.document
+    for block in (document["metrics"]["headline"],):
+        c = block["counts"]
+        c["tp"], c["fn"] = c["tp"] + c["fn"], 0
+        for key in ("fnr_conditional", "fnr_effective"):
+            block["rates"][key] = dict(block["rates"][key], numerator=0)
+    import hashlib
+
+    from agent_reliability.experimental.calibration.assessment import _body_bytes
+
+    document["integrity"] = {
+        "sha256": hashlib.sha256(_body_bytes(document)).hexdigest()
+    }
+    forged = CalibrationAssessment(document)
+    assert forged.digest_matches  # the public digest was recomputed
+    d = decide(forged)
+    assert d.status is S.UNCALIBRATED and d.integrity == "unverified"
 
 
 def test_the_admissible_claim_is_stated_conservatively(tmp_path: Path) -> None:
@@ -165,7 +207,10 @@ def test_synthetic_labels_never_calibrate_under_a_human_policy(tmp_path: Path) -
 
 
 def test_a_demonstration_policy_can_only_demonstrate(tmp_path: Path) -> None:
-    synthetic = load(tmp_path / "s", {"heldout": heldout_cases()})
+    synthetic = load(
+        tmp_path / "s",
+        {"heldout": heldout_cases(), "train": train_cases(provenance=None)},
+    )
     a = assessed(synthetic, runs(perfect_outcomes(synthetic)))
     d = decide(a, demo_policy())
     assert d.status is S.DEMONSTRATION and not d.admissible
@@ -204,7 +249,21 @@ def test_no_repeat_runs_means_insufficient_repeatability_evidence(
     ds = human_dataset(tmp_path)
     d = decide(assessed(ds, perfect_outcomes(ds)))  # one run each
     assert d.status is S.INSUFFICIENT_REFERENCE_EVIDENCE
-    assert "repeat_cases" in names(d, "violated")
+    assert {"repeat_cases", "repeatability_measured_on_all_cases"} <= names(
+        d, "violated"
+    )
+
+
+def test_repeats_on_only_some_cases_leave_the_rest_unmeasured_not_stable(
+    tmp_path: Path,
+) -> None:
+    ds = human_dataset(tmp_path)
+    outcomes = runs(perfect_outcomes(ds))
+    victim = next(iter(outcomes))
+    outcomes[victim] = outcomes[victim][:1]  # one case only has a single run
+    d = decide(assessed(ds, outcomes))
+    assert d.status is S.INSUFFICIENT_REFERENCE_EVIDENCE
+    assert names(d, "violated") == {"repeatability_measured_on_all_cases"}
 
 
 def test_indeterminate_heavy_data_is_insufficient(tmp_path: Path) -> None:
@@ -214,7 +273,11 @@ def test_indeterminate_heavy_data_is_insufficient(tmp_path: Path) -> None:
                  labels=[("rev-a", "unknown"), ("rev-b", "unknown")])
         for i in range(60)
     ]  # fmt: skip
-    ds = load(tmp_path, {"heldout": docs}, provenance={"heldout": "human_multi"})
+    ds = load(
+        tmp_path,
+        {"heldout": docs, "train": train_cases()},
+        provenance={"heldout": "human_multi", "train": "human_multi"},
+    )
     d = decide(assessed(ds, runs(perfect_outcomes(ds))))
     assert d.status is S.INSUFFICIENT_REFERENCE_EVIDENCE
     assert "indeterminate_fraction" in names(d, "violated")
@@ -230,7 +293,11 @@ def test_inter_labeler_agreement_below_the_floor_is_insufficient(
         doc["adjudication"] = {"method": "third_reviewer"}
     for doc in docs[10:]:
         doc["adjudication"] = {"method": "majority"}
-    ds = load(tmp_path, {"heldout": docs}, provenance={"heldout": "human_adjudicated"})
+    ds = load(
+        tmp_path,
+        {"heldout": docs, "train": train_cases()},
+        provenance={"heldout": "human_adjudicated", "train": "human_multi"},
+    )
     a = assessed(ds, runs(perfect_outcomes(ds)))
     assert (
         decide(a, human_policy(min_inter_labeler_agreement=0.5)).status is S.CALIBRATED
@@ -359,8 +426,7 @@ def test_a_dataset_built_for_another_rubric_version_is_incompatible(
 def test_a_tampered_assessment_is_uncalibrated(tmp_path: Path) -> None:
     a = assessed(human_dataset(tmp_path))
     document = a.document
-    document["metrics"]["headline"]["counts"]["fn"] = 0
-    document["metrics"]["headline"]["counts"]["tp"] += 1
+    document["heldout_attempt"] = 7  # any edit that keeps the document consistent
     tampered = CalibrationAssessment(document)  # digest no longer matches
     assert not tampered.digest_matches
     d = decide(tampered)
@@ -370,15 +436,44 @@ def test_a_tampered_assessment_is_uncalibrated(tmp_path: Path) -> None:
 def test_a_forged_digest_without_the_key_fails_a_verified_policy(
     tmp_path: Path,
 ) -> None:
-    a = assessed(human_dataset(tmp_path)).sign(KEY)
+    a = assessed(human_dataset(tmp_path))
     document = a.document
-    document["metrics"]["headline"]["counts"]["fn"] += 1
+    document["heldout_attempt"] = 7
     forged = CalibrationAssessment(document)
     assert not forged.verify(KEY)
+    assert decide(forged, human_policy(), key=KEY).status is S.UNCALIBRATED
+
+
+def test_arithmetically_inconsistent_records_are_refused_at_parse(
+    tmp_path: Path,
+) -> None:
+    a = assessed(human_dataset(tmp_path), signed=False)
+    for mutate in (
+        lambda d: d["metrics"]["headline"]["counts"].update(
+            fn=1
+        ),  # counts no longer partition
+        lambda d: d["metrics"]["headline"]["rates"]["failure_rate"].update(
+            numerator=99
+        ),
+        lambda d: d["repeatability"].update(unstable=10_000),
+    ):
+        document = a.document
+        mutate(document)
+        with pytest.raises(AssessmentError, match="inconsistent"):
+            CalibrationAssessment(document)
+
+
+def test_the_hmac_is_domain_separated(tmp_path: Path) -> None:
+    import hashlib
+    import hmac
+
+    from agent_reliability.experimental.calibration.assessment import _body_bytes
+
+    a = assessed(human_dataset(tmp_path), signed=False).sign(KEY)
+    plain = hmac.new(KEY, _body_bytes(a.document), hashlib.sha256).hexdigest()
     assert (
-        decide(forged, human_policy(require_verified_integrity=True), key=KEY).status
-        is S.UNCALIBRATED
-    )
+        a.document["integrity"]["hmac_sha256"] != plain
+    )  # not a bare HMAC of the body
 
 
 def test_only_the_held_out_split_may_be_assessed(tmp_path: Path) -> None:
@@ -413,7 +508,7 @@ def test_assessment_and_decision_are_deterministic_and_round_trip(
 def test_signing_requires_a_real_key_and_hmac_survives_serialisation(
     tmp_path: Path,
 ) -> None:
-    a = assessed(human_dataset(tmp_path))
+    a = assessed(human_dataset(tmp_path), signed=False)
     with pytest.raises(AssessmentError):
         a.sign(b"short")
     signed = CalibrationAssessment.from_json(a.sign(KEY).to_json())
@@ -505,3 +600,43 @@ def test_cross_split_leakage_is_found_when_identical_content_has_different_case_
         d.status is S.INSUFFICIENT_REFERENCE_EVIDENCE
         and "no_split_leakage" in names(d, "violated")
     )
+
+
+def test_a_dataset_created_after_its_assessment_is_refused(tmp_path: Path) -> None:
+    ds = human_dataset(tmp_path)
+    ds = dataclasses.replace(ds, created_at=NOW + timedelta(days=30))
+    with pytest.raises(AssessmentError, match="inconsistent"):
+        assessed(
+            ds, runs(perfect_outcomes(ds))
+        )  # a dataset cannot postdate its assessment
+
+
+def test_a_dataset_that_is_in_the_future_at_decision_time_fails_the_age_check(
+    tmp_path: Path,
+) -> None:
+    a = assessed(human_dataset(tmp_path))
+    d = decide(a, now=a.dataset_created_at - timedelta(days=5))
+    assert d.status is S.UNCALIBRATED and "not_future_dated" in names(d, "violated")
+
+
+def test_duplicate_content_inside_the_heldout_split_alone_blocks_calibration(
+    tmp_path: Path,
+) -> None:
+    held = heldout_cases(provenance="human_multi", multi=True)
+    held.append(dict(held[0], case_id="dup-inside-heldout"))
+    ds = load(tmp_path, {"heldout": held}, provenance={"heldout": "human_multi"})
+    assert not ds.leakage.cross_split and not ds.leakage.clean
+    d = decide(assessed(ds, runs(perfect_outcomes(ds))))
+    assert (
+        d.status is S.INSUFFICIENT_REFERENCE_EVIDENCE
+        and "no_split_leakage" in names(d, "violated")
+    )
+
+
+def test_a_changed_engine_revision_makes_a_calibration_incompatible(
+    tmp_path: Path,
+) -> None:
+    a = assessed(human_dataset(tmp_path))
+    changed = dataclasses.replace(fingerprint(), engine_revision="2")
+    assert decide(a, fp=changed).status is S.INCOMPATIBLE
+    assert "engine_revision" in a.fingerprint.diff(changed)

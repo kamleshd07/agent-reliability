@@ -29,6 +29,7 @@ _BEHAVIOUR_FIELDS = (
     "dimension",
     "template_id",
     "template_digest",
+    "engine_revision",
     "limits_digest",
     "repeats",
     "min_confidence",
@@ -68,6 +69,7 @@ class JudgeFingerprint:
     dimension: str
     template_id: str
     template_digest: str
+    engine_revision: str
     limits_digest: str
     repeats: int
     min_confidence: str
@@ -98,6 +100,7 @@ class JudgeFingerprint:
             dimension=rubric.dimension.value,
             template_id=behaviour.template_id,
             template_digest=behaviour.template_digest,
+            engine_revision=behaviour.engine_revision,
             limits_digest=behaviour.limits_digest,
             repeats=behaviour.repeats,
             min_confidence=behaviour.min_confidence,

@@ -10,6 +10,7 @@ P28 wire are unchanged. A display name such as `model_label` never implies equiv
 |---|---|---|
 | `rubric_id`, `rubric_version`, `rubric_fingerprint`, `dimension` | the bound judge's rubric (`rubric.fingerprint()` is a SHA-256 of the canonical rubric) | rubric text changes change the fingerprint |
 | `template_id`, `template_digest` | `judge.behaviour` | digest of the prompt as the real builder renders it for fixed probe rubrics, nonce and parts (with/without citations, with the repair variant) plus the output schema id, reason bound and requested temperature. A template edit that forgot to change `jp1` still changes the digest. |
+| `engine_revision` | code-owned constant `ENGINE_REVISION` in `judge/behaviour.py` | covers reply parsing, verdict mapping, repeat aggregation, repair and retry logic that the template digest cannot see; a test pins the source of the parser and mapping functions so a behaviour change cannot go unnoticed. Bump it when they change. |
 | `limits_digest` | `JudgeLimits` of the bound judge | timeouts, attempts, repair attempts, input/output bounds change failure and abstention behaviour |
 | `repeats`, `min_confidence`, `capture_reason`, `require_citations`, `configuration_id` | the bound judge's policy and composed identity | `configuration_id` = `<model_label>.<template>.mc-<..>.rp<..>.ct<..>` |
 | `implementation_version` | `agent_reliability.__version__` | recorded and shown in `diff()`, **not** part of the digest: a patch release does not force re-calibration |

@@ -11,6 +11,7 @@ reported as counts and ``case_id`` values, never as content digests.
 from __future__ import annotations
 
 import enum
+import errno
 import hashlib
 import os
 import re
@@ -105,8 +106,26 @@ class AdjudicationMethod(enum.StrEnum):
     UNRESOLVED = "unresolved"
 
 
+#: Characters that carry no visible content and are used to dodge exact matching:
+#: format characters (zero-width space/joiner, soft hyphen, BOM) and punctuation.
+_IGNORABLE = frozenset({"Cf", "Cc", "Mn"})
+
+
 def _normalise(text: str) -> str:
-    return " ".join(unicodedata.normalize("NFKC", text).casefold().split())
+    """Comparison form for near-duplicate detection (NOT a security boundary).
+
+    NFKC + case folding, then drop format/control/combining characters and all
+    punctuation, and collapse whitespace. Homoglyph substitution (for example a
+    Cyrillic letter for a Latin one), paraphrase and translation are not detected.
+    """
+    folded = unicodedata.normalize("NFKC", text).casefold()
+    kept = "".join(
+        ch
+        for ch in folded
+        if unicodedata.category(ch) not in _IGNORABLE
+        and not unicodedata.category(ch).startswith("P")
+    )
+    return " ".join(kept.split())
 
 
 @dataclass(frozen=True, slots=True, repr=False)
@@ -283,7 +302,7 @@ def _parse_case(
         )
     if n:
         distinct = {label for _, label in labels}
-        if len(distinct) == 1 and method is AdjudicationMethod.NONE:
+        if len(distinct) == 1 and method is not AdjudicationMethod.UNRESOLVED:
             _require(
                 case.human_label == next(iter(distinct)),
                 "human_label contradicts unanimous labels",
@@ -307,9 +326,16 @@ def _parse_case(
         raise DatasetError("adjudication requires labeler entries")
     if method is AdjudicationMethod.UNRESOLVED:
         _require(case.human_label == "unknown", "unresolved cases must be 'unknown'")
+        _require(
+            len({label for _, label in labels}) > 1,
+            "unresolved adjudication needs disagreeing labels",
+        )
 
     content = canonical([[p.role.value, p.text] for p in case.parts])
-    normalised = canonical([[p.role.value, _normalise(p.text)] for p in case.parts])
+    # Parts are sorted so that reordering them does not evade detection.
+    normalised = canonical(
+        sorted([p.role.value, _normalise(p.text)] for p in case.parts)
+    )
     return ReferenceCase(
         case=case,
         provenance=provenance,
@@ -327,14 +353,31 @@ def _read_bounded(directory: Path, name: object, limit: int) -> bytes:
         "split files must be plain names beside the manifest",
     )
     path = directory / name
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    flags |= getattr(os, "O_CLOEXEC", 0)
     try:
-        info = os.lstat(path)
+        fd = os.open(path, flags)
+    except OSError as error:
+        if error.errno == errno.ELOOP:
+            raise DatasetError("symlinks are refused") from None
+        raise DatasetError("a dataset file cannot be read") from None
+    try:
+        info = os.fstat(fd)  # the descriptor we will read, not a path that may change
+        _require(stat.S_ISREG(info.st_mode), "dataset files must be regular files")
+        _require(info.st_size <= limit, "a dataset file exceeds its size cap")
+        chunks: list[bytes] = []
+        remaining = limit + 1  # read at most one byte past the cap, never more
+        while remaining > 0:
+            chunk = os.read(fd, min(65536, remaining))
+            if not chunk:
+                break
+            chunks.append(chunk)
+            remaining -= len(chunk)
     except OSError:
         raise DatasetError("a dataset file cannot be read") from None
-    _require(not stat.S_ISLNK(info.st_mode), "symlinks are refused")
-    _require(stat.S_ISREG(info.st_mode), "dataset files must be regular files")
-    _require(info.st_size <= limit, "a dataset file exceeds its size cap")
-    data = path.read_bytes()
+    finally:
+        os.close(fd)
+    data = b"".join(chunks)
     _require(len(data) <= limit, "a dataset file exceeds its size cap")
     return data
 

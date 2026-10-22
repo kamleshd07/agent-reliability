@@ -13,7 +13,7 @@ import copy
 import hashlib
 import hmac
 from collections.abc import Mapping
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any, Final
 
 from agent_reliability.experimental.calibration._json import canonical, strict_loads
@@ -53,9 +53,57 @@ class AssessmentError(ValueError):
     """An assessment cannot be built or parsed. Messages never contain content."""
 
 
+_HMAC_DOMAIN: Final = b"gentlity.calibration-assessment/1\x00hmac-sha256\x00"
+
+
 def _body_bytes(document: Mapping[str, Any]) -> bytes:
     body = {k: v for k, v in document.items() if k != "integrity"}
     return canonical(body).encode("utf-8")
+
+
+def _check_consistency(document: Mapping[str, Any]) -> None:
+    """Arithmetic consistency that a schema cannot express (a hostile record could
+    otherwise pass the schema yet contradict itself)."""
+
+    def fail() -> AssessmentError:
+        return AssessmentError("assessment is internally inconsistent")
+
+    stack: list[Any] = [document]
+    while stack:
+        node = stack.pop()
+        if isinstance(node, dict):
+            if (
+                "numerator" in node
+                and "denominator" in node
+                and not (0 <= node["numerator"] <= node["denominator"])
+            ):
+                raise fail()
+            stack.extend(node.values())
+        elif isinstance(node, list):
+            stack.extend(node)
+    metrics = document["metrics"]
+    for block in (metrics["headline"], *metrics["strata"].values()):
+        c = block["counts"]
+        if (
+            c["answered"] + c["abstained"] + c["failed"] + c["missing"]
+            != block["n_labelled"]
+            or c["tp"] + c["fn"] + c["fp"] + c["tn"] != c["answered"]
+            or c["support_fail"] + c["support_pass"] != block["n_labelled"]
+            or c["judged"] != c["answered"] + c["abstained"]
+        ):
+            raise fail()
+    repeat = document["repeatability"]
+    if repeat["unstable"] > repeat["cases_compared"]:
+        raise fail()
+    try:
+        created = datetime.fromisoformat(document["created_at"])
+        dataset_created = datetime.fromisoformat(document["dataset"]["created_at"])
+    except ValueError:
+        raise fail() from None
+    if created.tzinfo is None or dataset_created.tzinfo is None:
+        raise fail()
+    if dataset_created > created + timedelta(seconds=60):
+        raise fail()  # a dataset cannot be created after it was assessed
 
 
 class CalibrationAssessment:
@@ -74,6 +122,7 @@ class CalibrationAssessment:
             check(copied, "calibration-assessment")
         except ValueError:
             raise AssessmentError("assessment does not satisfy its schema") from None
+        _check_consistency(copied)
         try:
             JudgeFingerprint.from_dict(copied["fingerprint"])
         except (ValueError, KeyError, TypeError):
@@ -139,7 +188,7 @@ class CalibrationAssessment:
         document["integrity"] = {
             "sha256": self.digest,
             "hmac_sha256": hmac.new(
-                key, _body_bytes(document), hashlib.sha256
+                key, _HMAC_DOMAIN + _body_bytes(document), hashlib.sha256
             ).hexdigest(),
         }
         return CalibrationAssessment(document)
@@ -154,7 +203,7 @@ class CalibrationAssessment:
         ):
             return False
         expected = hmac.new(
-            key, _body_bytes(self._document), hashlib.sha256
+            key, _HMAC_DOMAIN + _body_bytes(self._document), hashlib.sha256
         ).hexdigest()
         return hmac.compare_digest(expected, stored)
 
@@ -235,6 +284,9 @@ def build_assessment(
             },
             "rubric_matches_fingerprint": rubric_matches,
             "leakage": dataset.leakage.as_dict(),
+            "leakage_checked_against": sorted(
+                s.value for s in dataset.splits if s is not split
+            ),
             "leakage_clean": dataset.leakage.clean,
         },
         "metrics": split_metrics(cases, table, 0),

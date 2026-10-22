@@ -255,3 +255,67 @@ def test_verdict_validation() -> None:
             AdmissionVerdict.skip(bad)  # type: ignore[arg-type]
     with pytest.raises(ValueError):
         AdmissionVerdict(True, "reason")
+
+
+# ---------------------------------------------------------------- the async paths
+
+
+def _async_judge():  # type: ignore[no-untyped-def]
+    from agent_reliability.experimental.judge import LLMJudge
+    from agent_reliability.experimental.judge.testing import FakeProvider
+
+    provider = FakeProvider([good_reply(), good_reply()])
+    judge = LLMJudge(
+        rubric=GR, provider=provider, model_label="adm-async", jitter=lambda: 0.0
+    )
+    return judge, provider
+
+
+def test_the_async_evaluate_path_honours_the_hook() -> None:
+    import asyncio
+
+    judge, provider = _async_judge()
+    gate = Script(
+        judge, AdmissionVerdict.skip("calibration_expired"), AdmissionVerdict.allow()
+    )
+    coordinator = JudgeCoordinator(
+        [IndicatorBinding("groundedness", judge, admission=gate)]
+    )
+    sink = HealthSink()
+    sdk = AgentReliability(sink=sink)  # type: ignore[arg-type]
+
+    async def go() -> list[EvaluationDisposition]:
+        out = []
+        for _ in range(2):  # two runs: first skipped, second allowed
+            with sdk.run(agent_id="a", name="Agent", version="1") as run:
+                async with coordinator.scope(run) as scope:
+                    out.append(await scope.evaluate("groundedness", grounded_request()))
+        return out
+
+    first, second = asyncio.run(go())
+    assert first is EvaluationDisposition.SKIPPED_BY_ADMISSION
+    assert second is EvaluationDisposition.RECORDED_RESULT
+    assert provider.call_count == 1  # only the admitted run reached the provider
+
+
+def test_the_submit_path_honours_the_hook_and_fails_closed() -> None:
+    import asyncio
+
+    judge, provider = _async_judge()
+    gate = Script(judge, RuntimeError("boom"))
+    observer = Collect()
+    coordinator = JudgeCoordinator(
+        [IndicatorBinding("groundedness", judge, admission=gate)], observer=observer
+    )
+    sink = HealthSink()
+    sdk = AgentReliability(sink=sink)  # type: ignore[arg-type]
+
+    async def go() -> None:
+        with sdk.run(agent_id="a", name="Agent", version="1") as run:
+            async with coordinator.scope(run) as scope:
+                scope.submit("groundedness", grounded_request())
+
+    asyncio.run(go())
+    assert provider.call_count == 0 and recorded(sink) == []
+    assert [r.reason_code for r in observer.reports] == ["admission_error"]
+    assert coordinator.coverage().indicators[0].admission_skipped == 1

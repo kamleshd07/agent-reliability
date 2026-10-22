@@ -282,7 +282,21 @@ def _data_and_rates(
     )
     criteria.append(
         Criterion(
-            "no_split_leakage", "data", MET if dataset["leakage_clean"] else VIOLATED
+            "leakage_checked_against_other_splits",
+            "data",
+            MET if dataset["leakage_checked_against"] else INCONCLUSIVE,
+            (("checked_against", dataset["leakage_checked_against"]),),
+        )
+    )
+    criteria.append(
+        Criterion(
+            "no_split_leakage",
+            "data",
+            MET if dataset["leakage_clean"] else VIOLATED,
+            (
+                ("checked_against", dataset["leakage_checked_against"]),
+                ("detects", "exact and normalised duplicates only"),
+            ),
         )
     )
     criteria.append(
@@ -335,6 +349,14 @@ def _data_and_rates(
     repeat = document["repeatability"]
     repeat_n = int(repeat["cases_compared"]) + int(repeat["excluded_for_failures"])
     criteria.append(_size("repeat_cases", repeat_n, policy.min_repeat_cases))
+    criteria.append(
+        Criterion(
+            "repeatability_measured_on_all_cases",
+            "data",
+            MET if repeat["single_run_cases"] == 0 else VIOLATED,
+            (("single_run_cases", repeat["single_run_cases"]),),
+        )
+    )
 
     criteria.append(
         _lower(
@@ -385,6 +407,7 @@ def _time(
 ) -> list[Criterion]:
     age = now - assessment.created_at
     dataset_age = now - assessment.dataset_created_at
+    future_dataset = assessment.dataset_created_at > now + FUTURE_SKEW
     return [
         Criterion(
             "calibration_valid",
@@ -399,7 +422,8 @@ def _time(
             "dataset_current",
             "time",
             MET
-            if dataset_age <= timedelta(days=policy.max_dataset_age_days)
+            if not future_dataset
+            and dataset_age <= timedelta(days=policy.max_dataset_age_days)
             else VIOLATED,
             (
                 ("age_days", round(dataset_age.total_seconds() / 86400, 3)),

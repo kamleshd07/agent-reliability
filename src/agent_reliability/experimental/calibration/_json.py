@@ -21,6 +21,22 @@ def _no_constants(_: str) -> Any:
     raise ValueError("NaN and Infinity are not valid JSON")
 
 
+MAX_INT_DIGITS = 18  # counts and sizes here are far smaller; refuse absurd integers
+
+
+def _bounded_int(text: str) -> int:
+    if len(text.lstrip("-")) > MAX_INT_DIGITS:
+        raise ValueError("integer is too large")
+    return int(text)
+
+
+def _finite_float(text: str) -> float:
+    value = float(text)
+    if value != value or value in (float("inf"), float("-inf")):
+        raise ValueError("number is not finite")
+    return value
+
+
 def _depth_ok(value: Any, limit: int) -> bool:
     stack: list[tuple[Any, int]] = [(value, 1)]
     while stack:
@@ -38,7 +54,11 @@ def strict_loads(text: str, *, max_depth: int = 8) -> Any:
     """Parse JSON rejecting duplicate members, NaN/Infinity and excess nesting."""
     try:
         value = json.loads(
-            text, object_pairs_hook=_no_duplicates, parse_constant=_no_constants
+            text,
+            object_pairs_hook=_no_duplicates,
+            parse_constant=_no_constants,
+            parse_int=_bounded_int,
+            parse_float=_finite_float,
         )
     except RecursionError:
         raise ValueError("JSON nesting is too deep") from None

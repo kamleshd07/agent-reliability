@@ -199,6 +199,7 @@ def human_policy(**overrides: Any) -> CalibrationPolicy:
             {LabelProvenance.HUMAN_MULTI, LabelProvenance.HUMAN_ADJUDICATED}
         ),
         "demonstration_only": False,
+        "require_verified_integrity": True,
     }
     values.update(overrides)
     return demo_policy(**values)
@@ -235,6 +236,25 @@ def heldout_cases(
             )
         )
     return cases
+
+
+def train_cases(
+    n: int = 3, *, provenance: str | None = "human_multi"
+) -> list[dict[str, Any]]:
+    """A small train split whose content is distinct from every held-out case."""
+    return [
+        case_doc(
+            f"tr{i:02d}",
+            "pass" if i % 2 else "fail",
+            provenance=provenance,
+            labels=[
+                ("rev-a", "pass" if i % 2 else "fail"),
+                ("rev-b", "pass" if i % 2 else "fail"),
+            ],
+            text=f"unrelated training sample number {i}",
+        )
+        for i in range(n)
+    ]
 
 
 def perfect_outcomes(

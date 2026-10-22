@@ -425,6 +425,17 @@
           ],
           "type": "object"
         },
+        "leakage_checked_against": {
+          "items": {
+            "enum": [
+              "train",
+              "calibration",
+              "heldout"
+            ]
+          },
+          "maxItems": 3,
+          "type": "array"
+        },
         "leakage_clean": {
           "type": "boolean"
         },
@@ -510,7 +521,8 @@
         "rubric",
         "rubric_matches_fingerprint",
         "leakage",
-        "leakage_clean"
+        "leakage_clean",
+        "leakage_checked_against"
       ],
       "type": "object"
     },
@@ -528,6 +540,11 @@
           "type": "string"
         },
         "dimension": {
+          "type": "string"
+        },
+        "engine_revision": {
+          "maxLength": 32,
+          "minLength": 1,
           "type": "string"
         },
         "implementation_version": {
@@ -608,7 +625,8 @@
         "configuration_id",
         "implementation_version",
         "behaviour_digest",
-        "model"
+        "model",
+        "engine_revision"
       ],
       "type": "object"
     },
@@ -740,6 +758,10 @@
           "minimum": 0,
           "type": "integer"
         },
+        "single_run_cases": {
+          "minimum": 0,
+          "type": "integer"
+        },
         "unstable": {
           "minimum": 0,
           "type": "integer"
@@ -760,7 +782,8 @@
         "unstable_rate_worst_case",
         "flip_kinds",
         "mean_pairwise_agreement",
-        "caveat"
+        "caveat",
+        "single_run_cases"
       ],
       "type": "object"
     },

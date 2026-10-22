@@ -13,7 +13,7 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
   provenance checks; calibration metrics with explicit undefined values, exact and Wilson intervals,
   coverage, abstention, F1, FPR/FNR (conditional and effective); repeatability and judge-disagreement analysis;
   a judge fingerprint derived from the bound evaluator; a caller-supplied calibration policy and a status
-  (`calibrated`, `uncalibrated`, `insufficient_reference_evidence`, `calibration_expired`, `incompatible`);
+  (`calibrated`, `uncalibrated`, `insufficient_reference_evidence`, `calibration_expired`, `incompatible`, plus `demonstration`, which is never admissible);
   deterministic drift indicators; JSON Schemas for the file formats. "Calibrated" means "meets the caller's
   policy on a named held-out dataset for this configuration at that time", never production accuracy.
   See [docs/p29-calibration](docs/p29-calibration/README.md).

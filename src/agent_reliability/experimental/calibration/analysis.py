@@ -35,10 +35,12 @@ def repeatability(
 
     Failed runs are excluded from the stability comparison but counted, and a
     worst-case rate treats every case that lost its comparison to failures as
-    unstable. Identical requests to a caching or deterministic provider are
-    trivially stable: stability is only informative if repetitions are independent.
+    unstable. Labelled cases with fewer than two runs are counted in
+    ``single_run_cases`` (the admission layer requires none). Identical requests to
+    a caching or deterministic provider are trivially stable: stability is only
+    informative if repetitions are independent.
     """
-    compared = unstable = excluded = 0
+    compared = unstable = excluded = single_run = 0
     pass_fail_flips = unknown_flips = 0
     agreements: list[float] = []
     repetitions = 0
@@ -48,6 +50,7 @@ def repeatability(
         runs = table.runs(case.case_id)
         repetitions = max(repetitions, len(runs))
         if len(runs) < 2:
+            single_run += 1  # stability unmeasured for this case
             continue
         usable = [r.outcome for r in runs if r.outcome.is_verdict]
         if len(usable) < 2:
@@ -70,6 +73,7 @@ def repeatability(
         "unstable": unstable,
         "unstable_rate": Proportion(unstable, compared).as_json(),
         "excluded_for_failures": excluded,
+        "single_run_cases": single_run,
         "unstable_rate_worst_case": Proportion(
             unstable + excluded, compared + excluded
         ).as_json(),

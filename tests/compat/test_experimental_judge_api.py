@@ -368,6 +368,7 @@ def test_coordinator_admission_hook_shapes_snapshot() -> None:
         "require_citations",
         "template_id",
         "template_digest",
+        "engine_revision",
     ]
 
 

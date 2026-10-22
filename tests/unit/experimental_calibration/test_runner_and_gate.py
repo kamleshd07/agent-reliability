@@ -49,6 +49,7 @@ from tests.fakes.p29_calibration import (
     load,
     perfect_outcomes,
     table,
+    train_cases,
 )
 from tests.fakes.p29_judge import HealthSink
 
@@ -64,6 +65,12 @@ def recorded(sink: HealthSink) -> list[Any]:
     from agent_reliability.ports.events import EvaluationRecorded
 
     return [e for e in sink.events if isinstance(e, EvaluationRecorded)]
+
+
+def build_unsigned(assessment):  # type: ignore[no-untyped-def]
+    document = assessment.document
+    document["integrity"].pop("hmac_sha256")
+    return type(assessment)(document)
 
 
 def sync_judge(script: list[Any], label: str = "local-a") -> SyncLLMJudge:
@@ -162,15 +169,21 @@ def test_the_async_runner_matches_the_sync_runner(tmp_path: Path) -> None:
 def test_end_to_end_offline_scripted_judge_to_status(tmp_path: Path) -> None:
     """Dataset -> scripted judge -> assessment -> policy -> status, no network."""
     docs = heldout_cases(provenance="human_multi", multi=True)
-    ds = load(tmp_path, {"heldout": docs}, provenance={"heldout": "human_multi"})
+    ds = load(
+        tmp_path,
+        {"heldout": docs, "train": train_cases()},
+        provenance={"heldout": "human_multi", "train": "human_multi"},
+    )
     cases = ds.cases(Split.HELDOUT)
     script = []
     for case in cases:  # three runs each, always the right verdict
         script += [FAIL if case.human_label == "fail" else PASS] * 3
     judge = sync_judge(script)
     t = collect_judgments(judge, MODEL, cases, repetitions=3)
-    a = build_assessment(ds, Split.HELDOUT, t, now=NOW - timedelta(days=1))
-    gate = CalibrationGate(judge, MODEL, a, human_policy(), clock=lambda: NOW)
+    a = build_assessment(ds, Split.HELDOUT, t, now=NOW - timedelta(days=1)).sign(KEY)
+    gate = CalibrationGate(
+        judge, MODEL, a, human_policy(), clock=lambda: NOW, hmac_key=KEY
+    )
     assert gate.decision().status is CalibrationStatus.CALIBRATED
     assert CANARY not in a.to_json()
 
@@ -181,15 +194,18 @@ def test_end_to_end_offline_scripted_judge_to_status(tmp_path: Path) -> None:
 def _calibrated_setup(tmp_path: Path) -> tuple[SyncLLMJudge, Any, Any]:
     ds = load(
         tmp_path,
-        {"heldout": heldout_cases(provenance="human_multi", multi=True)},
-        provenance={"heldout": "human_multi"},
+        {
+            "heldout": heldout_cases(provenance="human_multi", multi=True),
+            "train": train_cases(),
+        },
+        provenance={"heldout": "human_multi", "train": "human_multi"},
     )
     outcomes = {k: [v] * 3 for k, v in perfect_outcomes(ds).items()}
     judge = sync_judge([PASS, PASS, PASS, PASS])
     fp = JudgeFingerprint.for_evaluator(judge, MODEL)
     a = build_assessment(
         ds, Split.HELDOUT, table(outcomes, fp=fp), now=NOW - timedelta(days=1)
-    )
+    ).sign(KEY)
     return judge, a, ds
 
 
@@ -219,7 +235,9 @@ def test_a_calibrated_gate_lets_evidence_through_and_an_expired_one_stops_it(
 ) -> None:
     judge, assessment, ds = _calibrated_setup(tmp_path)
     clock = Clock()
-    gate = CalibrationGate(judge, MODEL, assessment, human_policy(), clock=clock)
+    gate = CalibrationGate(
+        judge, MODEL, assessment, human_policy(), clock=clock, hmac_key=KEY
+    )
     coordinator = JudgeCoordinator(
         [IndicatorBinding("answer-correctness", judge, admission=gate)]
     )
@@ -245,7 +263,7 @@ def test_a_gate_cannot_be_attached_to_a_different_judge(tmp_path: Path) -> None:
         [PASS], label="local-a"
     )  # identical configuration, other object
     gate_for_x = CalibrationGate(
-        judge_x, MODEL, assessment, human_policy(), clock=Clock()
+        judge_x, MODEL, assessment, human_policy(), clock=Clock(), hmac_key=KEY
     )
     with pytest.raises(ValueError, match="not bound"):
         IndicatorBinding("answer-correctness", judge_y, admission=gate_for_x)
@@ -256,7 +274,9 @@ def test_a_judge_with_other_behaviour_is_skipped_as_incompatible_not_admitted(
 ) -> None:
     _, assessment, ds = _calibrated_setup(tmp_path)
     changed = sync_judge([PASS], label="local-b")  # different configuration_id
-    gate = CalibrationGate(changed, MODEL, assessment, human_policy(), clock=Clock())
+    gate = CalibrationGate(
+        changed, MODEL, assessment, human_policy(), clock=Clock(), hmac_key=KEY
+    )
     assert gate.decision().status is CalibrationStatus.INCOMPATIBLE
     coordinator = JudgeCoordinator(
         [IndicatorBinding("answer-correctness", changed, admission=gate)]
@@ -273,7 +293,9 @@ def test_an_uncalibrated_judge_is_skipped_when_gated_and_counted_when_not(
 ) -> None:
     judge, _, ds = _calibrated_setup(tmp_path)
     request = ds.cases(Split.HELDOUT)[0].case.request()
-    gate = CalibrationGate(judge, MODEL, None, human_policy(), clock=Clock())
+    gate = CalibrationGate(
+        judge, MODEL, None, human_policy(), clock=Clock(), hmac_key=KEY
+    )
     gated = JudgeCoordinator(
         [IndicatorBinding("answer-correctness", judge, admission=gate)]
     )
@@ -293,11 +315,11 @@ def test_a_verified_integrity_policy_refuses_a_gate_without_a_key(
     with pytest.raises(ValueError, match="HMAC"):
         CalibrationGate(judge, MODEL, assessment, policy, clock=Clock())
     unsigned = CalibrationGate(
-        judge, MODEL, assessment, policy, clock=Clock(), hmac_key=KEY
+        judge, MODEL, build_unsigned(assessment), policy, clock=Clock(), hmac_key=KEY
     )
     assert unsigned.decision().status is CalibrationStatus.UNCALIBRATED
     signed = CalibrationGate(
-        judge, MODEL, assessment.sign(KEY), policy, clock=Clock(), hmac_key=KEY
+        judge, MODEL, assessment, policy, clock=Clock(), hmac_key=KEY
     )
     assert signed.decision().admissible
 
@@ -307,7 +329,12 @@ def test_a_naive_gate_clock_is_refused(tmp_path: Path) -> None:
 
     judge, assessment, _ = _calibrated_setup(tmp_path)
     gate = CalibrationGate(
-        judge, MODEL, assessment, human_policy(), clock=lambda: datetime(2026, 1, 1)
+        judge,
+        MODEL,
+        assessment,
+        human_policy(),
+        clock=lambda: datetime(2026, 1, 1),
+        hmac_key=KEY,
     )
     with pytest.raises(ValueError, match="aware"):
         gate.decision()

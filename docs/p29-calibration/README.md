@@ -68,6 +68,13 @@ binding = IndicatorBinding(
 `collect_judgments` is the only function that can reach a provider, and only through the judge you supply (its opt-in,
 budgets, limits and retry policy apply unchanged). Nothing here makes a paid call by itself.
 
+## Before a real calibration run
+
+Set a `JudgeBudget` and `JudgeLimits` on the judge **before** calibrating against a paid provider: `collect_judgments` makes
+`cases x repetitions` provider calls through the judge you supply, with that judge's own budget, timeouts and retry policy and nothing
+added. Obtain written authorisation for provider, dataset and spend first (`docs/P28_P29_CALIBRATION_PREPARATION.md` section 1). Nothing in this
+package spends money or sends data by itself.
+
 ## What is and is not guaranteed
 
 * An **ungated** judge (no `admission=`) behaves exactly as before: its outcomes are recorded and counted as ever, and are
@@ -75,5 +82,7 @@ budgets, limits and retry policy apply unchanged). Nothing here makes a paid cal
   Making an explicit choice mandatory is owner decision OD-S4-2.
 * A gated, inadmissible judge is **skipped**: no provider call, no evidence, no failure, run health unchanged. The platform
   sees absence (missing evidence), never PASS, and cannot yet see why (OD-S4-3).
+* A signed assessment proves **integrity since signing**: that the document was not altered by someone without the key. It does **not** prove
+  that a real judge run on that dataset produced it; whoever holds the key can sign any numbers. The key is the caller's to protect.
 * Silent provider-side model updates are undetectable unless you encode the model version in `model_label`
   ([PROVENANCE_SPEC.md](PROVENANCE_SPEC.md)).

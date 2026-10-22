@@ -33,7 +33,14 @@ from agent_reliability.experimental.judge.values import (
     JudgePolicy,
 )
 
-__all__ = ["JudgeBehaviour", "behaviour_of", "template_digest"]
+__all__ = ["ENGINE_REVISION", "JudgeBehaviour", "behaviour_of", "template_digest"]
+
+#: Code-owned revision of the judge's behaviour that the template digest cannot see:
+#: reply parsing, verdict mapping, repeat aggregation, repair and retry logic. Bump it
+#: whenever one of those changes behaviour (a test pins the source of the parser and
+#: mapping functions, so a change cannot go unnoticed). It is part of the calibration
+#: fingerprint, so an SDK patch release that changes behaviour invalidates calibrations.
+ENGINE_REVISION: Final = "1"
 
 _PROBE_NONCE: Final = "0123456789abcdef"
 
@@ -117,6 +124,7 @@ class JudgeBehaviour:
     require_citations: bool
     template_id: str
     template_digest: str
+    engine_revision: str
 
 
 def behaviour_of(
@@ -138,4 +146,5 @@ def behaviour_of(
         require_citations=rubric.require_citations,
         template_id=TEMPLATE_ID,
         template_digest=template_digest(),
+        engine_revision=ENGINE_REVISION,
     )

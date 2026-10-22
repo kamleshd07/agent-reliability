@@ -82,6 +82,12 @@ exclude = [
     "/docs/P29_WORKSPACE_BASELINE*",
     "/docs/evidence",
     "/docs/p30",
+    "/docs/p29-calibration/GAP_ASSESSMENT.md",
+    "/docs/p29-calibration/PLATFORM_PROPOSAL.md",
+    "/docs/p29-calibration/TRACEABILITY_MATRIX.md",
+    "/docs/p29-calibration/COMPATIBILITY_REPORT.md",
+    "/docs/p29-calibration/GO_NO_GO.md",
+    "/docs/p29-calibration/reviews",
 ]
 
 [tool.hatch.version]

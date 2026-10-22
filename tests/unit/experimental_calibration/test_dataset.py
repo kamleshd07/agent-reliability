@@ -336,3 +336,98 @@ def test_distinct_cases_are_clean(tmp_path: Path) -> None:
         tmp_path, {"train": heldout_cases(2, 2, 0), "heldout": [case_doc("only")]}
     )
     assert ds.leakage.clean and not ds.leakage.cross_split
+
+
+def test_unresolved_adjudication_needs_disagreeing_labels(tmp_path: Path) -> None:
+    unanimous = case_doc(
+        "a", "unknown", provenance="human_adjudicated",
+        labels=[("r1", "pass"), ("r2", "pass")], adjudication="unresolved",
+    )  # fmt: skip
+    with pytest.raises(DatasetError, match="disagreeing"):
+        load(
+            tmp_path / "x",
+            {"heldout": [unanimous]},
+            provenance={"heldout": "human_adjudicated"},
+        )
+
+
+def test_a_fifo_or_other_special_file_is_refused_without_blocking(
+    tmp_path: Path,
+) -> None:
+    path, _ = write_dataset(tmp_path, {"heldout": heldout_cases()})
+    (tmp_path / "heldout.jsonl").unlink()
+    os.mkfifo(tmp_path / "heldout.jsonl")  # a reader with no writer would block forever
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    with pytest.raises(DatasetError, match="regular"):
+        load_reference_dataset(path, expected_manifest_sha256=digest)
+
+
+def test_the_size_cap_applies_to_the_opened_descriptor_and_the_read_is_bounded(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path, digest = write_dataset(tmp_path, {"heldout": heldout_cases()})
+    reads: list[int] = []
+    real_read = os.read
+
+    def spy(fd: int, n: int) -> bytes:
+        reads.append(n)
+        return real_read(fd, n)
+
+    monkeypatch.setattr(dataset_module.os, "read", spy)
+    load_reference_dataset(path, expected_manifest_sha256=digest)
+    assert reads and max(reads) <= 65536  # chunked, never an unbounded read_bytes()
+
+
+@pytest.mark.parametrize(
+    "variant",
+    [
+        "{t}.",  # trailing punctuation
+        "{t}​",  # zero-width space
+        "{t}­",  # soft hyphen
+        "  {t}  ",  # padding
+        "{T}",  # case
+        "{t}﻿",  # BOM / zero-width no-break space
+    ],
+)
+def test_cheap_evasions_of_leakage_detection_are_caught(
+    tmp_path: Path, variant: str
+) -> None:
+    base = "Refunds take ninety days"
+    train = [case_doc("t1", text=base)]
+    heldout = [case_doc("h1", text=variant.format(t=base, T=base.upper()))]
+    ds = load(tmp_path, {"train": train, "heldout": heldout})
+    assert ds.leakage.cross_split and not ds.leakage.clean
+
+
+def test_homoglyph_substitution_is_a_documented_limit_not_detected(
+    tmp_path: Path,
+) -> None:
+    ds = load(
+        tmp_path,
+        {"train": [case_doc("t1", text="Refunds take ninety days")],
+         "heldout": [case_doc("h1", text="Refunds take nin\u0435ty days")]},
+    )  # fmt: skip
+    assert (
+        ds.leakage.clean
+    )  # "clean" means no *detected* overlap (see DATASET_SCHEMA.md)
+
+
+def test_the_third_reviewer_cannot_contradict_unanimous_labelers(
+    tmp_path: Path,
+) -> None:
+    doc = case_doc(
+        "a", "fail", provenance="human_adjudicated",
+        labels=[("r1", "pass"), ("r2", "pass")], adjudication="third_reviewer",
+    )  # fmt: skip
+    with pytest.raises(DatasetError, match="contradicts"):
+        load(tmp_path, {"heldout": [doc]}, provenance={"heldout": "human_adjudicated"})
+
+
+def test_trailing_newline_does_not_satisfy_an_anchored_schema_pattern() -> None:
+    from agent_reliability.experimental.calibration._schemas import check
+
+    doc = case_doc("ok")
+    check(doc, "reference-case")
+    doc["case_id"] = "ok\n"
+    with pytest.raises(ValueError):
+        check(doc, "reference-case")

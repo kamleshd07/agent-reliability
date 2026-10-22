@@ -50,8 +50,16 @@ class PolicyError(ValueError):
     """The policy is invalid or cannot be satisfied by its own size minima."""
 
 
+MAX_SIZE = 10**9
+
+
 def _is_number(value: object) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:  # an integer too large for a float
+        return False
 
 
 def _upper_at_zero(n: int) -> float:
@@ -96,11 +104,11 @@ class CalibrationPolicy:
     def __post_init__(self) -> None:
         for name in _POSITIVE_INTS:
             value = getattr(self, name)
-            if type(value) is not int or value < 1:
-                raise PolicyError(f"{name} must be a positive int")
+            if type(value) is not int or not 1 <= value <= MAX_SIZE:
+                raise PolicyError(f"{name} must be an int in 1..{MAX_SIZE}")
         if (
             type(self.max_adversarial_pass_on_fail) is not int
-            or self.max_adversarial_pass_on_fail < 0
+            or not 0 <= self.max_adversarial_pass_on_fail <= MAX_SIZE
         ):
             raise PolicyError("max_adversarial_pass_on_fail must be an int >= 0")
         for name in _RATE_CAPS:
@@ -134,6 +142,11 @@ class CalibrationPolicy:
         if LabelProvenance.SYNTHETIC in accepted and not self.demonstration_only:
             raise PolicyError(
                 "synthetic labels are accepted only by a demonstration_only policy"
+            )
+        if not self.demonstration_only and not self.require_verified_integrity:
+            raise PolicyError(
+                "a calibrating policy must require verified integrity: an unsigned "
+                "record can be forged by anyone who can write the file"
             )
         if not self.demonstration_only and not accepted <= _HUMAN:
             raise PolicyError("a calibrating policy accepts human provenance only")

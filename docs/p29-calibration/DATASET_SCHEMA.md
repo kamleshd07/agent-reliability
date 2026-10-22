@@ -44,7 +44,7 @@ Rules enforced at load (violations raise `DatasetError`; messages never contain 
 2. `human_single` needs at least one labeler entry; `human_multi` and `human_adjudicated` need two; `human_adjudicated` needs a method.
 3. Unanimous labels and no adjudication: `human_label` must equal them.
 4. Labelers disagree: an adjudication method is required. `majority` requires the strict majority label; `third_reviewer`
-   names an outside decision (the third label is not stored); `unresolved` requires `human_label = "unknown"`.
+   names an outside decision (the third label is not stored); `unresolved` requires `human_label = "unknown"` and at least two *disagreeing* labels.
 5. An `unresolved` case, and any `unknown` case, is **indeterminate**: excluded from accuracy and error rates, reported separately.
 6. **Derived provenance:** a split's provenance is the *weakest* case provenance; the declared `label_provenance` must equal it.
    One synthetic case makes a split `synthetic`. Provenance is an attestation by whoever wrote the file: it is made visible and
@@ -55,8 +55,12 @@ Rules enforced at load (violations raise `DatasetError`; messages never contain 
 * `train`: few-shot examples, prompt development. `calibration`: rubric/threshold tuning. `heldout`: the **only** split an
   assessment may use; fix and hash it before running, do not tune against it, and count attempts (`heldout_attempt`).
 * Leakage is reported as counts and `case_id`s only: duplicate ids within or across splits, identical canonical content, and
-  identical content after NFKC + case-folding + whitespace collapse. Near-duplicates, rubric text or few-shot examples copied from held-out
-  cases, and paraphrases are **not** detectable. Any leakage makes the status `insufficient_reference_evidence`.
+  identical content after NFKC + case-folding + whitespace collapse. The comparison form folds NFKC and case, drops format/control/combining characters and punctuation, collapses whitespace and ignores part order.
+  Homoglyph substitution (for example a Cyrillic letter), near-duplicates, rubric text or few-shot examples copied from held-out
+  cases, paraphrases and translations are **not** detectable: "clean" means *no detected* overlap. Any leakage makes the status `insufficient_reference_evidence`.
+* **Leakage is only checked against the other splits that are present.** A held-out-only dataset cannot show the absence of overlap with
+  training material, so its status is `insufficient_reference_evidence` (criterion `leakage_checked_against_other_splits`). Provide the
+  `train`/`calibration` splits (or accept that status).
 * Use **one example per source** (conversation, document): the intervals assume independent trials.
 
 ## Genuine human labelling (the process the framework supports)
