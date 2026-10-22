@@ -87,6 +87,8 @@ exclude = [
     "/docs/p29-calibration/TRACEABILITY_MATRIX.md",
     "/docs/p29-calibration/COMPATIBILITY_REPORT.md",
     "/docs/p29-calibration/GO_NO_GO.md",
+    "/docs/p29-calibration/OWNER_DECISIONS_S4.md",
+    "/docs/p29-calibration/FUTURE_CALIBRATION_PLAN.md",
     "/docs/p29-calibration/reviews",
 ]
 

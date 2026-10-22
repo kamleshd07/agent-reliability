@@ -36,6 +36,9 @@ Test paths are under `tests/`. "Brief" = the owner's Session 4 brief; AC = its a
 | 29 | Three independent reviews and a separate validator; reports unedited (brief 13) | `reviews/` | (review documents) | Done: all four reports in [reviews/](reviews/); decision in [GO_NO_GO.md](GO_NO_GO.md) |
 | 30 | Zero mandatory runtime dependencies; no stable wire change | `dependencies = []`; no stable file changed | `tests/compat/test_experimental_judge_api.py::test_core_dependencies_remain_empty...`; clean-install check | Done |
 | 31 | Performance and resource limits report | `PERFORMANCE.md`, `scripts/p29_calibration_benchmark.py` | `test_scaling.py` | Done |
+| 32 | Owner decisions OD-S4-1..6 recorded; policy identity recorded in decisions; ungated stays documented opt-in; no breaking change | [OWNER_DECISIONS_S4.md](OWNER_DECISIONS_S4.md), `policy.py`, `admission.py` | `test_admission.py::test_the_decision_records_the_policy_identity_and_configuration`, `::test_the_assessment_itself_is_independent_of_the_policy`, `test_s4_admission_hook.py` | Done (documentation; OD-S4-2/3/4 implementation deferred by decision) |
+| 33 | Design for machine-readable calibration provenance; observed model version; architecture principle | [PLATFORM_PROPOSAL.md](PLATFORM_PROPOSAL.md) | `test_docs.py` (links, no readiness claims) | Done (design only) |
+| 34 | Plan for real-world calibration (dataset ownership, labelling, disagreement, methodology, privacy, budgets) | [FUTURE_CALIBRATION_PLAN.md](FUTURE_CALIBRATION_PLAN.md) | `test_docs.py` | Done (plan only; nothing executed) |
 | - | Hosted workflows, human-review UI, automatic dataset collection, provider-backed benchmarking | not built | - | Deferred |
 | - | Carrying status to the platform | `PLATFORM_PROPOSAL.md` only | - | Deferred (OD-S4-3) |
 | - | Live decision-mix, failure-rate and error-rate drift statistics; approval attestation; CLI | not built | - | Deferred |

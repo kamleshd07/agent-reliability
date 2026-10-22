@@ -91,7 +91,8 @@ def test_internal_reports_are_excluded_from_the_sdist() -> None:
     excluded = set(project["tool"]["hatch"]["build"]["targets"]["sdist"]["exclude"])
     for internal in (
         "GAP_ASSESSMENT.md", "PLATFORM_PROPOSAL.md", "TRACEABILITY_MATRIX.md",
-        "COMPATIBILITY_REPORT.md", "GO_NO_GO.md",
+        "COMPATIBILITY_REPORT.md", "GO_NO_GO.md", "OWNER_DECISIONS_S4.md",
+        "FUTURE_CALIBRATION_PLAN.md",
     ):  # fmt: skip
         assert f"/docs/p29-calibration/{internal}" in excluded
     assert "/docs/p29-calibration/reviews" in excluded

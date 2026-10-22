@@ -18,9 +18,10 @@ time*, with label provenance an attestation.
 | [PROVENANCE_SPEC.md](PROVENANCE_SPEC.md) | judge fingerprint and what it can and cannot detect |
 | [SECURITY_AND_PRIVACY.md](SECURITY_AND_PRIVACY.md) | threat model, controls, limits of LLM-judging-LLM |
 | [PERFORMANCE.md](PERFORMANCE.md) | bounded local measurements and resource limits |
-| [PLATFORM_PROPOSAL.md](PLATFORM_PROPOSAL.md) | proposal only: conveying status to the platform |
+| [PLATFORM_PROPOSAL.md](PLATFORM_PROPOSAL.md) | design only: calibration provenance for the platform, observed model version, architecture principle |
 | [GAP_ASSESSMENT.md](GAP_ASSESSMENT.md) | what P29 already had, what was missing |
 | [COMPATIBILITY_REPORT.md](COMPATIBILITY_REPORT.md), [TRACEABILITY_MATRIX.md](TRACEABILITY_MATRIX.md) | compatibility evidence; requirement-to-test map |
+| [OWNER_DECISIONS_S4.md](OWNER_DECISIONS_S4.md), [FUTURE_CALIBRATION_PLAN.md](FUTURE_CALIBRATION_PLAN.md) | recorded owner decisions; plan for real-world calibration (not executed) |
 | [GO_NO_GO.md](GO_NO_GO.md), [reviews/](reviews/) | decision and the independent reports, unedited |
 
 ## Five-minute offline walkthrough

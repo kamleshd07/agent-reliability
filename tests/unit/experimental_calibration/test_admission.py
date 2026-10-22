@@ -640,3 +640,23 @@ def test_a_changed_engine_revision_makes_a_calibration_incompatible(
     changed = dataclasses.replace(fingerprint(), engine_revision="2")
     assert decide(a, fp=changed).status is S.INCOMPATIBLE
     assert "engine_revision" in a.fingerprint.diff(changed)
+
+
+def test_the_decision_records_the_policy_identity_and_configuration(
+    tmp_path: Path,
+) -> None:
+    policy = human_policy()
+    d = decide(assessed(human_dataset(tmp_path)), policy)
+    recorded = d.as_dict()["policy"]
+    assert recorded["policy_digest"] == policy.digest
+    assert recorded["policy"] == policy.as_dict()  # the full configuration, not a label
+    assert recorded["below_starting_point"] == list(policy.below_starting_point())
+    other = decide(assessed(human_dataset(tmp_path / "o")), human_policy(max_fnr=0.4))
+    assert other.as_dict()["policy"]["policy_digest"] != recorded["policy_digest"]
+
+
+def test_the_assessment_itself_is_independent_of_the_policy(tmp_path: Path) -> None:
+    ds = human_dataset(tmp_path)
+    assert (
+        "policy" not in assessed(ds).document
+    )  # one measurement, many possible policies
