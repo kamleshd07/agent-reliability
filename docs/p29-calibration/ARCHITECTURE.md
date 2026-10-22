@@ -1,232 +1,282 @@
-# P29 judge calibration and evaluation trustworthiness: architecture (v1, for review)
+# P29 judge calibration and evaluation trustworthiness: architecture (v2)
 
-Status: **DRAFT for independent architecture review. No code beyond this document has been written.** Scope, constraints and the
-existing/missing split are in [GAP_ASSESSMENT.md](GAP_ASSESSMENT.md). Repository: the open-source SDK
-(`agent-reliability`), stdlib only. The proprietary platform is **not** changed.
+Status: **v2, revised after the independent architecture review** (`S4_ARCHITECTURE_REVIEW.md`: 8 HIGH, 10 MEDIUM; every item is dispositioned in
+section 13). Implementation starts only after the reviewer re-checks this version. Scope, constraints and existing/missing split:
+[GAP_ASSESSMENT.md](GAP_ASSESSMENT.md). Repository: the open-source SDK, stdlib only. The platform is **not** changed.
 
 ## 1. Goals and non-goals
 
-Answer, reproducibly and offline: how accurate is an LLM judge against human-reviewed labels, how repeatable, how does it disagree with
-other judge configurations, when does a calibration stop applying, and may its outcomes feed reliability SLO evidence.
+Answer, reproducibly and offline: how accurate a judge configuration is against labelled examples, how repeatable, how it disagrees with another
+configuration, when a calibration stops applying, and whether its outcomes may feed reliability SLO evidence.
 
-Non-goals: hosted workflows, review UI, dataset collection, provider-backed benchmarking, paid calls, platform changes, changes to
-`EvaluatorIdentity`, the P28 wire or measurement health, retraining, provider switching, any claim that a calibrated judge is accurate in
-production.
+Non-goals: hosted workflows, review UI, dataset collection, provider-backed benchmarking, paid calls, platform changes, changes to `EvaluatorIdentity`,
+the P28 wire or measurement health, retraining, provider switching, a CLI, statistical drift tests on live decisions, approval workflows, and any claim
+that a calibrated judge is accurate in production.
 
 ## 2. Placement and layering
 
-New Experimental package **`agent_reliability.experimental.calibration`** (stdlib only, no network, no environment reads, no I/O except
-reading local dataset files the caller names). It depends on `experimental.judge` (rubric fingerprint, `TEMPLATE_ID`, `wilson_interval`,
-`CalibrationCase`, the strict JSON loader, `_jsonschema.validate`) and on nothing else. The existing judge package, its `__all__`, schemas
-and fixtures are unchanged, so its compat snapshot stays byte-identical. Existing `CalibrationReport` (`calibration-report/1`) remains the
-way to *run* a judge over cases; the new package analyses **judgments**, which may come from that run or from a recorded file.
+* New Experimental package **`agent_reliability.experimental.calibration`** (stdlib only, no network, no environment reads; the only I/O is reading local
+  dataset files whose manifest the caller names, with byte caps). It depends on `experimental.judge` **public names only** (`CalibrationCase`, `Rubric`,
+  `LLMJudge`/`SyncLLMJudge`, `JudgeLimits`, `TEMPLATE_ID`, `wilson_interval`, `compose_*`); it ships its own small strict-JSON reader and validators rather than
+  reaching into underscore-private helpers.
+* **One additive change to the guarded judge package** (stated honestly; the earlier draft contradicted itself): a *calibration-agnostic admission hook* in
+  `coordinator.py` (section 8). It is additive, defaults to today's behaviour, and the judge compat snapshots gain explicit entries for the new names.
+  Everything else in `experimental.judge` (rubrics, schemas, prompt `jp1`, `calibration-case/1`, `calibration-report/1`, fixtures) is untouched.
+* The existing `run_calibration` / `CalibrationReport` stay as they are. The new package has its **own runner** (`collect_judgments`) that returns the
+  per-run judgment table, because `run_calibration` keeps only the first run's decision per case.
 
 ```mermaid
 flowchart LR
-  D[Dataset manifest + split files\nreference-dataset/1] --> L[Loader + leakage check]
-  J[Judge run or recorded judgments\nJudgmentTable] --> M[Metrics engine]
-  L --> M
-  M --> R[Repeatability + disagreement]
-  F[JudgeFingerprint] --> A[Assessment\ncalibration-assessment/1]
+  D[Dataset manifest + split files] --> L[Loader: bounds, hashes, provenance, leakage]
+  L --> M[Metrics engine]
+  C[collect_judgments / recorded table] --> M
+  M --> R[Repeatability + compare_judges]
+  F[JudgeFingerprint from the bound evaluator] --> A[CalibrationAssessment]
   M --> A
   R --> A
-  P[CalibrationPolicy] --> E[Eligibility status]
-  A --> E
-  E --> G{Opt-in gate}
-  G -- eligible --> S[normal evidence path unchanged]
-  G -- ineligible --> K[evaluation skipped: missing evidence, not PASS]
-  A --> X[Drift indicators]
+  P[CalibrationPolicy] --> S[assess_admission: status]
+  A --> S
+  S --> G{Admission hook, opt-in}
+  G -- admissible --> N[unchanged evidence path]
+  G -- not admissible --> K[judge not called: no evidence, counted and explained]
 ```
 
-## 3. Data model (all immutable, content-free except the dataset files)
+## 3. Data model (immutable; artefacts content-free)
 
-**Dataset manifest** `gentlity.reference-dataset/1` (JSON): `dataset_id`, `dataset_version` (opaque, printable), `created_at` (UTC),
-`license` (SPDX id or short text), `description`, `rubric` {`rubric_id`, `rubric_version`}, `label_provenance` of the dataset
-(`synthetic` | `human_single` | `human_multi` | `human_adjudicated`), `splits`: map `train` | `calibration` | `heldout` to
-{`file`, `sha256`, `case_count`}. Limits: at most 3 splits, 100 000 cases per split, 1 MiB per case, files read as bytes and hashed before parsing.
+**Dataset manifest** `gentlity.reference-dataset/1` (JSON): `dataset_id`, `dataset_version`, `created_at` (aware UTC), `license`, `description`, `rubric`
+{`rubric_id`, `rubric_version`, `dimension`}, `label_provenance` (declared; must equal the derived value, below) and `splits`: any of `train`, `calibration`,
+`heldout` -> {`file`, `sha256`, `case_count`}. Hard limits checked **before** reading: 8 MiB per split file, 25 MiB per dataset, 20 000 cases per split,
+64 KiB per line, nesting depth 8. Split files must lie in the manifest's directory (no `..`, no absolute paths, symlinks refused).
 
-**Case** `gentlity.reference-case/1` = `calibration-case/1` plus optional `adjudication` {`method`: `none` | `majority` | `third_reviewer` | `unresolved`}
-and `label_provenance`. `reference-case/1` converts to the existing `CalibrationCase` so the existing harness can run it. Per-labeler
-`labels` use role identifiers, not personal data.
+**Case** `gentlity.reference-case/1`: `calibration-case/1` plus optional `adjudication` {`method`: `none` | `majority` | `third_reviewer` | `unresolved`} and
+`label_provenance` (`synthetic` | `human_single` | `human_multi` | `human_adjudicated`). It converts to `CalibrationCase`. Label rules enforced at load:
+labels list present => labeler ids stable role ids (not personal names); if all labels agree and adjudication is `none`, `human_label` must equal them; if
+they disagree, adjudication must be `majority`/`third_reviewer` with `human_label` set, otherwise the case is **`unresolved`** (ground-truth ambiguous, whatever
+`human_label` says). `human_single`/`human_multi`/`human_adjudicated` claim at least 1/2/2 labeler entries.
 
-**Honesty rule.** `synthetic` data can exercise the machinery and can never satisfy a policy that requires human labels; the report states
-the provenance in every artefact. `unresolved` adjudication marks ground-truth ambiguity.
+**Derived provenance.** The dataset's provenance is the **weakest** of its cases (order synthetic < human_single < human_multi < human_adjudicated). A declared
+value that differs fails the load. The assessment reports counts per provenance, the number of cases with >= 2 labeler entries, and the number adjudicated.
+Provenance remains an **attestation by whoever wrote the file**; the code can make it visible and consistent, not true. Every status prints it as `attested`.
 
-**Judgment** (one row per example x judge fingerprint x run index): `outcome` in {`PASS`, `FAIL`, `UNKNOWN`, `FAILURE`, `MISSING`}, optional
-`failure_class` (the existing closed class names), optional declared `confidence_level` (existing categorical level), no text. `FAILURE` means
-the evaluation ran and produced no verdict (provider error, timeout, malformed output, budget, overload). `MISSING` means no judgment exists for
-an example that should have one. They are different conditions and are never merged.
+**Judgment** (example x fingerprint digest x run index): `outcome` in {PASS, FAIL, UNKNOWN, FAILURE, MISSING}, optional `failure_class` (closed names from
+`FAILURE_CLASS_NAMES`), optional declared `confidence_level`. `FAILURE` = the evaluation ran and produced no verdict; `MISSING` = no judgment exists for an
+example that should have one. Never merged.
 
-**JudgeFingerprint** (canonical JSON, sha-256 `digest`): `provider`, `model_id`, `model_version` (nullable, never guessed), `implementation_version`
-(SDK version string), `rubric_id`, `rubric_version`, `rubric_fingerprint`, `template_id`, `template_digest` (sha-256 of the golden prompt fixture
-bytes for that `template_id`, so a template edit that forgot to change the id is still visible), `configuration_id` (the existing composed id:
-min confidence, repeats, citations). All components use the existing identity intersection grammar. Two fingerprints are equivalent **iff the
-digests are equal**; display names and `model_label` alone never imply equivalence. A component-wise `diff()` names what changed. Raw prompts are
-never captured; only identifiers and digests.
+**JudgeFingerprint.** Derived **from the bound evaluator**, not typed in by the caller: `rubric_id`, `rubric_version`, `rubric_fingerprint`, `dimension`,
+`template_id`, `template_digest`, `limits_digest`, `capture_reason`, `configuration_id` (existing composed id), plus the **caller-declared**
+`ModelDeclaration` {`provider`, `model_id`, `model_version` or null} which is a separate, always-displayed part of the fingerprint and of every decision.
+* `template_digest` = sha256 of the prompt rendered by the real builder for a fixed internal probe rubric and fixed nonce, plus the parser/engine constants
+  that affect behaviour (output schema id, requested temperature, repair prompt text). A unit test pins it to `tests/fixtures/p29/prompt_golden_jp1.json`, so a
+  template edit that forgot to bump `template_id` fails CI. (Fixtures are not shipped in the wheel; the runtime digest does not read them.)
+* `limits_digest` covers `JudgeLimits` (input/output bounds, attempts, repair attempts) because they change failure and abstention behaviour.
+* `behaviour_digest` = sha256 over the canonical JSON of all of the above **except** `implementation_version` and the model declaration's display fields;
+  **equivalence = equal `behaviour_digest` and equal `ModelDeclaration`**. `implementation_version` (SDK version) is recorded and shown in `diff()` but does not
+  force re-calibration on a patch release.
+* **Stated limitation (H-2).** Provider, model id and version are *declarations*. The judge never observes the model that answered (no model metadata in
+  `ProviderReply`), so a **silent provider-side model update is undetectable** by this design except through (i) expiry, (ii) re-calibration, and (iii) the
+  existing Session 2 methodology check **only if the caller encodes the model version in `model_label`** (which reaches `configuration_id`). We recommend
+  that. An additive `ProviderReply.model_version_observed` would close part of the gap but touches the judge API: owner decision OD-S4-4, not implemented.
 
 ## 4. Statistical definitions (normative)
 
-Notation. Ground truth `h` in {pass, fail, unknown} is the dataset's `human_label` (adjudicated). The **positive class is `fail`** (a defect the
-judge should flag). The **eligible** set `E` is the examples with `h` in {pass, fail} in the evaluated split. Examples with `h = unknown` are
-ground-truth-ambiguous: they are excluded from accuracy/precision/recall/FPR/FNR and reported separately (section 4.5). Per example the judge
-outcome `o` (first run, or the run named by the caller) is one of PASS, FAIL, UNKNOWN, FAILURE, MISSING.
+Notation. Ground truth `h` in {pass, fail, unknown}. The **positive class is `fail`**. The **labelled evaluation set** `E` (not "eligible", to avoid the
+SLO term) = examples of the evaluated split with `h` in {pass, fail} **and** not `unresolved`. Examples with `h = unknown` or `unresolved` form the
+**ambiguous set** `A`. Per example the judge outcome `o` is from **run index 0** of the fingerprint under assessment (fixed, recorded as
+`run_index_used`, with `runs_available`); no run selection is possible.
 
-4.1 **Counts.** Over `E`: `judged` = outcomes in {PASS, FAIL, UNKNOWN}; `answered` = outcomes in {PASS, FAIL}; `abstained` = UNKNOWN; `failed` = FAILURE;
-`missing` = MISSING. `TP` = (h fail, o FAIL); `FN` = (h fail, o PASS); `FP` = (h pass, o FAIL); `TN` = (h pass, o PASS). `fail_abstained` = (h fail, o UNKNOWN);
-`pass_abstained` = (h pass, o UNKNOWN). `support_fail` / `support_pass` = counts of `h` in `E` (all outcomes). Identity: `answered = TP+FN+FP+TN`.
+4.1 **Counts** (over `E`; these partition `|E|`): `answered = TP+FN+FP+TN`, `abstained` (UNKNOWN), `failed` (FAILURE), `missing` (MISSING); with
+`TP` = (h fail, FAIL), `FN` = (fail, PASS), `FP` = (pass, FAIL), `TN` = (pass, PASS); `support_fail`, `support_pass` = class sizes in `E`;
+`fail_abstained`, `fail_failed`, `fail_missing` and the same for `pass`. `judged = answered + abstained`.
 
-4.2 **Coverage and abstention.** `coverage = judged / |E|` (denominator is every eligible example, including FAILURE and MISSING, so missing
-evidence lowers coverage and cannot be hidden). `answer_rate = answered / judged`. `abstention_rate = abstained / judged`. `failure_rate = failed / |E|`.
-`missing_rate = missing / |E|`. These four plus `answered` partition `|E|`.
+4.2 **Rates and denominators** (the rates do **not** partition; each states its denominator):
 
-4.3 **Error and quality metrics (conditional on answered unless named otherwise).**
-`accuracy = (TP+TN) / answered`; `accuracy_end_to_end = (TP+TN) / judged` (abstention counts as not correct);
-`precision_fail = TP/(TP+FP)`; `recall_fail = TP/(TP+FN)`; `precision_pass = TN/(TN+FN)`; `recall_pass = TN/(TN+FP)`;
-`f1_class = 2PR/(P+R)`; `fpr = FP/(FP+TN)`; `fnr = FN/(FN+TP)` (note `fnr = 1 - recall_fail`);
-abstention-inclusive: `miss_rate_fail = (FN + fail_abstained)/support_fail_judged` and `false_alarm_rate = FP / (pass judged)` where "judged" restricts to
-judged examples of that class. Conditional metrics describe the judge **when it commits**; abstention-inclusive metrics describe the judge as a
-**filter**. Both are reported; a policy must name which it uses. The library never selects one silently.
+| Rate | Numerator | Denominator | Meaning |
+|---|---|---|---|
+| `verdict_rate` | judged | \|E\| | the judge returned PASS/FAIL/UNKNOWN |
+| `committed_coverage` | answered | \|E\| | the judge committed to PASS/FAIL (an always-UNKNOWN judge scores 0) |
+| `abstention_rate` | abstained | judged | UNKNOWN share of verdicts |
+| `failure_rate` | failed | \|E\| | evaluation failure (provider/format/budget/overload) |
+| `missing_rate` | missing | \|E\| | no judgment at all |
+| `accuracy_conditional` | TP+TN | answered | correct when committing |
+| `accuracy_effective` | TP+TN | \|E\| | correct, counting abstention/failure/missing as not correct |
+| `fnr_conditional` | FN | TP+FN | defects the judge passed, among defects it committed on (`= 1 - recall_fail`) |
+| `fnr_effective` | support_fail - TP | support_fail | defects **not flagged FAIL** (passed, abstained, failed or missing) |
+| `fpr_conditional` | FP | FP+TN | false alarms among good runs it committed on |
+| `fpr_effective` | FP | support_pass | false alarms over all good runs |
+| `precision_fail` / `precision_pass` | TP / TN | TP+FP / TN+FN | descriptive, prevalence-dependent |
+| `recall_fail` / `recall_pass` | TP / TN | TP+FN / TN+FP | descriptive |
+| `f1_fail` / `f1_pass` | 2TP / 2TN | 2TP+FP+FN / 2TN+FN+FP | descriptive; TP=0 with errors is **0**, not undefined; ignores the other cell; no interval; not a policy input |
 
-4.4 **Undefined values.** Any ratio with a zero denominator, any F1 with undefined or zero-sum P+R, and kappa with expected agreement 1 return
-`Undefined(reason)` with `reason` in {`zero_denominator`, `single_class`, `no_judgments`, `insufficient_samples`}; JSON renders
-`{"value": null, "undefined_reason": "..."}`. There is no silent 0 or 1, no NaN, no exception. **Intervals:** every proportion reports its numerator,
-denominator and the Wilson 95% interval (existing `wilson_interval`); F1 and kappa carry no interval (stated). **Sufficiency** is not decided by the
-metric layer; it is a policy criterion (section 6). A dataset smaller than the caller's `min_examples` still reports metrics with their wide intervals,
-flagged `below_policy_minimum`.
+Naming rule: suffix `_conditional` = over `answered` of that class; `_effective` = over all `E` examples of the class. **`fnr_effective` is the SLO-relevant
+miss rate**: reliability drops UNKNOWN (`IndicatorCoverage` / SLI), so an abstained defect inflates reliability exactly like a false PASS. It is conservative
+under either SLI UNKNOWN policy; a policy using `_conditional` is only valid where abstentions are acceptable and must say so. Precision and accuracy depend on
+class prevalence; policies use the prevalence-free FNR/FPR. Metrics are also reported **per difficulty stratum** (`clear`, `ambiguous`, `borderline`,
+`adversarial`) and pooled; the pooled headline excludes `borderline` and `adversarial` exactly as the existing report does, and says so.
 
-4.5 **Ground-truth-ambiguous examples** (`h = unknown`, or adjudication `unresolved`): reported as `ambiguous_support`, `ambiguous_decisive_rate`
-(judge committed PASS/FAIL where people could not decide: "over-confidence"), and `ambiguous_abstention_rate`. They never enter accuracy.
+4.3 **Undefined values.** A ratio with a zero denominator, or a statistic that is not computable, is `Undefined(reason)` with reason in {`zero_denominator`,
+`single_class`, `no_judgments`}. JSON: `{"value": null, "undefined_reason": "..."}`; never 0, 1, NaN or an exception. Every proportion carries numerator,
+denominator, the **Wilson 95% interval** (existing convention, for display) and the **Clopper-Pearson 95% interval** (exact; used by policy). Neither is
+rounded before a policy comparison; reported values are rounded to 6 digits for rendering only. **Independence assumption:** both intervals treat examples as
+independent trials; examples from one conversation or source violate it, so datasets should contain one example per source cluster (documented; not
+checkable by the library).
 
-4.6 **Agreement is not correctness.** Judge-vs-judge and judge-vs-human agreement use raw agreement and Cohen's kappa (existing definition;
-kappa undefined at expected agreement 1). Comparison reports always carry both judges' correctness against `h` and a `shared_errors` count (both
-decisive, equal, and both wrong), so two judges agreeing is never presented as evidence they are right.
+4.4 **Ambiguous set `A`** is reported, never mixed into 4.2: `ambiguous_fraction = |A| / (|E|+|A|)`, `commit_rate_on_ambiguous = answered_on_A / |A|`
+(informational: human indecision is not truth, so a commit is not automatically an error), `abstention_rate_on_ambiguous`. Excluding `A` flatters accuracy
+when much of the hard data is ambiguous; therefore `ambiguous_fraction` is a policy criterion (`max_ambiguous_fraction`).
 
-4.7 **Inter-labeler agreement.** Over examples with at least two distinct labeler entries: raw agreement and Cohen's kappa between the first two
-labelers (generalisation to more labelers is out of scope and documented), with the count of examples ignored for having a single label. Judge
-metrics are flagged `uninterpretable_labels` when inter-labeler kappa is below a policy floor (default none; a caller choice).
+4.5 **Agreement is not correctness.** Judge-vs-human and judge-vs-judge agreement report raw agreement and Cohen's kappa over the explicit category set
+{PASS, FAIL, UNKNOWN} on judged pairs (kappa `Undefined(single_class)` when expected agreement is 1). Comparison reports always include each judge's correctness and
+`shared_errors` (both committed, equal, both wrong).
 
-4.8 **Repeatability.** For examples with at least two runs of the **same fingerprint digest**: `unstable` if the set of outcomes in {PASS, FAIL, UNKNOWN}
-across runs has more than one element; `run_failed` if any run is FAILURE (counted separately and excluded from the stability numerator and
-denominator); `pairwise_agreement` = mean over example of (agreeing run pairs / run pairs) on non-failed runs. Reported as counts, `unstable_rate`
-with Wilson interval, plus `flip_kinds`: pass<->fail flips vs flips involving UNKNOWN. Runs of different fingerprints are never pooled.
+4.6 **Inter-labeler agreement** is deliberately simple: over cases with >= 2 labeler entries, `mean_pairwise_agreement` (mean over cases of the fraction of
+agreeing labeler pairs) and the count of such cases; kappa is not computed because it requires a fixed rater pair. A policy may set `min_inter_labeler_agreement`.
 
-4.9 **Disagreement taxonomy** (`compare_judges(a, b)`). Each example gets exactly one category by the ordered rule: `missing` (either MISSING) >
-`evaluation_failure` (either FAILURE) > `ambiguous_ground_truth` (h unknown/unresolved) > `judgment_disagreement` (one PASS, other FAIL) >
-`abstention_mismatch` (one UNKNOWN, the other decisive) > `agreement` (same outcome). Counts are reported for every category and **no combined
-"disagreement rate" is computed**; `judgment_disagreement_rate = judgment_disagreement / (examples with both decisive and determinate truth)` is
-stated with its own denominator. Fingerprints must differ or the run indices must differ; comparing a fingerprint against itself is rejected.
+4.7 **Repeatability** (examples with >= 2 runs of the **same behaviour digest**): among examples with >= 2 non-FAILURE runs, `unstable` = more than one distinct
+outcome in {PASS, FAIL, UNKNOWN}; report `n`, `unstable`, rate with intervals, flip kinds (pass<->fail vs involving UNKNOWN) and `mean_pairwise_agreement`.
+`excluded_for_failures` (examples with < 2 usable runs because of failures) is reported, and `unstable_rate_worst_case` counts every excluded example as unstable
+(its Clopper-Pearson upper bound is what a policy uses). Record `repetitions` and the caveat that identical requests to a caching or deterministic provider are
+trivially stable, so stability is only informative if repetitions are independent calls.
 
-4.10 **Confidence.** Only the categorical level the judge already declares is summarised (accuracy per level, with counts). No probability,
-Brier score, ECE or reliability diagram is produced, because categorical judgments do not carry calibrated probabilities; the architecture
-states this limitation and a test asserts the absence.
+4.8 **Disagreement taxonomy** (`compare_judges(a, b)`; requires different behaviour digests or model declarations, otherwise use repeatability). Each example gets
+exactly one category by the ordered rule: `missing` > `evaluation_failure` > `ambiguous_ground_truth` > `judgment_disagreement` (PASS vs FAIL) >
+`abstention_mismatch` (one UNKNOWN, one committed) > `both_abstain` > `agreement` (same PASS/FAIL). Counts per category are reported; **no combined
+disagreement rate**. Rates with their own denominators: `judgment_disagreement_rate` over examples where both committed and truth is determinate;
+`abstention_mismatch_rate` over examples where both returned a verdict and truth is determinate.
+
+4.9 **Confidence.** Only the categorical level the judge declares is summarised (accuracy and counts per level). No probability, Brier score, ECE or
+reliability diagram is produced; a test asserts their absence.
 
 ## 5. Calibration assessment (`gentlity.calibration-assessment/1`)
 
-Content-free JSON, deterministic (sorted keys, injected clock, canonical float rendering by rounding to 6 digits as in report/1): `assessment_version`,
-`created_at`, `fingerprint` (components + digest), dataset {id, version, manifest sha-256, split, case_count, label_provenance, created_at}, split
-discipline result (leakage findings), counts and metrics (4.1-4.5), repeatability, optional inter-labeler agreement, policy (verbatim), status and
-reasons (section 6), and an `integrity` digest (sha-256 over the canonical document without that member). An assessment may only be produced from the
-**held-out** split; assessing `train` or `calibration` raises (those splits tune prompts/rubrics/thresholds and would inflate every metric).
+Content-free, deterministic JSON (sorted keys, injected aware-UTC clock): `fingerprint` (all components, `behaviour_digest`, model declaration), `dataset`
+{id, version, manifest sha-256, split, case_count, provenance counts, derived provenance, `attested`: true}, split discipline findings, all counts/metrics of 4.x,
+repeatability, `run_index_used`, `runs_available`, `heldout_attempt` (caller-supplied attempt number on this held-out set, because trying many fingerprints
+against one held-out set is uncontrolled multiple testing), `created_at`, and an `integrity` member: a plain sha-256 over the canonical document, plus an
+**optional HMAC-SHA256** (`sign(key)` / `verify(key)`, stdlib `hmac`) that is the only forgery-resistant form; an unsigned or unverified assessment is labelled
+`integrity: unverified` in every decision. Only the **held-out** split may be assessed (train/calibration tune prompts, rubrics and thresholds and would inflate
+every metric); assessing requires `expected_manifest_sha256` from the caller so the held-out data was pinned **before** running. The loader refuses a dataset
+with cross-split leakage.
 
-**Split leakage.** Within and across splits the loader reports: duplicate `case_id`; identical `content_digest` (sha-256 of the canonical role-tagged
-parts); and equal `normalized_digest` (NFKC, case-folded, whitespace-collapsed text). Any cross-split finding makes the dataset `leaky`; assessment
-refuses a leaky dataset. Near-duplicate detection beyond normalisation is out of scope and documented.
+**Leakage** is reported with **counts and `case_id`s only** (no digests, which are dictionary-reversible for short content): duplicate `case_id` within/across
+splits; identical canonical content; identical content after NFKC + case-fold + whitespace collapse. Near-duplicate and rubric/few-shot copying from held-out
+cases are not detectable (documented).
 
 ## 6. Calibration policy and status
 
-`CalibrationPolicy` is a frozen dataclass whose **every threshold has no default** (OD-S4-1): `min_examples`, `min_per_class`, `min_coverage`,
-`max_abstention_rate`, `max_fnr_upper`, `max_fpr_upper`, `max_unstable_rate_upper`, `min_inter_labeler_kappa` (nullable = not required),
-`validity_days`, `max_dataset_age_days`, `accepted_label_provenance` (set; `synthetic` is rejected at construction for any policy not explicitly
-flagged `allow_synthetic_for_demonstration=True`, and such a policy can only yield the status `demonstration`, never `calibrated`),
-`rate_basis` (`conditional` | `abstention_inclusive`), `require_approval`. All rate criteria compare the **Wilson bound** (upper for error rates,
-lower for coverage), not the point estimate. `CalibrationPolicy.starting_point()` returns a documented preset (min_examples 200, min_per_class 50,
-coverage lower bound 0.90, abstention <= 0.20, FNR upper <= 0.10, FPR upper <= 0.15, unstable upper <= 0.10, kappa floor 0.60, validity 90 days,
-dataset age 365 days, human-adjudicated only, approval required). It is labelled in code and docs as a starting point that makes no claim of safety
-and must be reviewed against the customer's risk (it restates the proposals of `P28_P29_CALIBRATION_PREPARATION.md` section 10 more conservatively).
+`CalibrationPolicy` is a frozen dataclass where **every field is required (no defaults)** (OD-S4-1): `min_examples`, `min_per_class`, `min_adversarial_fail`,
+`min_committed_coverage`, `max_abstention_rate`, `max_failure_rate`, `max_missing_rate`, `max_fnr`, `fn_basis` (`conditional`|`effective`), `max_fpr`,
+`fp_basis`, `max_adversarial_pass_on_fail` (count, normally 0), `max_unstable_rate`, `min_repeat_cases`, `max_ambiguous_fraction`,
+`min_inter_labeler_agreement` (nullable), `accepted_label_provenance` (set), `min_human_fraction`, `min_multi_labeled_fraction`, `validity_days`,
+`max_dataset_age_days`, `demonstration_only` (bool). `CalibrationPolicy.starting_point()` is an explicit, caller-invoked preset:
+min_examples 400, min_per_class 150, min_adversarial_fail 30, committed coverage >= 0.80, abstention <= 0.20, failure <= 0.02, missing <= 0.02,
+`max_fnr` 0.05 (effective), `max_fpr` 0.10 (conditional), adversarial FAIL-case passes = 0, unstable <= 0.05 over >= 150 repeat cases, ambiguous fraction
+<= 0.20, inter-labeler agreement >= 0.80, accepted provenance {human_multi, human_adjudicated}, human fraction 1.0, multi-labelled fraction >= 0.5,
+validity 90 days, dataset age 365 days. These are the proposals of `P28_P29_CALIBRATION_PREPARATION.md` section 10 made **sample-size-coherent**
+(an upper bound of 0.05 needs about 73 error-free cases; 150 allows two errors) - they are not safer than that document and make no safety claim.
+**Coherence check:** construction rejects a policy whose `min_per_class` (or `min_repeat_cases`) cannot satisfy a rate bound even with zero errors (computed
+with the exact bound), and rejects non-positive sizes, rates outside (0,1], and aware-UTC violations. Every decision prints the full policy summary and a
+`policy_below_starting_point` flag (not a block, so D10 is respected).
 
-**Status** (ordered evaluation; the first applicable status is returned, and all failed criteria are listed as reasons):
+**Criterion test (three-way).** For an upper-bound criterion (rate <= limit) using the **Clopper-Pearson** bounds on unrounded counts: `met` if upper <= limit;
+`violated` if lower > limit; else `inconclusive`. For a lower-bound criterion (rate >= min): `met` if lower >= min; `violated` if upper < min; else
+`inconclusive`. Size/provenance/leakage criteria are `met`/`violated`.
 
-1. `uncalibrated` - no assessment exists, its integrity digest fails, or it is not from the held-out split.
-2. `incompatible` - the current fingerprint digest differs from the assessed fingerprint digest (reasons name the differing components).
-3. `insufficient_reference_evidence` - dataset too small, a class below `min_per_class`, coverage lower bound below minimum, provenance not accepted, leaky
-   dataset, or inter-labeler kappa below floor: the metrics cannot be trusted either way.
-4. `uncalibrated` (metrics measured and failing) - an error/abstention/instability bound exceeds the policy; the reasons list the exceeded criteria.
-5. `calibration_expired` - metrics pass but `now - created_at > validity_days` or the dataset is older than `max_dataset_age_days`.
-6. `pending_approval` - all criteria pass but `require_approval` is set and no approval attestation matching the assessment digest is recorded. **Not eligible.**
-7. `calibrated` - all criteria pass, current, compatible, approved if required. Meaning: *meets the caller's policy on the named held-out dataset for
-   exactly this fingerprint at that time.* It is not a statement about production accuracy.
+**Status** (first applicable; every criterion verdict is listed in `reasons`):
+1. `uncalibrated` - no assessment; integrity digest mismatch; not the held-out split; `created_at` more than 60 s in the future; or any **measured** rate
+   criterion is `violated`.
+2. `incompatible` - the current fingerprint's `behaviour_digest` or model declaration differs from the assessed one, or the rubric id/version/dimension differs
+   from the dataset binding (reasons name the components).
+3. `insufficient_reference_evidence` - dataset too small, a class or adversarial stratum below minimum, provenance not accepted or below the human/multi-labelled
+   fractions, leakage found, inter-labeler agreement below minimum, ambiguous fraction too high, or **any criterion `inconclusive`** (the data cannot show the
+   judge is within the limit). The reasons separate "not provably good" from "measurably bad".
+4. `calibration_expired` - everything passes but `now - created_at > validity_days` or the dataset is older than `max_dataset_age_days`.
+5. `demonstration` - a `demonstration_only` policy on synthetic data passes; **never admissible**.
+6. `calibrated` - all criteria `met`, current, compatible. Meaning: *meets the caller's stated policy on the named held-out dataset for exactly this behaviour
+   digest and model declaration at that time.* Not a statement about production accuracy. A vacuous caller policy still yields `calibrated`, which is why the
+   policy summary and flag accompany it.
 
-`demonstration` is returned only for a demonstration policy with synthetic data and is never eligible. **Eligible = status is `calibrated`.**
-Approval is an `Approval` record {role, approved_at, assessment_digest}; it is an **attestation by whoever holds the file, not authentication**: the
-SDK is a local library with no principal model, so separation of "who uploads data" from "who approves" is a platform/process control (limitation,
-section 10).
+**Evidence admissible = status `calibrated`.** (Naming: "admission", not "eligibility", which collides with the SLO "eligible run".) There is no approval
+attestation in this slice (cut: it cannot authenticate; separation of duties is a platform/process control).
 
-## 7. Drift indicators (deterministic, offline, never "significant")
+## 7. Drift (slice: deterministic and minimal)
 
-`assess_drift(record, current_fingerprint, now, observed=None, resample=None)` returns indicators, each `not_assessed` | `clear` | `indicated` with its
-evidence counts: (1) `fingerprint_changed` (per component: provider, model id/version, rubric id/version/fingerprint, template id/digest,
-configuration, implementation version), (2) `calibration_expired`, (3) `dataset_stale`, (4) `decision_mix_shift` - observed judge outcome counts
-(PASS/FAIL/UNKNOWN) against the held-out outcome distribution, assessed **only** when `n_observed >= observed_min` (policy field) and `indicated` when
-the Wilson intervals of the UNKNOWN rate or of the FAIL share of answered decisions do not overlap; it is named *decision* mix because production
-labels are unknown and **population or label shift cannot be inferred from judge decisions** (stated), (5) `failure_rate_shift` (same rule on the
-FAILURE rate), (6) `error_rate_change` - only if a new labelled `resample` assessment of the same fingerprint is supplied: FNR/FPR interval
-non-overlap between the two. Below the minimum observation count the state is `not_assessed`, not `clear`. No automatic action is taken; an
-`indicated` fingerprint/expiry indicator already forces `incompatible`/`calibration_expired` in the status.
+`assess_drift(assessment, current_fingerprint, now)` returns three indicators, each `clear` | `indicated` with evidence: `fingerprint_changed` (component-wise
+diff), `calibration_expired`, `dataset_stale`. Live decision-mix shift, failure-rate shift and error-rate change are **deferred**: they need a statistical and
+product design and cannot be validated offline without data (reviewer scope cut). Drift is advisory; `fingerprint_changed`/`expired` already demote the
+status. No retraining, no provider switching, no significance claim anywhere.
 
-## 8. SLO and platform integration (separate eligibility layer)
+## 8. Admission layer, hook and platform
 
-Principles preserved: UNKNOWN is not PASS; missing evidence is not proof; evaluator failure is not agent failure; judge disagreement is not agent
-failure; deterministic evaluators keep their own semantics; history is not rewritten; `MeasurementHealth` is untouched (OD-10).
+Principles preserved: UNKNOWN is not PASS; missing evidence is not proof; evaluator failure is not agent failure; judge disagreement is not agent failure;
+deterministic evaluators and history untouched; `MeasurementHealth` untouched (OD-10).
 
-* **Eligibility is a pure function** `assess_eligibility(record, current_fingerprint, policy, now) -> EligibilityDecision(eligible, status, reasons, digest)`.
-* **Opt-in gate (this slice).** `CalibrationGate(record, policy, clock)` is a small object that `IndicatorBinding` accepts through a new optional field
-  `eligibility` (default `None` = exactly today's behaviour). When set and the decision is ineligible, `EvaluationScope` does not call the judge and
-  returns a **new** disposition `SKIPPED_CALIBRATION_INELIGIBLE`, records **nothing** (the indicator has no evidence for that run), counts it in
-  `CoverageReport`, and emits an observer report of kind `skipped_ineligible`. Missing evidence is therefore reported as missing, never as PASS, and
-  existing sampling/skip machinery already treats a skip as "no evidence, no health change". No failure is recorded (an ineligible judge is not an
-  evaluation failure), so run health is unchanged.
-* **Unchanged by default.** Without the gate the coordinator records judge outcomes exactly as today. The documentation and SG checklist state
-  plainly that an *ungated* judge's outcomes are uncalibrated unless the application proves otherwise. Making the gate mandatory is OD-S4-2.
-* **Platform.** No wire member, API, schema or migration is added. A proposal (not implemented) for carrying `calibration_status` and the fingerprint
-  digest to the platform as an evaluator-provenance attribute that the Session 2 guard could use to exclude ineligible judge evidence from SLO
-  windows is outlined in `PLATFORM_PROPOSAL.md` and requires its own review (OD-S4-3). Existing deterministic evaluations and historical SLO
-  results are untouched. Compatibility with the Session 2 guard today: judge evidence carries a distinct evaluator identity (rubric id/version +
-  configuration id), so a fingerprint change that alters `configuration_id` already appears as a new methodology and trips the guard's
-  mixed-methodology rule; a change that does **not** alter `configuration_id` (for example a provider-side silent model update) is invisible to it, which
-  is exactly the gap the fingerprint and drift indicators address on the SDK side.
+* **Pure function** `assess_admission(assessment, current_fingerprint, policy, now) -> AdmissionDecision(admissible, status, reasons, policy_summary,
+  integrity, assessment_digest)` and `AdmissionDecision.explain()` (content-free text for application dashboards).
+* **Generic hook (calibration-agnostic, in `coordinator.py`).** `Admission` is a protocol: `decide(indicator, identity) -> AdmissionVerdict` where the verdict is
+  `allow` or `skip(reason_code)` with a bounded closed reason string. `IndicatorBinding(admission=...)` accepts an `Admission`, `None` (today's behaviour) or the
+  explicit `UNGATED` sentinel. The calibration package implements it as `CalibrationGate`. New generic disposition `SKIPPED_BY_ADMISSION` and report kind
+  `skipped_admission`; **calibration vocabulary never enters the judge enums**. Evaluation order in `_prepare`: admission first, then sampling (so ineligible
+  runs sampled out are still counted as admission skips and the magnitude is visible); the decision is read once per call from a cached object; the hook runs
+  under the scope lock and must be non-blocking (documented, tested). A skip makes **no provider call, records no evidence and no failure**, so run health is
+  unchanged and `attempted`/reliability exclude it; a new `admission_skipped` counter and observer report make it locally visible.
+* **Gate binds to the running evaluator.** `CalibrationGate.for_evaluator(evaluator, model, assessment, policy, clock)` computes the fingerprint **from the bound
+  evaluator** at construction and per decision (cached), so a gate cannot approve evidence from judge Y under judge X's assessment; only the model declaration is
+  caller-supplied and it is displayed in every decision.
+* **What this does and does not guarantee (H-1).** The brief's requirement - an uncalibrated judge must not silently produce trusted semantic SLO evidence - is
+  satisfied **for gated bindings only**. These paths bypass any gate and remain ungated: using `LLMJudge`/`SyncLLMJudge` directly through
+  `EvaluatorRunner`, calling `run.record_evaluation` yourself, and any `IndicatorBinding` left at `None`. Mitigations in this slice: (a) `CoverageReport` gains an
+  `ungated_model_backed` count so ungated judge evidence is visible locally; (b) the docs and SG checklist state that an ungated judge's outcomes are
+  uncalibrated unless the application proves otherwise; (c) **owner decision OD-S4-2:** make an explicit choice (a gate or `UNGATED`) mandatory for model-backed
+  evaluators in the next minor release (acceptable on an Experimental API, changelog entry), or keep `None` as the default. This slice keeps `None` and does not
+  silently change recording behaviour.
+* **Missing-evidence semantics (M-9).** Recording nothing is consistent with the Session 2 guard (`decide_guard`: no determinate evidence -> `no_data` /
+  `insufficient_data`, absence never recovers an active alert). Residual hazards, documented: a calibration expiry silently turns a monitored indicator into a
+  blind spot that the platform shows only as absence (indistinguishable from no traffic until OD-S4-3); with `on_no_data=warn` the P7 gate is permissive (SG-6 must
+  set `block` where needed); run health stays HEALTHY while the semantic evidence is absent, as with unsampled runs; a window straddling a re-calibration can mix
+  configuration ids and trip the guard's methodology rule. SG-5 is amended to alert on `admission_skipped`.
+* **Platform.** No wire member, API, schema or migration change. `PLATFORM_PROPOSAL.md` outlines (not implements) carrying the status and behaviour digest as
+  evaluator-provenance data so the Session 2 guard could exclude inadmissible judge evidence from SLO windows (OD-S4-3). Today the guard sees only rubric id/
+  version/configuration id, so a change that alters `configuration_id` already appears as a new methodology; a silent provider update does not.
 
 ## 9. Offline demonstration
 
-Deterministic synthetic fixtures (`tests/fixtures/p29_calibration/`, labelled `synthetic`, hand-computable confusion matrices) and a scripted
-`FakeProvider` (existing test double) run end to end with no network: load dataset -> leakage check -> run/replay judgments -> metrics -> repeatability
--> disagreement -> fingerprint -> assessment -> policy -> status -> drift -> optional gate. `examples/judge_calibration_offline.py` prints the
-walkthrough; `python -m agent_reliability.experimental.calibration` offers `validate-dataset`, `assess` (from a judgments file) and `status` for
-recorded assessments. No CLI path can contact a provider.
+Synthetic fixtures (`tests/fixtures/p29_calibration/`, provenance `synthetic`, hand-computable confusion matrices; public synthetic data may be in future model
+training sets and **must never be used to gauge a real model**) and the scripted fake provider run end to end with no network: load -> leakage -> judgments ->
+metrics -> repeatability -> comparison -> fingerprint -> assessment -> policy -> status -> drift -> gate. `examples/judge_calibration_offline.py` prints the
+walkthrough. A `demonstration_only` policy shows the machinery; a human-provenance policy shows `insufficient_reference_evidence` on the synthetic set.
 
 ## 10. Privacy, security and limits
 
-Content-free artefacts (assessment, record, drift, eligibility, comparison) hold identifiers, counts and digests only; tests plant canary strings in
-case text, rubric text, failure messages and assert absence in every artefact and in every `repr`. Datasets are untrusted input: strict JSON
-(duplicate keys, NaN rejected), size/count/depth bounds, hash pinning against the manifest, no path traversal outside the manifest's directory, no
-symlink following for split files. Prompt injection inside samples is handled by the existing judge prompt framing; the `adversarial` difficulty
-stratum is reported separately and a policy may require a zero-defect-pass criterion for it (counted, not asserted statistically). Poisoned labels
-are mitigated, not eliminated: provenance is explicit, adjudication metadata is carried, inter-labeler agreement gates interpretation, and the
-held-out split must be fixed (hash-pinned) before running. Provider-backed runs reuse the judge's existing opt-in provider, budgets, timeouts and
-retry policy; this slice adds none. Records can be forged by anyone who can write the file: the integrity digest detects accidental change and
-mixing, not malice (limitation). Using an LLM to judge an LLM inherits shared blind spots, position and verbosity bias, sensitivity to prompt
-wording, and non-stationarity of hosted models; calibration against labels measures one configuration on one distribution at one time.
+Artefacts hold identifiers, counts and bounded enums only (no digests of content, no reasons, no raw output); tests plant canaries in case text, rubric text,
+failure messages and assert absence in every artefact and `repr`. Dataset files are untrusted: strict JSON (duplicate keys, NaN, Infinity rejected), the byte/line/
+count/depth caps of section 3, hash pinning (`expected_manifest_sha256` required to assess), path containment. Prompt injection inside samples is handled by the
+existing judge framing; the adversarial stratum is reported separately and a policy criterion bounds adversarial passes on defect cases. Poisoned or LLM-generated
+"human" labels are mitigated, not eliminated (visible provenance, adjudication metadata, inter-labeler agreement, min human fraction); a calibration set
+contaminated by the judge's own outputs is a documented threat. Integrity: plain digests detect accident only; HMAC detects tampering by anyone without the key.
+No CLI exists, so no path prints a status from an unverified file. Provider-backed runs reuse the judge's existing opt-in provider, budgets, timeouts and retry
+policy; this slice adds none and makes no provider call in tests. Case ids should be opaque. Using an LLM to judge an LLM inherits shared blind spots, position and
+verbosity bias, prompt-wording sensitivity, and non-stationarity of hosted models; calibration measures one configuration on one distribution at one time, with
+the held-out set reused on every attempt (`heldout_attempt`).
 
 ## 11. Compatibility
 
-No change to `EvaluatorIdentity`, `EvaluationRecorded`, P28 schemas or fixtures, `MeasurementHealth`, the judge `__all__`, rubrics, prompt template
-(`jp1`) or `calibration-case/1` and `calibration-report/1`. The `IndicatorBinding.eligibility` field and the new disposition/report kind are additive
-on an Experimental API; their compat snapshot entries are updated deliberately and the change is recorded in the changelog. Python 3.11-3.13.
+Unchanged: `EvaluatorIdentity`, `EvaluationRecorded`, P28 schemas/fixtures, `MeasurementHealth`, rubrics, prompt `jp1`, `calibration-case/1`,
+`calibration-report/1`, the judge `__all__` (new names are added to it deliberately and to the compat snapshot: `Admission`, `AdmissionVerdict`, `UNGATED`,
+`EvaluationDisposition.SKIPPED_BY_ADMISSION`, report kind `skipped_admission`, `IndicatorBinding.admission`, `IndicatorCoverage.admission_skipped`,
+`CoverageReport.ungated_model_backed`). A new snapshot of the `IndicatorBinding` and `EvaluationDisposition` shapes is added in the same change (none existed).
+Python 3.11-3.13; zero runtime dependencies.
 
-## 12. Risks the reviewer should challenge
+## 12. Owner decisions
 
-1. Positive class = `fail` and the conditional vs abstention-inclusive pair (4.3): is exposing both the right call?
-2. Wilson bounds for policy comparison with small `n` and multiple simultaneous criteria (no multiplicity correction): acceptable, or document?
-3. Recording nothing on ineligibility: could missing evidence be misread downstream? (Session 2 guard handles missing as insufficient data.)
-4. Is changing `IndicatorBinding`/`EvaluationDisposition` acceptable for an Experimental API, or should the gate be a wrapper evaluator instead?
-5. Template digest from a golden fixture: is that a sound proxy for the prompt text?
-6. `starting_point()` versus D10: does a preset violate "no enforced threshold"?
+OD-S4-1 policy vs P29-D10 (note: D10's primary record is absent from the repository, `P28_P29_GOVERNANCE_INDEPENDENT_REVIEW.md` F-14); OD-S4-2 default gating
+(explicit choice mandatory vs `None` default); OD-S4-3 platform visibility and use of status; OD-S4-4 additive `ProviderReply.model_version_observed`.
+
+## 13. Disposition of the architecture review
+
+H-1 section 8 (honest scope, `ungated_model_backed`, OD-S4-2); H-2 sections 3, 8 (fingerprint from the bound evaluator, declaration limits, OD-S4-4); H-3 4.2 (F1);
+H-4/H-5 4.1-4.2 (denominator table, `committed_coverage`, `_effective`, `fnr_effective` SLO-relevant, naming rule); H-6 section 6 (coherent preset, retracted claim,
+coherence check, adversarial/ambiguous/failure criteria); H-7 section 6 (three-way test); H-8 section 3 (derived provenance, counts, fractions);
+M-1 sections 2, 4 (run 0 fixed, own runner, public names only); M-2 4.6; M-3 4.4, policy; M-4 4.7; M-5 4.3, section 5 (Clopper-Pearson, unrounded, independence,
+`heldout_attempt`); M-6 section 3 (runtime digest, limits, behaviour digest); M-7 section 6 (future dates, binding, policy summary, no approval); M-8 section 8
+(generic hook, order, counters, snapshots); M-9 section 8; M-10 sections 3, 5, 10; L-1 naming; L-2 4.8; L-3 `PLATFORM_PROPOSAL.md` and the D10 note.
+Scope cuts adopted: no CLI, drift reduced to three indicators, no approval attestation, simple inter-labeler agreement.

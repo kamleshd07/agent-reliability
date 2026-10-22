@@ -2,7 +2,7 @@
 
 Baseline: SDK `origin/main` at `b887999` (Merge of PR #9, P30 LangChain instrumentation; v1.3.0 is published and tagged);
 platform `origin/main` at `805b9c7` (Merge of PR #64, Session 2 operational loop). Both repositories were fetched and
-inspected on 2026-10-22. SDK baseline test run (Python 3.11, CI extras installed): **1802 passed, 1 skipped**.
+inspected on 2026-10-22. SDK baseline test run (Python 3.11, CI extras installed): **1802 passed, 1 skipped** (run by the author; the independent validator re-runs it).
 
 P29 is **substantially implemented** as an Experimental namespace (`agent_reliability.experimental.judge`, ADR-0010,
 `docs/P29_*.md`). This assessment lists what exists so that nothing is duplicated, and what is missing.
@@ -13,7 +13,7 @@ P29 is **substantially implemented** as an Experimental namespace (`agent_reliab
 |---|---|---|
 | ADR-0010, `docs/VERSIONING.md` | The judge namespace is Experimental: it may change in a minor release with notes; its compat snapshot (`tests/compat/test_experimental_judge_api.py`) and fixture manifest are guarded. | New code goes in a **new** Experimental namespace so the guarded judge `__all__` and fixtures stay byte-identical. |
 | P29-D10 (option A) | Calibration is customer-local; the harness enforces **no threshold** and never says "good", "ready" or "accurate". | The brief asks for a configurable policy with conservative defaults. This is a **tension with D10**; see owner decision OD-S4-1. The design keeps thresholds the customer's: a policy object whose every threshold is explicit, plus a clearly-labelled starting-point preset. |
-| OD-10 (owner, 2026-10-17) | Measurement health is **not** a gate input; changing it needs a design cycle. | Calibration eligibility is a **separate layer**. It never edits `MeasurementHealth`, outcome meaning, or P28 wire members. |
+| OD-10 (owner, 2026-10-17) | Measurement health is **not** a gate input; changing it needs a design cycle. | Calibration admission is a **separate layer**. It never edits `MeasurementHealth`, outcome meaning, or P28 wire members. |
 | Stable HTTP contract rule (`CLAUDE.md`) | No wire change without an explicit version decision. | No wire, API or migration change is made. Platform integration is a separate proposal (section 8 of the architecture document). |
 | SDK core | Zero runtime dependencies. | Stdlib only; no numpy/scipy. |
 
@@ -29,7 +29,7 @@ P29 is **substantially implemented** as an Experimental namespace (`agent_reliab
 | **Uncertainty handling** | `UNKNOWN` outcome and the confidence floor (`min_confidence`); `judge_disagreement` reason when repeats disagree; Wilson intervals; small-dataset flag. | Policy use of abstention (coverage / abstention caps); distinguishing abstention on determinate vs human-unknown examples in the decision; **no** invented confidence scores. | **Add** abstention/coverage criteria to the policy. Confidence is only summarised by the *declared* categorical level that already exists; no ECE or probability is manufactured. |
 | **Versioned provenance** | `EvaluatorIdentity(name = rubric_id, version = rubric_version, configuration_id = "<model_label>.jp1.mc-..")`; rubric content fingerprint; `template_id`; report records rubric id/version/fingerprint, model label, template id, configuration id, dataset id and sha-256. The identity grammar is the SDK/wire intersection. | A structured **judge fingerprint** separating provider, model id, model version, implementation (SDK) version, rubric id/version/fingerprint, template id and a template digest, configuration, and linking dataset version and calibration-report version; a rule that **display names never imply equivalence**. `model_label` is today a single caller-declared label. | **Add** `JudgeFingerprint` (canonical JSON + sha-256 digest, component-wise diff). It is **additive**; `EvaluatorIdentity` and the wire are untouched. |
 | **Drift detection** | Only manual `compare_reports` between two runs. | Version/rubric/template/provider invalidation; calibration expiry; dataset age; decision-mix and failure-rate shift against the calibration baseline with explicit minimum observations; error-rate change between two labelled samples. | **Add** deterministic offline drift **indicators** (never "significant"). No retraining, no provider switching. |
-| **SLO integration** | Judge evidence is recorded through the normal evaluator path with `deterministic=False` and the judge identity; failures set run health `UNAVAILABLE` (SG-2); the Session 2 platform guard separates evaluator identities and refuses mixed methodology above its dominant-share limit. **Nothing consults a calibration status.** An uncalibrated judge's PASS/FAIL is recorded and counted like any other. | An **eligibility layer** that says whether a judge fingerprint may feed SLO evidence under a policy, and a way to apply it. | **Add** `assess_eligibility` (pure) and an **opt-in** gate; default behaviour unchanged. Platform use is a separate proposal. See architecture section 8 and OD-S4-2. |
+| **SLO integration** | Judge evidence is recorded through the normal evaluator path with `deterministic=False` and the judge identity; failures set run health `UNAVAILABLE` (SG-2); the Session 2 platform guard separates evaluator identities and refuses mixed methodology above its dominant-share limit. **Nothing consults a calibration status.** An uncalibrated judge's PASS/FAIL is recorded and counted like any other. | An **admission layer** that says whether a judge's evidence may feed SLO windows under a policy, and a way to apply it. | **Add** `assess_admission` (pure) and a generic, **opt-in** admission hook with a calibration gate; default behaviour unchanged and ungated judge evidence is counted. Platform use is a separate proposal (`PLATFORM_PROPOSAL.md`). See architecture section 8 and OD-S4-2. |
 | **Privacy / security** | `CalibrationCase` refuses pickle/copy and redacts `repr`; reports are content-free; rubric roles only reach the provider; nonce/untrusted-content prompt framing; strict JSON loading; no network in the harness; `tests/security/test_experimental_judge_privacy.py` planted-canary tests; budgets and limits. | Dataset **poisoning** controls (hash pinning, provenance requirement, split discipline); manifest bounds; assessment/record **integrity digest**; approval attestation separated from execution; documented limits of LLM-judging-LLM; retention guidance; guarantee that new artefacts are content-free. | **Add** with tests (canary scan of every new artefact), and a threat model in the security document. |
 
 ## What this slice deliberately does not do
@@ -38,10 +38,16 @@ Hosted workflows, a human-review UI, automatic dataset collection, provider-back
 schema/API/migration changes, changes to `EvaluatorIdentity`, to the P28 wire, or to measurement-health semantics, and automatic
 retraining or provider switching.
 
+## Notes
+
+* The primary record of owner decision P29-D10 is not in the repository (`P28_P29_GOVERNANCE_INDEPENDENT_REVIEW.md` F-14); its content is taken from the documents that quote it.
+* The independent architecture review of the first draft is `S4_ARCHITECTURE_REVIEW.md` (kept outside the repository by the reviewer, copied unedited into `reviews/` at the end).
+
 ## Owner decisions raised by this assessment
 
 * **OD-S4-1 (amends P29-D10).** D10 says the harness enforces no threshold. A calibration *policy* is requested. Proposal: thresholds
   are **always supplied by the caller** (no implicit defaults on the policy type); a named preset is provided only as a documented
   starting point; the word "calibrated" is defined as "meets the caller's policy on the named dataset" and never as an accuracy claim.
 * **OD-S4-2.** Applying eligibility by default would change recording behaviour of existing users. Proposal: opt-in only in this slice.
+* **OD-S4-4.** An additive `ProviderReply.model_version_observed` (judge API) would let fingerprints compare the model that actually answered.
 * **OD-S4-3.** Conveying calibration status to the platform needs a wire/API design cycle (OD-10 also forbids feeding it into measurement health).
