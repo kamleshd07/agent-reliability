@@ -98,6 +98,7 @@ a `MET` and a `BREACHED` outcome. Full reference:
 
 - Learn the terminology in [Concepts](CONCEPTS.md).
 - Adapt the boundaries in [Integrations](INTEGRATIONS.md).
+- Evaluate your own agent end to end with the [first-evaluation guide](EXTERNAL_EVALUATION.md).
 - Try [async usage](../examples/async_agent.py), the
   [provenance-conflict example](../examples/provenance_conflict.py), and the
   privacy-bounded [tool-call evaluators](../examples/tool_call_evaluators.py).
