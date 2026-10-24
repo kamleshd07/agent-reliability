@@ -126,8 +126,7 @@ after a SQL error on a non-existent column) is the only run with a tool error.
   explain *why* the model invented an answer, find the empty query result, or suggest a fix: that
   needed reading the step log.
 * **Cost**: wiring needed 4 evaluators, about 70 lines of adapter code (`harness._agent_step_facts`, `execute_case`,
-  `_evaluate`) and no change to the upstream agent. `python measure_overhead.py` measured about
-  0.2 ms added per run against 1 to 6 s of model time.
+  `_evaluate`) and no change to the upstream agent. `python measure_overhead.py` measured well under a millisecond (about 0.2 ms in a 10-pass run; the figure is within timer noise) against 1 to 6 s of model time.
 * **Not compared**: framework tracing backends and hosted evaluation tools were not run.
 
 The honest summary: for this agent, Gentlity found **no failure that a careful assertion test would
