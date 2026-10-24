@@ -52,7 +52,7 @@ No BLOCKER or HIGH design finding. AR-1 through AR-3 are actionable MEDIUM clari
 - `src/agent_reliability/ports/events.py`: unchanged four-event stable union.
 - `src/agent_reliability/sdk/diagnostics.py`: existing diagnostic trust boundary.
 - `pyproject.toml`: zero mandatory runtime dependencies.
-- Installed pinned dependency under `/Users/kamleshdigarse/Development/gentlity-s3-evidence/venv311/lib/python3.11/site-packages/langchain_core/callbacks/{base,manager}.py` inspected directly. Official reference URLs in the architecture could not be rendered by the web tool (markdown content type); this assessment relies on the installed pinned implementation rather than assuming those pages were inspected successfully.
+- Installed pinned dependency under `<workspace>/gentlity-s3-evidence/venv311/lib/python3.11/site-packages/langchain_core/callbacks/{base,manager}.py` inspected directly. Official reference URLs in the architecture could not be rendered by the web tool (markdown content type); this assessment relies on the installed pinned implementation rather than assuming those pages were inspected successfully.
 
 ## Independent design re-check
 
