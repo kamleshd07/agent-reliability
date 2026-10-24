@@ -101,8 +101,8 @@ class LogLine:
 @dataclass
 class AgentResult:
     """What one execution produced. ``fact_ids`` is the agent's *structured* claim,
-    used only by the test oracle; evaluators see only ``answer``, ``called_tools``
-    and ``duration_seconds``."""
+    used only to cross-check the text evaluators; evaluators see only ``answer``,
+    ``called_tools`` and ``duration_seconds``."""
 
     answer: str
     called_tools: frozenset[str]

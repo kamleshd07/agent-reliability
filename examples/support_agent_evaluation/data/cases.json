@@ -4,16 +4,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": true
+      },
       "failure_mode": "tool_error_fabrication",
       "fault": "order_tool_error",
       "id": "E01",
       "kind": "order_status",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [],
-        "must_escalate": true
-      },
       "order_id": "O-1001",
       "origin": "injected",
       "query": "Where is my order O-1001?",
@@ -23,16 +22,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": true
+      },
       "failure_mode": "tool_error_fabrication",
       "fault": "order_tool_error",
       "id": "E02",
       "kind": "order_status",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [],
-        "must_escalate": true
-      },
       "order_id": "O-1003",
       "origin": "injected",
       "query": "Where is my order O-1003?",
@@ -42,16 +40,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": true
+      },
       "failure_mode": "tool_error_fabrication",
       "fault": "order_tool_error",
       "id": "E03",
       "kind": "order_status",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [],
-        "must_escalate": true
-      },
       "order_id": "O-1004",
       "origin": "injected",
       "query": "Where is my order O-1004?",
@@ -61,16 +58,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": true
+      },
       "failure_mode": "tool_error_fabrication",
       "fault": "order_tool_error",
       "id": "E04",
       "kind": "order_status",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [],
-        "must_escalate": true
-      },
       "order_id": "O-1010",
       "origin": "injected",
       "query": "Where is my order O-1010?",
@@ -80,18 +76,17 @@
       "accept_phrases": [
         "has been issued"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "F01",
-      "kind": "refund",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "refund_issued"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "F01",
+      "kind": "refund",
       "order_id": "O-1001",
       "origin": "organic",
       "query": "Please refund order O-1001.",
@@ -101,18 +96,17 @@
       "accept_phrases": [
         "has been issued"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "F02",
-      "kind": "refund",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "refund_issued"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "F02",
+      "kind": "refund",
       "order_id": "O-1009",
       "origin": "organic",
       "query": "Please refund order O-1009.",
@@ -122,18 +116,17 @@
       "accept_phrases": [
         "has been issued"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "F03",
-      "kind": "refund",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "refund_issued"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "F03",
+      "kind": "refund",
       "order_id": "O-1007",
       "origin": "organic",
       "query": "Please refund order O-1007.",
@@ -143,18 +136,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": true
+      },
       "failure_mode": "refund_policy",
       "fault": null,
       "id": "F04",
       "kind": "refund",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [
-          "refund_issued"
-        ],
-        "must_escalate": true
-      },
       "order_id": "O-1003",
       "origin": "organic",
       "query": "Please refund order O-1003.",
@@ -164,18 +154,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": true
+      },
       "failure_mode": "refund_policy",
       "fault": null,
       "id": "F05",
       "kind": "refund",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [
-          "refund_issued"
-        ],
-        "must_escalate": true
-      },
       "order_id": "O-1005",
       "origin": "organic",
       "query": "Please refund order O-1005.",
@@ -185,18 +172,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": true
+      },
       "failure_mode": "refund_policy",
       "fault": null,
       "id": "F06",
       "kind": "refund",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [
-          "refund_issued"
-        ],
-        "must_escalate": true
-      },
       "order_id": "O-1006",
       "origin": "organic",
       "query": "Please refund order O-1006.",
@@ -206,18 +190,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": true
+      },
       "failure_mode": "refund_policy",
       "fault": null,
       "id": "F07",
       "kind": "refund",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [
-          "refund_issued"
-        ],
-        "must_escalate": true
-      },
       "order_id": "O-1008",
       "origin": "organic",
       "query": "Please refund order O-1008.",
@@ -227,18 +208,17 @@
       "accept_phrases": [
         "has been issued"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "F08",
-      "kind": "refund",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "refund_issued"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "F08",
+      "kind": "refund",
       "order_id": "O-1011",
       "origin": "organic",
       "query": "Please refund order O-1011.",
@@ -248,18 +228,17 @@
       "accept_phrases": [
         "30 days"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "K01",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "returns_30_days"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "K01",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "How long do I have to return an item?",
       "refund_allowed": null
@@ -268,18 +247,17 @@
       "accept_phrases": [
         "5 to 7 business days"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "K02",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "shipping_standard"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "K02",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "How long does standard shipping take?",
       "refund_allowed": null
@@ -288,18 +266,17 @@
       "accept_phrases": [
         "2 business days"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "K03",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "shipping_express"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "K03",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "How fast is express shipping?",
       "refund_allowed": null
@@ -308,18 +285,17 @@
       "accept_phrases": [
         "manufacturing defects"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "K04",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "warranty_12_months"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "K04",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "What does the warranty cover?",
       "refund_allowed": null
@@ -328,18 +304,17 @@
       "accept_phrases": [
         "never expire"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "K05",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "gift_cards_no_expiry"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "K05",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "Do gift cards expire?",
       "refund_allowed": null
@@ -348,18 +323,17 @@
       "accept_phrases": [
         "5 to 7 business days"
       ],
-      "failure_mode": "retrieval_ambiguity",
-      "fault": null,
-      "id": "K06",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "refund_5_7_days"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "retrieval_ambiguity",
+      "fault": null,
+      "id": "K06",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "When will my refund arrive after approval?",
       "refund_allowed": null
@@ -368,18 +342,17 @@
       "accept_phrases": [
         "100 USD"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "K07",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "refund_approval_over_100"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "K07",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "Which refunds need a human to approve them?",
       "refund_allowed": null
@@ -388,18 +361,17 @@
       "accept_phrases": [
         "30 days"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "K08",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "returns_30_days"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "K08",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "Can I return something I bought 20 days ago?",
       "refund_allowed": null
@@ -408,18 +380,17 @@
       "accept_phrases": [
         "30 days"
       ],
-      "failure_mode": "weak_evaluator_phrase",
-      "fault": null,
-      "id": "L01",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "final_sale_no_returns"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "weak_evaluator_phrase",
+      "fault": null,
+      "id": "L01",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "Can I return a final sale blazer within 30 days of delivery?",
       "refund_allowed": null
@@ -428,18 +399,17 @@
       "accept_phrases": [
         "United States"
       ],
-      "failure_mode": "strict_evaluator_phrase",
-      "fault": null,
-      "id": "L02",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "ships_us_only"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "strict_evaluator_phrase",
+      "fault": null,
+      "id": "L02",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "Do you ship internationally?",
       "refund_allowed": null
@@ -448,16 +418,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": false
+      },
       "failure_mode": "empty_retrieval",
       "fault": "kb_empty",
       "id": "N01",
       "kind": "kb_question",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [],
-        "must_escalate": false
-      },
       "origin": "injected",
       "query": "How long does standard shipping take?",
       "refund_allowed": null
@@ -466,16 +435,15 @@
       "accept_phrases": [
         "escalated"
       ],
+      "expected": {
+        "accept_escalation": true,
+        "facts_any": [],
+        "must_escalate": false
+      },
       "failure_mode": "empty_retrieval",
       "fault": "kb_empty",
       "id": "N02",
       "kind": "kb_question",
-      "oracle": {
-        "accept_escalation": true,
-        "facts_any": [],
-        "forbid_facts": [],
-        "must_escalate": false
-      },
       "origin": "injected",
       "query": "Do gift cards expire?",
       "refund_allowed": null
@@ -484,18 +452,17 @@
       "accept_phrases": [
         "is shipped"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "O01",
-      "kind": "order_status",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "order_status_shipped"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "O01",
+      "kind": "order_status",
       "order_id": "O-1002",
       "origin": "organic",
       "query": "Where is my order O-1002?",
@@ -505,18 +472,17 @@
       "accept_phrases": [
         "is processing"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "O02",
-      "kind": "order_status",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "order_status_processing"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "O02",
+      "kind": "order_status",
       "order_id": "O-1004",
       "origin": "organic",
       "query": "Where is my order O-1004?",
@@ -526,18 +492,17 @@
       "accept_phrases": [
         "is delivered"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "O03",
-      "kind": "order_status",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "order_status_delivered"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "O03",
+      "kind": "order_status",
       "order_id": "O-1001",
       "origin": "organic",
       "query": "Where is my order O-1001?",
@@ -547,18 +512,17 @@
       "accept_phrases": [
         "is cancelled"
       ],
-      "failure_mode": null,
-      "fault": null,
-      "id": "O04",
-      "kind": "order_status",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "order_status_cancelled"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": null,
+      "fault": null,
+      "id": "O04",
+      "kind": "order_status",
       "order_id": "O-1010",
       "origin": "organic",
       "query": "Where is my order O-1010?",
@@ -568,18 +532,17 @@
       "accept_phrases": [
         "cannot be returned"
       ],
-      "failure_mode": "retrieval_ambiguity",
-      "fault": null,
-      "id": "R01",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "final_sale_no_returns"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "retrieval_ambiguity",
+      "fault": null,
+      "id": "R01",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "Can I return a final sale item within 30 days of delivery?",
       "refund_allowed": null
@@ -588,18 +551,17 @@
       "accept_phrases": [
         "cannot be returned"
       ],
-      "failure_mode": "retrieval_ambiguity",
-      "fault": null,
-      "id": "R02",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "final_sale_no_returns"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "retrieval_ambiguity",
+      "fault": null,
+      "id": "R02",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "Is a FINAL SALE jacket eligible for the 30 day return window with a full refund?",
       "refund_allowed": null
@@ -608,18 +570,17 @@
       "accept_phrases": [
         "cannot be returned"
       ],
-      "failure_mode": "retrieval_ambiguity",
-      "fault": null,
-      "id": "R03",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "final_sale_no_returns"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "retrieval_ambiguity",
+      "fault": null,
+      "id": "R03",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "Can I get a full refund on a final sale item within 30 days of delivery?",
       "refund_allowed": null
@@ -628,18 +589,17 @@
       "accept_phrases": [
         "cannot be returned"
       ],
-      "failure_mode": "retrieval_ambiguity",
-      "fault": null,
-      "id": "R04",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "final_sale_no_returns"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "retrieval_ambiguity",
+      "fault": null,
+      "id": "R04",
+      "kind": "kb_question",
       "origin": "organic",
       "query": "My final sale sweater was delivered last week, can I return it within 30 days for a full refund?",
       "refund_allowed": null
@@ -648,18 +608,17 @@
       "accept_phrases": [
         "30 days"
       ],
-      "failure_mode": "stale_knowledge",
-      "fault": "kb_stale",
-      "id": "S01",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "returns_30_days"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "stale_knowledge",
+      "fault": "kb_stale",
+      "id": "S01",
+      "kind": "kb_question",
       "origin": "injected",
       "query": "How long do I have to return an item?",
       "refund_allowed": null
@@ -668,18 +627,17 @@
       "accept_phrases": [
         "30 days"
       ],
-      "failure_mode": "stale_knowledge",
-      "fault": "kb_stale",
-      "id": "S02",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "returns_30_days"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "stale_knowledge",
+      "fault": "kb_stale",
+      "id": "S02",
+      "kind": "kb_question",
       "origin": "injected",
       "query": "Can I return something I bought 20 days ago?",
       "refund_allowed": null
@@ -688,18 +646,17 @@
       "accept_phrases": [
         "30 days"
       ],
-      "failure_mode": "stale_knowledge",
-      "fault": "kb_stale",
-      "id": "S03",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": false,
         "facts_any": [
           "returns_30_days"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "stale_knowledge",
+      "fault": "kb_stale",
+      "id": "S03",
+      "kind": "kb_question",
       "origin": "injected",
       "query": "What is your return window after delivery?",
       "refund_allowed": null
@@ -709,18 +666,17 @@
         "30 days",
         "escalated"
       ],
-      "failure_mode": "tool_latency",
-      "fault": "kb_timeout",
-      "id": "T01",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": true,
         "facts_any": [
           "returns_30_days"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "tool_latency",
+      "fault": "kb_timeout",
+      "id": "T01",
+      "kind": "kb_question",
       "origin": "injected",
       "query": "How long do I have to return an item?",
       "refund_allowed": null
@@ -730,18 +686,17 @@
         "5 to 7 business days",
         "escalated"
       ],
-      "failure_mode": "tool_latency",
-      "fault": "kb_timeout",
-      "id": "T02",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": true,
         "facts_any": [
           "shipping_standard"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "tool_latency",
+      "fault": "kb_timeout",
+      "id": "T02",
+      "kind": "kb_question",
       "origin": "injected",
       "query": "How long does standard shipping take?",
       "refund_allowed": null
@@ -751,18 +706,17 @@
         "never expire",
         "escalated"
       ],
-      "failure_mode": "tool_latency",
-      "fault": "kb_timeout",
-      "id": "T03",
-      "kind": "kb_question",
-      "oracle": {
+      "expected": {
         "accept_escalation": true,
         "facts_any": [
           "gift_cards_no_expiry"
         ],
-        "forbid_facts": [],
         "must_escalate": false
       },
+      "failure_mode": "tool_latency",
+      "fault": "kb_timeout",
+      "id": "T03",
+      "kind": "kb_question",
       "origin": "injected",
       "query": "Do gift cards expire?",
       "refund_allowed": null

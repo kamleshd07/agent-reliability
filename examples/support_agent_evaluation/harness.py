@@ -3,7 +3,7 @@
 Language: Python. Everything numeric comes from the SDK (``EvaluatorRunner``,
 ``ReliabilityObservation``, ``evaluate_reliability``, ``report_to_dict``); this module
 only (a) feeds the SDK, (b) groups results and (c) compares them with ordinary-log
-signals and with a ground-truth oracle. It computes no reliability score of its own.
+signals and with the agent's structured claims. It computes no reliability score.
 """
 
 from __future__ import annotations
@@ -31,7 +31,11 @@ from agent_reliability.evaluation import (
     ToolCalledEvaluator,
     ToolNotCalledEvaluator,
 )
-from agent_reliability.ports.events import RunCompleted, RunFailed
+from agent_reliability.ports.events import (
+    EvaluationRecorded,
+    RunCompleted,
+    RunFailed,
+)
 from agent_reliability.reliability import (
     AggregationConflict,
     ReliabilityObservation,
@@ -162,7 +166,7 @@ def applicable(case: dict[str, Any], indicator: str) -> bool:
     if indicator in ("task_success", "latency"):
         return True
     if indicator == "escalation":
-        return bool(case["oracle"]["must_escalate"])
+        return bool(case["expected"]["must_escalate"])
     return case.get("refund_allowed") is False  # refund_policy
 
 
@@ -196,12 +200,18 @@ def run_version(
                 environment="offline-evaluation",
             ) as run:
                 run_id = run.run_id
-                record.result = agent.handle(case)
+                try:
+                    record.result = agent.handle(case)
+                except Exception as exc:
+                    # Record what the evaluators can say about a crash (an empty
+                    # answer, no duration) INSIDE the run, then let the SDK see the
+                    # exception so the run is classified as failed.
+                    record.exception_type = type(exc).__name__
+                    _evaluate(record, evaluators, runner, run)
+                    raise
                 _evaluate(record, evaluators, runner, run)
-        except Exception as exc:  # the SDK re-raises; the harness keeps going
-            record.exception_type = type(exc).__name__
+        except Exception:  # the SDK re-raises; the harness keeps going
             record.lifecycle = "failed"
-            _evaluate(record, evaluators, runner, None)  # outside any run
         runs.append(record)
         run_ids.append(run_id)
     _confirm_lifecycle(runs, run_ids, sink)
@@ -245,11 +255,16 @@ def _confirm_lifecycle(
 ) -> None:
     """Cross-check the harness's lifecycle against the SDK's own events."""
     statuses: dict[str, RunStatus] = {}
+    recorded = 0
     for event in sink.events:
         if isinstance(event, RunCompleted):
             statuses[event.run_id] = RunStatus.COMPLETED
         elif isinstance(event, RunFailed):
             statuses[event.run_id] = event.status
+        elif isinstance(event, EvaluationRecorded):
+            recorded += 1
+    if recorded != sum(len(r.observations) for r in runs):
+        raise RuntimeError("the SDK event stream lost an evaluation")
     for record, run_id in zip(runs, run_ids, strict=True):
         if run_id is None:
             raise RuntimeError("run id missing")
@@ -277,65 +292,66 @@ def reports_for(
     return out
 
 
-# -- ground truth -------------------------------------------------------------------
+# -- structured-claim check -----------------------------------------------------------
 
 
-def oracle_failures(record: CaseRun) -> dict[str, bool]:
-    """Independent ground truth: does the case really fail each applicable indicator?
+def structured_claim_failure(record: CaseRun) -> bool | None:
+    """Does the agent's *structured* claim contradict the case's expectation?
 
-    The oracle reads the agent's *structured* claim (fact ids, whether it escalated or
-    issued a refund), never the answer text the evaluator reads. Differences between the
-    two are therefore genuine evaluator false positives / false negatives."""
-    case, result = record.case, record.result
-    oracle = case["oracle"]
-    truth: dict[str, bool] = {}
-    for name in _SPEC:
-        if not applicable(case, name):
-            continue
-        if name == "task_success":
-            if result is None:
-                truth[name] = True
-                continue
-            right = bool(set(oracle["facts_any"]) & result.fact_ids) or (
-                oracle["accept_escalation"] and result.escalated
-            )
-            wrong = bool(set(oracle["forbid_facts"]) & result.fact_ids)
-            truth[name] = not right or wrong
-        elif name == "escalation":
-            truth[name] = result is None or not result.escalated
-        elif name == "refund_policy":
-            truth[name] = result is not None and result.refund_issued
-        else:  # latency: only judgeable when a duration exists
-            if result is None:
-                continue
-            truth[name] = result.duration_seconds > LATENCY_THRESHOLD_SECONDS
-    return truth
+    Only ``task_success`` has a check that is not the same state the evaluator reads:
+    the evaluator reads the answer **text**; this reads the fact ids the agent itself
+    reports it stated. A disagreement is a text-matching error (false positive or
+    negative). It is not independent of the agent: if the agent mis-reports its own
+    facts, this check is wrong too. For ``escalation``, ``refund_policy`` and
+    ``latency`` the "truth" would be the very value the evaluator already receives, so
+    no accuracy claim is made for them (``None``)."""
+    if "task_success" not in record.outcomes:
+        return None
+    result = record.result
+    if result is None:
+        return True
+    expected = record.case["expected"]
+    right = bool(set(expected["facts_any"]) & result.fact_ids) or (
+        expected["accept_escalation"] and result.escalated
+    )
+    return not right
 
 
 def confusion(runs: list[CaseRun]) -> dict[str, dict[str, int]]:
-    """Evaluator FAIL verdicts versus the oracle, per indicator (diagnostic)."""
+    """Text-matching verdicts for ``task_success`` versus the structured claims."""
     table = {
-        n: {
+        "task_success": {
             "true_positive": 0,
             "false_positive": 0,
             "false_negative": 0,
             "true_negative": 0,
         }
-        for n in _SPEC
     }
     for record in runs:
-        truth = oracle_failures(record)
-        for name, really_fails in truth.items():
-            flagged = record.outcomes.get(name) is EvaluationOutcome.FAIL
-            if flagged and really_fails:
-                table[name]["true_positive"] += 1
-            elif flagged:
-                table[name]["false_positive"] += 1
-            elif really_fails:
-                table[name]["false_negative"] += 1
-            else:
-                table[name]["true_negative"] += 1
+        really_fails = structured_claim_failure(record)
+        flagged = record.outcomes.get("task_success") is EvaluationOutcome.FAIL
+        if really_fails is None:
+            continue
+        if flagged and really_fails:
+            table["task_success"]["true_positive"] += 1
+        elif flagged:
+            table["task_success"]["false_positive"] += 1
+        elif really_fails:
+            table["task_success"]["false_negative"] += 1
+        else:
+            table["task_success"]["true_negative"] += 1
     return table
+
+
+def confirmed_failing_indicators(record: CaseRun) -> list[str]:
+    """Failing indicators excluding ``task_success`` verdicts the structured claim
+    contradicts (known text-matching false positives)."""
+    confirmed = []
+    for name in record.failing_indicators:
+        if name == "task_success" and structured_claim_failure(record) is False:
+            continue
+        confirmed.append(name)
+    return confirmed
 
 
 # -- analysis -----------------------------------------------------------------------
@@ -353,7 +369,7 @@ def failure_evidence(
     """One bounded evidence record per FAIL observation."""
     evidence: list[dict[str, Any]] = []
     for record in runs:
-        truth = oracle_failures(record)
+        claim = structured_claim_failure(record)
         for name in record.failing_indicators:
             result = record.result
             case = record.case
@@ -369,7 +385,9 @@ def failure_evidence(
                     "run_lifecycle": record.lifecycle,
                     "exception_type": record.exception_type,
                     "log_signal": record.log_signal,
-                    "oracle_agrees_it_is_a_failure": truth.get(name),
+                    "structured_claim_agrees_it_is_a_failure": (
+                        claim if name == "task_success" else None
+                    ),
                     "request": case["query"],
                     "answer": result.answer if result else None,
                     "tools_called": sorted(result.called_tools) if result else [],
@@ -385,8 +403,17 @@ def failure_evidence(
 
 
 def visibility(runs: list[CaseRun]) -> dict[str, Any]:
-    """Failures judged by Gentlity versus what ordinary logs and run status show."""
-    gentlity_failed = [r for r in runs if r.failing_indicators]
+    """Failures judged by Gentlity versus the run status and the agent's own log lines.
+
+    Illustrative, not a measurement of any real team's tooling: the "ordinary" baseline
+    is **run status plus the WARNING/ERROR lines this example agent chose to write**.
+    It ignores metrics, traces, dashboards and alerts a real team may have (for example,
+    anyone charting latency would see the slow cases). Runs whose only failure is a
+    known text-matching false positive are excluded and listed separately."""
+    gentlity_failed = [r for r in runs if confirmed_failing_indicators(r)]
+    excluded = sorted(
+        r.case["id"] for r in runs if r.failing_indicators and r not in gentlity_failed
+    )
     silent = [
         r
         for r in gentlity_failed
@@ -402,14 +429,16 @@ def visibility(runs: list[CaseRun]) -> dict[str, Any]:
     ]
     log_view_ok = [r for r in runs if r.log_signal != "error"]
     return {
+        "baseline": "run status plus the example agent's own WARNING/ERROR log lines",
         "runs": len(runs),
-        "runs_with_a_gentlity_failure": len(gentlity_failed),
+        "runs_with_a_confirmed_failure": len(gentlity_failed),
         "run_status_or_error_log_success": len(log_view_ok),
         "silent_failures_no_log_signal": sorted(r.case["id"] for r in silent),
         "failures_with_only_a_warning_log": sorted(r.case["id"] for r in warning_only),
         "failures_visible_as_run_failure_or_error_log": sorted(
             r.case["id"] for r in loud
         ),
+        "excluded_text_matching_false_positives": excluded,
     }
 
 
@@ -449,7 +478,7 @@ def analyse(
         per_version[version] = {
             "indicators": {name: report_dict(rep) for name, rep in reports.items()},
             "visibility": visibility(runs),
-            "evaluator_accuracy_vs_oracle": confusion(runs),
+            "evaluator_accuracy_vs_structured_claims": confusion(runs),
             "failures": failure_evidence(runs, modes),
         }
     out: dict[str, Any] = {

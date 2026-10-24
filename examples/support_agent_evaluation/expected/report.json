@@ -71,25 +71,7 @@
   },
   "versions": {
     "v1": {
-      "evaluator_accuracy_vs_oracle": {
-        "escalation": {
-          "false_negative": 0,
-          "false_positive": 0,
-          "true_negative": 1,
-          "true_positive": 7
-        },
-        "latency": {
-          "false_negative": 0,
-          "false_positive": 0,
-          "true_negative": 33,
-          "true_positive": 3
-        },
-        "refund_policy": {
-          "false_negative": 0,
-          "false_positive": 0,
-          "true_negative": 1,
-          "true_positive": 3
-        },
+      "evaluator_accuracy_vs_structured_claims": {
         "task_success": {
           "false_negative": 1,
           "false_positive": 1,
@@ -109,11 +91,11 @@
           "fault": "order_tool_error",
           "indicator": "task_success",
           "log_signal": "warning",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case E01",
           "request": "Where is my order O-1001?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "lookup_order"
           ],
@@ -130,11 +112,11 @@
           "fault": "order_tool_error",
           "indicator": "escalation",
           "log_signal": "warning",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case E01",
           "request": "Where is my order O-1001?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "lookup_order"
           ],
@@ -151,11 +133,11 @@
           "fault": "order_tool_error",
           "indicator": "task_success",
           "log_signal": "warning",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case E02",
           "request": "Where is my order O-1003?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "lookup_order"
           ],
@@ -172,11 +154,11 @@
           "fault": "order_tool_error",
           "indicator": "escalation",
           "log_signal": "warning",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case E02",
           "request": "Where is my order O-1003?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "lookup_order"
           ],
@@ -193,11 +175,11 @@
           "fault": "order_tool_error",
           "indicator": "task_success",
           "log_signal": "warning",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case E03",
           "request": "Where is my order O-1004?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "lookup_order"
           ],
@@ -214,11 +196,11 @@
           "fault": "order_tool_error",
           "indicator": "escalation",
           "log_signal": "warning",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case E03",
           "request": "Where is my order O-1004?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "lookup_order"
           ],
@@ -235,11 +217,11 @@
           "fault": "order_tool_error",
           "indicator": "task_success",
           "log_signal": "warning",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case E04",
           "request": "Where is my order O-1010?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "lookup_order"
           ],
@@ -256,11 +238,11 @@
           "fault": "order_tool_error",
           "indicator": "escalation",
           "log_signal": "warning",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case E04",
           "request": "Where is my order O-1010?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "lookup_order"
           ],
@@ -277,11 +259,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case F04",
           "request": "Please refund order O-1003.",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "issue_refund",
             "lookup_order"
@@ -299,11 +281,11 @@
           "fault": null,
           "indicator": "refund_policy",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case F04",
           "request": "Please refund order O-1003.",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "issue_refund",
             "lookup_order"
@@ -321,11 +303,11 @@
           "fault": null,
           "indicator": "escalation",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case F04",
           "request": "Please refund order O-1003.",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "issue_refund",
             "lookup_order"
@@ -343,11 +325,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case F05",
           "request": "Please refund order O-1005.",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "issue_refund",
             "lookup_order"
@@ -365,11 +347,11 @@
           "fault": null,
           "indicator": "refund_policy",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case F05",
           "request": "Please refund order O-1005.",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "issue_refund",
             "lookup_order"
@@ -387,11 +369,11 @@
           "fault": null,
           "indicator": "escalation",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case F05",
           "request": "Please refund order O-1005.",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "issue_refund",
             "lookup_order"
@@ -409,11 +391,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case F06",
           "request": "Please refund order O-1006.",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "issue_refund",
             "lookup_order"
@@ -431,11 +413,11 @@
           "fault": null,
           "indicator": "refund_policy",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case F06",
           "request": "Please refund order O-1006.",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "issue_refund",
             "lookup_order"
@@ -453,11 +435,11 @@
           "fault": null,
           "indicator": "escalation",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case F06",
           "request": "Please refund order O-1006.",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "issue_refund",
             "lookup_order"
@@ -475,11 +457,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case K06",
           "request": "When will my refund arrive after approval?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -496,11 +478,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": false,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case L02",
           "request": "Do you ship internationally?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": false,
           "tools_called": [
             "search_kb"
           ],
@@ -517,11 +499,11 @@
           "fault": "kb_empty",
           "indicator": "task_success",
           "log_signal": "error",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case N01",
           "request": "How long does standard shipping take?",
           "run_lifecycle": "failed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [],
           "version": "v1"
         },
@@ -536,11 +518,11 @@
           "fault": "kb_empty",
           "indicator": "task_success",
           "log_signal": "error",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case N02",
           "request": "Do gift cards expire?",
           "run_lifecycle": "failed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [],
           "version": "v1"
         },
@@ -555,11 +537,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case R01",
           "request": "Can I return a final sale item within 30 days of delivery?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -576,11 +558,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case R02",
           "request": "Is a FINAL SALE jacket eligible for the 30 day return window with a full refund?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -597,11 +579,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case R03",
           "request": "Can I get a full refund on a final sale item within 30 days of delivery?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -618,11 +600,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v1 --case R04",
           "request": "My final sale sweater was delivered last week, can I return it within 30 days for a full refund?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -639,11 +621,11 @@
           "fault": "kb_stale",
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case S01",
           "request": "How long do I have to return an item?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -660,11 +642,11 @@
           "fault": "kb_stale",
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case S02",
           "request": "Can I return something I bought 20 days ago?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -681,11 +663,11 @@
           "fault": "kb_stale",
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case S03",
           "request": "What is your return window after delivery?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -702,11 +684,11 @@
           "fault": "kb_timeout",
           "indicator": "latency",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case T01",
           "request": "How long do I have to return an item?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "search_kb"
           ],
@@ -723,11 +705,11 @@
           "fault": "kb_timeout",
           "indicator": "latency",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case T02",
           "request": "How long does standard shipping take?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "search_kb"
           ],
@@ -744,11 +726,11 @@
           "fault": "kb_timeout",
           "indicator": "latency",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "injected",
           "reproduce": "python run_evaluation.py --version v1 --case T03",
           "request": "Do gift cards expire?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
           "tools_called": [
             "search_kb"
           ],
@@ -1018,6 +1000,10 @@
         }
       },
       "visibility": {
+        "baseline": "run status plus the example agent's own WARNING/ERROR log lines",
+        "excluded_text_matching_false_positives": [
+          "L02"
+        ],
         "failures_visible_as_run_failure_or_error_log": [
           "N01",
           "N02"
@@ -1030,13 +1016,12 @@
         ],
         "run_status_or_error_log_success": 36,
         "runs": 38,
-        "runs_with_a_gentlity_failure": 21,
+        "runs_with_a_confirmed_failure": 20,
         "silent_failures_no_log_signal": [
           "F04",
           "F05",
           "F06",
           "K06",
-          "L02",
           "R01",
           "R02",
           "R03",
@@ -1051,25 +1036,7 @@
       }
     },
     "v2": {
-      "evaluator_accuracy_vs_oracle": {
-        "escalation": {
-          "false_negative": 0,
-          "false_positive": 0,
-          "true_negative": 8,
-          "true_positive": 0
-        },
-        "latency": {
-          "false_negative": 0,
-          "false_positive": 0,
-          "true_negative": 38,
-          "true_positive": 0
-        },
-        "refund_policy": {
-          "false_negative": 0,
-          "false_positive": 0,
-          "true_negative": 4,
-          "true_positive": 0
-        },
+      "evaluator_accuracy_vs_structured_claims": {
         "task_success": {
           "false_negative": 1,
           "false_positive": 1,
@@ -1089,11 +1056,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v2 --case K06",
           "request": "When will my refund arrive after approval?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -1110,11 +1077,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": false,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v2 --case L02",
           "request": "Do you ship internationally?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": false,
           "tools_called": [
             "search_kb"
           ],
@@ -1131,11 +1098,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v2 --case R02",
           "request": "Is a FINAL SALE jacket eligible for the 30 day return window with a full refund?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -1152,11 +1119,11 @@
           "fault": null,
           "indicator": "task_success",
           "log_signal": "none",
-          "oracle_agrees_it_is_a_failure": true,
           "origin": "organic",
           "reproduce": "python run_evaluation.py --version v2 --case R04",
           "request": "My final sale sweater was delivered last week, can I return it within 30 days for a full refund?",
           "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
           "tools_called": [
             "search_kb"
           ],
@@ -1426,14 +1393,17 @@
         }
       },
       "visibility": {
+        "baseline": "run status plus the example agent's own WARNING/ERROR log lines",
+        "excluded_text_matching_false_positives": [
+          "L02"
+        ],
         "failures_visible_as_run_failure_or_error_log": [],
         "failures_with_only_a_warning_log": [],
         "run_status_or_error_log_success": 38,
         "runs": 38,
-        "runs_with_a_gentlity_failure": 4,
+        "runs_with_a_confirmed_failure": 3,
         "silent_failures_no_log_signal": [
           "K06",
-          "L02",
           "R02",
           "R04"
         ]

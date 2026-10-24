@@ -36,14 +36,18 @@ def main(argv: list[str] | None = None) -> int:
 
     knowledge, cases = load_data()
     versions = VERSIONS if args.version == "both" else (args.version,)
-    analysis = analyse(cases, knowledge, versions, args.case)
+    try:
+        analysis = analyse(cases, knowledge, versions, args.case)
+    except ValueError as error:
+        parser.error(str(error))
     if args.output_dir is not None:
         args.output_dir.mkdir(parents=True, exist_ok=True)
+        # newline="\n": same bytes on every platform; existing files are overwritten
         (args.output_dir / "report.json").write_text(
-            to_json(analysis), encoding="utf-8"
+            to_json(analysis), encoding="utf-8", newline="\n"
         )
         (args.output_dir / "report.md").write_text(
-            to_markdown(analysis), encoding="utf-8"
+            to_markdown(analysis), encoding="utf-8", newline="\n"
         )
     renderers = {"text": to_text, "json": to_json, "markdown": to_markdown}
     sys.stdout.write(renderers[args.format](analysis))

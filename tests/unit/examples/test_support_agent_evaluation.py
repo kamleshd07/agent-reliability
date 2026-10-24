@@ -66,11 +66,10 @@ def test_dataset_is_well_formed_and_labels_origin() -> None:
         assert case["accept_phrases"] and all(case["accept_phrases"])
         mode = case["failure_mode"]
         assert mode is None or mode in CASES_FILE["failure_modes"]
-        assert set(case["oracle"]) == {
+        assert set(case["expected"]) == {
             "facts_any",
             "accept_escalation",
             "must_escalate",
-            "forbid_facts",
         }
 
 
@@ -131,20 +130,21 @@ def test_known_evaluator_limitations_are_real_and_documented(
     for version in harness.VERSIONS:
         l02 = runs[version]["L02"]
         assert l02.outcomes["task_success"] is FAIL
-        assert harness.oracle_failures(l02)["task_success"] is False  # false positive
-    l01 = runs["v1"]["L01"]
-    assert l01.outcomes["task_success"] is PASS
-    assert harness.oracle_failures(l01)["task_success"] is True  # false negative
+        assert harness.structured_claim_failure(l02) is False  # false positive
+        l01 = runs[version]["L01"]
+        assert l01.outcomes["task_success"] is PASS
+        assert harness.structured_claim_failure(l01) is True  # false negative
 
 
-def test_oracle_reads_structured_claims_not_answer_text(
+def test_structured_claim_check_reads_fact_ids_not_answer_text(
     runs: dict[str, dict[str, harness.CaseRun]],
 ) -> None:
     record = runs["v1"]["S01"]
     assert record.result is not None
     reworded = replace(record.result, answer="30 days " + record.result.answer)
     altered = replace(record, result=reworded)
-    assert harness.oracle_failures(altered) == harness.oracle_failures(record)
+    assert harness.structured_claim_failure(altered) is True
+    assert harness.structured_claim_failure(record) is True
 
 
 # -- SLI, SLO and error budget regression (numbers come from the SDK) ---------
@@ -209,13 +209,14 @@ def test_changing_an_evaluator_version_is_refused_not_averaged(
 def test_silent_failures_complete_without_any_warning_or_error(
     runs: dict[str, dict[str, harness.CaseRun]], analysis: dict[str, Any]
 ) -> None:
-    silent = analysis["versions"]["v1"]["visibility"]["silent_failures_no_log_signal"]
+    seen = analysis["versions"]["v1"]["visibility"]
+    silent = seen["silent_failures_no_log_signal"]
+    assert seen["excluded_text_matching_false_positives"] == ["L02"]
     assert silent == [
         "F04",
         "F05",
         "F06",
         "K06",
-        "L02",
         "R01",
         "R02",
         "R03",
@@ -305,3 +306,82 @@ def test_cli_writes_reports_and_runs_as_a_plain_script(tmp_path: Path) -> None:
 def test_agent_rejects_an_unknown_version() -> None:
     with pytest.raises(ValueError):
         SupportAgent("v3", [], [], {})
+
+
+# -- review follow-ups: boundaries, branches, newline-stable output ----------
+
+
+def test_latency_threshold_boundary_is_inclusive_at_three_seconds() -> None:
+    from agent_reliability.sdk import EvaluatorRunner
+
+    evaluator = harness.build_evaluators()["latency"]
+    runner = EvaluatorRunner()
+    verdicts = {}
+    for seconds in (2.999, 3.0, 3.001, 4.0, 8.0):
+        result = runner.evaluate(evaluator, seconds)
+        assert not isinstance(result, harness.EvaluationExecutionFailure)
+        verdicts[seconds] = result.outcome
+    assert verdicts == {2.999: PASS, 3.0: PASS, 3.001: FAIL, 4.0: FAIL, 8.0: FAIL}
+
+
+def _agent(version: str) -> SupportAgent:
+    return SupportAgent(
+        version,
+        KNOWLEDGE["knowledge_base"],
+        KNOWLEDGE["superseded_articles"],
+        KNOWLEDGE["orders"],
+    )
+
+
+def _kb_case(query: str, fault: str | None = None) -> dict[str, Any]:
+    return {"kind": "kb_question", "query": query, "fault": fault}
+
+
+def test_v2_hands_off_when_nothing_matches_and_v1_answers_anyway() -> None:
+    nonsense = _kb_case("zzqx plugh")
+    assert _agent("v2").handle(nonsense).escalated is True
+    v1 = _agent("v1").handle(nonsense)
+    assert v1.escalated is False and v1.answer  # the first article, confidently
+
+
+def test_title_match_decides_v2_retrieval_and_v1_ignores_it() -> None:
+    query = "Can I return a final sale item within 30 days of delivery?"
+    assert _agent("v2").handle(_kb_case(query)).fact_ids == {"final_sale_no_returns"}
+    assert _agent("v1").handle(_kb_case(query)).fact_ids == {"returns_30_days"}
+
+
+def test_tokenizer_stems_plurals_and_past_tense() -> None:
+    from examples.support_agent_evaluation.agent import _tokens
+
+    assert _tokens("Returned items, THE refunds") == {"return", "item", "refund"}
+
+
+def test_lifecycle_cross_check_detects_a_mismatch_with_the_sdk_event_stream() -> None:
+    from agent_reliability.adapters import InMemoryEventSink
+
+    record = harness.CaseRun(CASES["K01"], "v1", None, "completed", None)
+    with pytest.raises(RuntimeError):
+        harness._confirm_lifecycle([record], ["run-1"], InMemoryEventSink())
+
+
+def test_every_evaluation_reaches_the_sdk_event_stream_including_crashes(
+    runs: dict[str, dict[str, harness.CaseRun]],
+) -> None:
+    crashed = runs["v1"]["N01"]
+    assert crashed.lifecycle == "failed" and crashed.exception_type == "IndexError"
+    assert set(crashed.observations) == {"task_success", "latency"}
+
+
+def test_reports_use_unix_newlines_and_flag_small_samples(tmp_path: Path) -> None:
+    assert main(["--output-dir", str(tmp_path)]) == 0
+    for name in ("report.json", "report.md"):
+        assert b"\r" not in (tmp_path / name).read_bytes()
+    markdown = (tmp_path / "report.md").read_text("utf-8")
+    assert "(small sample)" in markdown
+    assert "synthetic validation only" in markdown
+
+
+def test_unknown_case_is_a_usage_error_not_a_traceback() -> None:
+    with pytest.raises(SystemExit) as raised:
+        main(["--case", "ZZZ"])
+    assert raised.value.code == 2

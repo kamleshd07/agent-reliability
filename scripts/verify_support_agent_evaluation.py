@@ -3,8 +3,8 @@
 Language: Python. Creates a throw-away virtual environment, installs only the built
 wheel (no dependencies, no network, no index), copies the example folder to an
 unrelated directory, runs it there and requires its reports to equal the committed
-expected reports byte for byte. Proves the example does not depend on the source
-checkout, on undocumented local files or on the network.
+expected reports byte for byte. Checks that the example does not depend on the
+source checkout or on undocumented local files, and that installation needs no network.
 
     python scripts/verify_support_agent_evaluation.py [path/to/agent_reliability-*.whl]
 """
@@ -48,21 +48,40 @@ def main(argv: list[str]) -> int:
             ],
             check=True,
         )
-        copy = work / "elsewhere" / "support_agent_evaluation"
-        shutil.copytree(EXAMPLE, copy, ignore=shutil.ignore_patterns("__pycache__"))
-        out = work / "out"
-        subprocess.run(
+        probe = subprocess.run(
             [
                 str(python),
                 "-I",
-                str(copy / "run_evaluation.py"),
-                "--output-dir",
-                str(out),
+                "-c",
+                "import agent_reliability as a; print(a.__file__)",
             ],
-            cwd=work,
             check=True,
             capture_output=True,
+            text=True,
         )
+        print(f"using the installed package: {probe.stdout.strip()}")
+        copy = work / "elsewhere" / "support_agent_evaluation"
+        shutil.copytree(EXAMPLE, copy, ignore=shutil.ignore_patterns("__pycache__"))
+        out = work / "out"
+        try:
+            subprocess.run(
+                [
+                    str(python),
+                    "-I",
+                    str(copy / "run_evaluation.py"),
+                    "--output-dir",
+                    str(out),
+                ],
+                cwd=work,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except subprocess.CalledProcessError as error:
+            print(f"the example failed (exit {error.returncode})")
+            print(error.stdout)
+            print(error.stderr)
+            return 1
         for name in ("report.json", "report.md"):
             if not filecmp.cmp(out / name, EXAMPLE / "expected" / name, shallow=False):
                 print(f"MISMATCH: {name} differs from expected/{name}")
