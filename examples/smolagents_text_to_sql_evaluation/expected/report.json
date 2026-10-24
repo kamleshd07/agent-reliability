@@ -1,0 +1,1510 @@
+{
+  "cases": [
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Woodrow Wilson",
+      "case": "Q01",
+      "duration_seconds": 1.52,
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "kind": "name",
+      "origin": "upstream",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Can you give me the name of the client who got the most expensive receipt?",
+      "sql_queries": [
+        "SELECT customer_name FROM receipts ORDER BY price DESC LIMIT 1"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Alan Payne",
+      "case": "Q02",
+      "duration_seconds": 1.32,
+      "expected": [
+        "Alan Payne"
+      ],
+      "kind": "name",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Which customer has the cheapest receipt?",
+      "sql_queries": [
+        "SELECT customer_name FROM receipts ORDER BY price ASC LIMIT 1"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The total price of all receipts is $110.46.",
+      "case": "Q03",
+      "duration_seconds": 1.35,
+      "expected": [
+        110.46
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the total price of all receipts?",
+      "sql_queries": [
+        "SELECT SUM(price) AS total_price FROM receipts"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The average receipt price is $27.62.",
+      "case": "Q04",
+      "duration_seconds": 1.3,
+      "expected": [
+        27.615
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the average receipt price?",
+      "sql_queries": [
+        "SELECT AVG(price) AS average_price FROM receipts"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "There are 4 receipts.",
+      "case": "Q05",
+      "duration_seconds": 1.13,
+      "expected": [
+        4
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "How many receipts are there?",
+      "sql_queries": [
+        "SELECT COUNT(*) FROM receipts"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The highest tip amount is $5.43.",
+      "case": "Q06",
+      "duration_seconds": 1.44,
+      "expected": [
+        5.43
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the highest tip amount?",
+      "sql_queries": [
+        "SELECT MAX(tip) AS max_tip FROM receipts"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Woodrow Wilson left the highest tip with $5.43.",
+      "case": "Q07",
+      "duration_seconds": 1.43,
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "kind": "name",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Who left the highest tip?",
+      "sql_queries": [
+        "SELECT customer_name, MAX(tip) AS max_tip FROM receipts"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The sum of all tips is 7.87",
+      "case": "Q08",
+      "duration_seconds": 1.48,
+      "expected": [
+        7.87
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the sum of all tips?",
+      "sql_queries": [
+        "SELECT SUM(tip) AS total_tips FROM receipts"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "23.86",
+      "case": "Q09",
+      "duration_seconds": 1.2,
+      "expected": [
+        23.86
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the price of receipt number 2?",
+      "sql_queries": [
+        "SELECT price FROM receipts WHERE receipt_id = 2"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Margaret James",
+      "case": "Q10",
+      "duration_seconds": 1.3,
+      "expected": [
+        "Margaret James"
+      ],
+      "kind": "name",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Who is the customer on receipt number 4?",
+      "sql_queries": [
+        "SELECT customer_name FROM receipts WHERE receipt_id = 4"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "3",
+      "case": "Q11",
+      "duration_seconds": 1.28,
+      "expected": [
+        3
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "How many receipts have a price above 20?",
+      "sql_queries": [
+        "SELECT COUNT(*) FROM receipts WHERE price > 20;"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "['Alex Mason', 'Woodrow Wilson', 'Margaret James']",
+      "case": "Q12",
+      "duration_seconds": 1.53,
+      "expected": [
+        "Alex Mason",
+        "Woodrow Wilson",
+        "Margaret James"
+      ],
+      "kind": "names",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "List the customers whose receipt price is above 20.",
+      "sql_queries": [
+        "SELECT customer_name FROM receipts WHERE price > 20;"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Alex Mason",
+      "case": "Q13",
+      "duration_seconds": 1.28,
+      "expected": [
+        "Alex Mason"
+      ],
+      "kind": "names",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Which customers left a tip of less than 1?",
+      "sql_queries": [
+        "SELECT customer_name FROM receipts WHERE tip < 1;"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Alan Payne, Woodrow Wilson, Margaret James",
+      "case": "Q14",
+      "duration_seconds": 1.41,
+      "expected": [
+        "Alan Payne",
+        "Woodrow Wilson",
+        "Margaret James"
+      ],
+      "kind": "names",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Which customers left a tip of at least 1?",
+      "sql_queries": [
+        "SELECT customer_name FROM receipts WHERE tip >= 1;"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "the question does not say whether the tip is included; the agent answered price plus tip (13.26), a defensible reading. The reference (price only) is the authors' choice, so this FAIL reflects an ambiguous question written by the authors, not an agent defect",
+        "verdict": "ambiguous_case"
+      },
+      "agent_state": "success",
+      "answer": "Alan Payne paid $13.26 for his receipt.",
+      "case": "Q15",
+      "duration_seconds": 1.59,
+      "expected": [
+        12.06
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "fail",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "How much did Alan Payne pay for his receipt?",
+      "sql_queries": [
+        "SELECT price + tip AS total_paid FROM receipts WHERE customer_name = 'Alan Payne';"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "the agent said the tip is 10% of the price; the exact value is 10.16%. A reviewer would accept rounding to a whole percent, the 0.01 tolerance does not",
+        "verdict": "evaluator_false_positive"
+      },
+      "agent_state": "success",
+      "answer": "Woodrow Wilson left a tip of 5.43, which is 10% of his receipt price of 53.43.",
+      "case": "Q16",
+      "duration_seconds": 2.6,
+      "expected": [
+        10.16
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "fail",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What percentage of his receipt price did Woodrow Wilson leave as a tip?",
+      "sql_queries": [
+        "SELECT tip, price FROM receipts WHERE customer_name = 'Woodrow Wilson';"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Alex Mason paid a total of $24.10.",
+      "case": "Q17",
+      "duration_seconds": 1.61,
+      "expected": [
+        24.1
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What did Alex Mason pay in total, price plus tip?",
+      "sql_queries": [
+        "SELECT price + tip AS total FROM receipts WHERE customer_name = 'Alex Mason';"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Alex Mason left the smallest tip.",
+      "case": "Q18",
+      "duration_seconds": 1.6,
+      "expected": [
+        "Alex Mason"
+      ],
+      "kind": "name",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Who left the smallest tip?",
+      "sql_queries": [
+        "SELECT customer_name, MIN(tip) AS smallest_tip FROM receipts ORDER BY smallest_tip ASC LIMIT 1;"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "65.49",
+      "case": "Q19",
+      "duration_seconds": 1.38,
+      "expected": [
+        65.49
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the combined price of receipts 1 and 3?",
+      "sql_queries": [
+        "SELECT SUM(price) FROM receipts WHERE receipt_id IN (1, 3)"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The difference between the most and the least expensive receipt price is $41.37.",
+      "case": "Q20",
+      "duration_seconds": 1.66,
+      "expected": [
+        41.37
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the difference between the most and the least expensive receipt price?",
+      "sql_queries": [
+        "SELECT MAX(price) - MIN(price) AS price_difference FROM receipts"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Alex Mason",
+      "case": "Q21",
+      "duration_seconds": 1.31,
+      "expected": [
+        "Alex Mason"
+      ],
+      "kind": "name",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Who has the second most expensive receipt?",
+      "sql_queries": [
+        "SELECT customer_name, price FROM receipts ORDER BY price DESC LIMIT 1, 1"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "2 customers have a first name starting with the letter A.",
+      "case": "Q22",
+      "duration_seconds": 1.55,
+      "expected": [
+        2
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "How many customers have a first name starting with the letter A?",
+      "sql_queries": [
+        "SELECT COUNT(*) FROM receipts WHERE customer_name LIKE 'A%'"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The average tip is 1.97.",
+      "case": "Q23",
+      "duration_seconds": 1.46,
+      "expected": [
+        1.9675
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the average tip?",
+      "sql_queries": [
+        "SELECT AVG(tip) AS average_tip FROM receipts"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The total amount spent across all receipts including tips is $118.33.",
+      "case": "Q24",
+      "duration_seconds": 1.65,
+      "expected": [
+        118.33
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the total amount spent across all receipts including tips?",
+      "sql_queries": [
+        "SELECT SUM(price + tip) AS total_spent FROM receipts"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "('Alan Payne', 'Alex Mason', 'Margaret James', 'Woodrow Wilson')",
+      "case": "Q25",
+      "duration_seconds": 1.45,
+      "expected": [
+        "Alan Payne",
+        "Alex Mason",
+        "Margaret James",
+        "Woodrow Wilson"
+      ],
+      "kind": "names",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "List all customer names in alphabetical order.",
+      "sql_queries": [
+        "SELECT customer_name FROM receipts ORDER BY customer_name ASC"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Woodrow Wilson left the highest tip as a percentage of their price, with a tip of 10.16%.",
+      "case": "Q26",
+      "duration_seconds": 4.05,
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "kind": "name",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Which customer left the highest tip as a percentage of their price?",
+      "sql_queries": [
+        "SELECT customer_name, (tip / price) * 100 AS tip_percentage FROM receipts ORDER BY tip_percentage DESC LIMIT 1;"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The customers with a receipt number greater than 2 are Woodrow Wilson and Margaret James.",
+      "case": "Q27",
+      "duration_seconds": 1.61,
+      "expected": [
+        "Woodrow Wilson",
+        "Margaret James"
+      ],
+      "kind": "names",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Which customers have a receipt number greater than 2?",
+      "sql_queries": [
+        "SELECT customer_name FROM receipts WHERE receipt_id > 2"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "21",
+      "case": "Q28",
+      "duration_seconds": 1.56,
+      "expected": [
+        21
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What was Margaret James's receipt price rounded to the nearest dollar?",
+      "sql_queries": [
+        "SELECT ROUND(price, 0) AS rounded_price FROM receipts WHERE customer_name = 'Margaret James';"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "2 receipts have a tip greater than 1.",
+      "case": "Q29",
+      "duration_seconds": 1.48,
+      "expected": [
+        2
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "How many receipts have a tip greater than 1?",
+      "sql_queries": [
+        "SELECT COUNT(*) FROM receipts WHERE tip > 1;"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The average price of the receipts that have a tip above 1 is $32.745.",
+      "case": "Q30",
+      "duration_seconds": 1.76,
+      "expected": [
+        32.745
+      ],
+      "kind": "number",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the average price of the receipts that have a tip above 1?",
+      "sql_queries": [
+        "SELECT AVG(price) FROM receipts WHERE tip > 1"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Woodrow Wilson paid the most with a total payment of $58.86.",
+      "case": "Q31",
+      "duration_seconds": 3.06,
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "kind": "name",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Who paid the most?",
+      "sql_queries": [
+        "SELECT customer_name, (price + tip) AS total_payment FROM receipts ORDER BY total_payment DESC LIMIT 1;"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "answer read by hand and agrees with the SQL reference",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "Woodrow Wilson",
+      "case": "Q32",
+      "duration_seconds": 1.52,
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "kind": "name",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "Which customer paid the most in total including the tip?",
+      "sql_queries": [
+        "SELECT customer_name, SUM(price + tip) as total_paid FROM receipts GROUP BY customer_name ORDER BY total_paid DESC LIMIT 1"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "the query returned no rows (no such customer) and the agent invented a price (10.50); the run state is success and no step errored",
+        "verdict": "true_failure"
+      },
+      "agent_state": "success",
+      "answer": "Bob Smith paid $10.50.",
+      "case": "Q33",
+      "duration_seconds": 1.44,
+      "expected": [],
+      "kind": "absent",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "fail",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "How much did Bob Smith pay?",
+      "sql_queries": [
+        "SELECT price + tip AS total_paid FROM receipts WHERE customer_name = 'Bob Smith';"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "there is no email column; the agent answered with a customer name instead of saying the data is not available; silent",
+        "verdict": "true_failure"
+      },
+      "agent_state": "success",
+      "answer": "Woodrow Wilson",
+      "case": "Q34",
+      "duration_seconds": 1.23,
+      "expected": [],
+      "kind": "absent",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "fail",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the email address on receipt number 3?",
+      "sql_queries": [
+        "SELECT customer_name FROM receipts WHERE receipt_id = 3"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    },
+    {
+      "adjudication": {
+        "note": "correct 'not available' answer; the first query referenced a column that does not exist and raised a tool error that the agent recovered from (counted by tool_execution)",
+        "verdict": "true_pass"
+      },
+      "agent_state": "success",
+      "answer": "The receipt with receipt_id 1 was issued to Alan Payne, but the exact date is not available.",
+      "case": "Q35",
+      "duration_seconds": 5.98,
+      "expected": [],
+      "kind": "absent",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "pass",
+        "tool_execution": "fail",
+        "tool_used": "pass"
+      },
+      "question": "On what date was receipt number 1 issued?",
+      "sql_queries": [
+        "SELECT receipt_id, customer_name, price, tip FROM receipts WHERE receipt_id = 1"
+      ],
+      "step_error_types": [
+        "AgentToolExecutionError"
+      ],
+      "steps": 3,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": true
+    },
+    {
+      "adjudication": {
+        "note": "the query returned no rows (no receipt 9) and the agent invented a price (12.50); silent",
+        "verdict": "true_failure"
+      },
+      "agent_state": "success",
+      "answer": "The price of receipt number 9 is 12.50.",
+      "case": "Q36",
+      "duration_seconds": 1.42,
+      "expected": [],
+      "kind": "absent",
+      "origin": "authored",
+      "outcomes": {
+        "latency": "pass",
+        "task_success": "fail",
+        "tool_execution": "pass",
+        "tool_used": "pass"
+      },
+      "question": "What is the price of receipt number 9?",
+      "sql_queries": [
+        "SELECT price FROM receipts WHERE receipt_id = 9"
+      ],
+      "step_error_types": [],
+      "steps": 2,
+      "tokens_in_out": null,
+      "tool_names": [
+        "sql_engine",
+        "final_answer"
+      ],
+      "upstream_visible": false
+    }
+  ],
+  "indicators": {
+    "latency": {
+      "burn_rate": null,
+      "cohort": {
+        "deterministic": true,
+        "evaluator": {
+          "configuration_id": null,
+          "name": "within-10-seconds",
+          "version": "1"
+        },
+        "indicator": "latency"
+      },
+      "counts": {
+        "considered": 36,
+        "considered_fail": 0,
+        "considered_pass": 36,
+        "fail": 0,
+        "pass": 36,
+        "unknown": 0
+      },
+      "error_budget": {
+        "allowed_bad_events": {
+          "denominator": 5,
+          "numerator": 9
+        },
+        "allowed_bad_fraction": {
+          "denominator": 20,
+          "numerator": 1
+        },
+        "consumption_ratio": {
+          "denominator": 1,
+          "numerator": 0
+        },
+        "observed_bad_events": 0,
+        "remaining_fraction": {
+          "denominator": 1,
+          "numerator": 1
+        },
+        "status": "measured"
+      },
+      "indicator": "latency",
+      "measurement_health": {
+        "health": "healthy",
+        "reasons": []
+      },
+      "reliability": {
+        "fail_ratio": {
+          "denominator": 1,
+          "numerator": 0
+        },
+        "pass_ratio": {
+          "denominator": 1,
+          "numerator": 1
+        }
+      },
+      "slo": {
+        "direction": "at_least",
+        "name": "latency",
+        "status": "met",
+        "target": {
+          "denominator": 20,
+          "numerator": 19
+        }
+      },
+      "unknown_policy": "exclude"
+    },
+    "task_success": {
+      "burn_rate": null,
+      "cohort": {
+        "deterministic": true,
+        "evaluator": {
+          "configuration_id": null,
+          "name": "matches-sql-reference",
+          "version": "1"
+        },
+        "indicator": "task_success"
+      },
+      "counts": {
+        "considered": 36,
+        "considered_fail": 5,
+        "considered_pass": 31,
+        "fail": 5,
+        "pass": 31,
+        "unknown": 0
+      },
+      "error_budget": {
+        "allowed_bad_events": {
+          "denominator": 5,
+          "numerator": 18
+        },
+        "allowed_bad_fraction": {
+          "denominator": 10,
+          "numerator": 1
+        },
+        "consumption_ratio": {
+          "denominator": 18,
+          "numerator": 25
+        },
+        "observed_bad_events": 5,
+        "remaining_fraction": {
+          "denominator": 18,
+          "numerator": -7
+        },
+        "status": "measured"
+      },
+      "indicator": "task_success",
+      "measurement_health": {
+        "health": "healthy",
+        "reasons": []
+      },
+      "reliability": {
+        "fail_ratio": {
+          "denominator": 36,
+          "numerator": 5
+        },
+        "pass_ratio": {
+          "denominator": 36,
+          "numerator": 31
+        }
+      },
+      "slo": {
+        "direction": "at_least",
+        "name": "task-success",
+        "status": "breached",
+        "target": {
+          "denominator": 10,
+          "numerator": 9
+        }
+      },
+      "unknown_policy": "treat_as_bad"
+    },
+    "tool_execution": {
+      "burn_rate": null,
+      "cohort": {
+        "deterministic": true,
+        "evaluator": {
+          "configuration_id": null,
+          "name": "no-step-error",
+          "version": "1"
+        },
+        "indicator": "tool_execution"
+      },
+      "counts": {
+        "considered": 36,
+        "considered_fail": 1,
+        "considered_pass": 35,
+        "fail": 1,
+        "pass": 35,
+        "unknown": 0
+      },
+      "error_budget": {
+        "allowed_bad_events": {
+          "denominator": 5,
+          "numerator": 9
+        },
+        "allowed_bad_fraction": {
+          "denominator": 20,
+          "numerator": 1
+        },
+        "consumption_ratio": {
+          "denominator": 9,
+          "numerator": 5
+        },
+        "observed_bad_events": 1,
+        "remaining_fraction": {
+          "denominator": 9,
+          "numerator": 4
+        },
+        "status": "measured"
+      },
+      "indicator": "tool_execution",
+      "measurement_health": {
+        "health": "healthy",
+        "reasons": []
+      },
+      "reliability": {
+        "fail_ratio": {
+          "denominator": 36,
+          "numerator": 1
+        },
+        "pass_ratio": {
+          "denominator": 36,
+          "numerator": 35
+        }
+      },
+      "slo": {
+        "direction": "at_least",
+        "name": "tool-execution",
+        "status": "met",
+        "target": {
+          "denominator": 20,
+          "numerator": 19
+        }
+      },
+      "unknown_policy": "treat_as_bad"
+    },
+    "tool_used": {
+      "burn_rate": null,
+      "cohort": {
+        "deterministic": true,
+        "evaluator": {
+          "configuration_id": null,
+          "name": "queried-database",
+          "version": "1"
+        },
+        "indicator": "tool_used"
+      },
+      "counts": {
+        "considered": 36,
+        "considered_fail": 0,
+        "considered_pass": 36,
+        "fail": 0,
+        "pass": 36,
+        "unknown": 0
+      },
+      "error_budget": {
+        "allowed_bad_events": {
+          "denominator": 5,
+          "numerator": 9
+        },
+        "allowed_bad_fraction": {
+          "denominator": 20,
+          "numerator": 1
+        },
+        "consumption_ratio": {
+          "denominator": 1,
+          "numerator": 0
+        },
+        "observed_bad_events": 0,
+        "remaining_fraction": {
+          "denominator": 1,
+          "numerator": 1
+        },
+        "status": "measured"
+      },
+      "indicator": "tool_used",
+      "measurement_health": {
+        "health": "healthy",
+        "reasons": []
+      },
+      "reliability": {
+        "fail_ratio": {
+          "denominator": 1,
+          "numerator": 0
+        },
+        "pass_ratio": {
+          "denominator": 1,
+          "numerator": 1
+        }
+      },
+      "slo": {
+        "direction": "at_least",
+        "name": "tool-used",
+        "status": "met",
+        "target": {
+          "denominator": 20,
+          "numerator": 19
+        }
+      },
+      "unknown_policy": "treat_as_bad"
+    }
+  },
+  "meta": {
+    "agent_reliability_version": "1.3.0",
+    "max_steps": 6,
+    "model_id": "qwen2.5-coder:7b",
+    "openai_version": "3.37.0",
+    "platform": "macOS-26.7.1-arm64-arm-64bit",
+    "python": "3.12.15",
+    "recorded_at": "2026-10-24",
+    "runtime": "ollama (local, OpenAI-compatible endpoint)",
+    "seed": 0,
+    "smolagents_version": "1.26.0",
+    "temperature": 0
+  },
+  "slo_design": {
+    "latency": {
+      "meaning": "the wall-clock time of the run is within 10 s",
+      "slo": "19/20"
+    },
+    "task_success": {
+      "meaning": "the final answer agrees with the independent SQL reference",
+      "slo": "9/10"
+    },
+    "tool_execution": {
+      "meaning": "no step of the run raised a tool or parsing error (recovered or not)",
+      "slo": "19/20"
+    },
+    "tool_used": {
+      "meaning": "the agent queried the database instead of answering from memory",
+      "slo": "19/20"
+    }
+  },
+  "summary": {
+    "adjudication": {
+      "ambiguous_case": 1,
+      "evaluator_false_negative": 0,
+      "evaluator_false_positive": 1,
+      "true_failure": 3,
+      "true_pass": 31,
+      "unadjudicated": 0
+    },
+    "cases": 36,
+    "runs_with_step_error": [
+      "Q35"
+    ],
+    "silent_task_failures": [
+      "Q15",
+      "Q16",
+      "Q33",
+      "Q34",
+      "Q36"
+    ],
+    "task_failures": 5,
+    "task_failures_visible_to_upstream_signals": []
+  }
+}
