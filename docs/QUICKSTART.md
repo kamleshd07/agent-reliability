@@ -13,7 +13,8 @@ hyphen; the Python import uses an underscore.
 python -m pip install agent-reliability
 ```
 
-The runnable example scripts are in the repository, not in the pip package.
+The runnable example scripts are in the repository (and in the source
+distribution), not in the installed package (the wheel).
 To run `examples/basic_reliability.py` and the other examples, clone the
 repository first (`git clone https://github.com/kamleshd07/agent-reliability.git`,
 then `cd agent-reliability`); for a checkout you can also use
