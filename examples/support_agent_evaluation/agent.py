@@ -246,7 +246,6 @@ class SupportAgent:
         self, query: str, candidates: list[dict[str, Any]]
     ) -> dict[str, Any] | None:
         query_tokens = _tokens(query)
-        lowered = query.lower()
         best: dict[str, Any] | None = None
         best_score = -1
         for article in candidates:
@@ -256,8 +255,6 @@ class SupportAgent:
             if self.version == "v2":
                 title_tokens = _tokens(str(article["title"]))
                 score += 2 * len(query_tokens & title_tokens)
-                if str(article["title"]).lower() in lowered:
-                    score += 3
             if score > best_score:  # ties keep the earlier article
                 best, best_score = article, score
         if best is None or (self.version == "v2" and best_score <= 0):

@@ -385,3 +385,19 @@ def test_unknown_case_is_a_usage_error_not_a_traceback() -> None:
     with pytest.raises(SystemExit) as raised:
         main(["--case", "ZZZ"])
     assert raised.value.code == 2
+
+
+def test_an_event_stream_that_drops_an_evaluation_is_detected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from agent_reliability.adapters import InMemoryEventSink
+    from agent_reliability.ports.events import EvaluationRecorded
+
+    class Dropping(InMemoryEventSink):
+        def emit(self, event: Any) -> None:
+            if not isinstance(event, EvaluationRecorded):
+                super().emit(event)
+
+    monkeypatch.setattr(harness, "InMemoryEventSink", Dropping)
+    with pytest.raises(RuntimeError, match="lost an evaluation"):
+        harness.run_version("v2", KNOWLEDGE, [CASES["K01"]])
