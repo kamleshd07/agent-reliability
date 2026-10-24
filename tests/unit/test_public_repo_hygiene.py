@@ -26,9 +26,17 @@ BASELINE_PROTECTED = re.compile(r"^docs/(P28_|P29_|p29-calibration/|p30/)")
 
 
 def _tracked_text_files() -> list[Path]:
-    names = subprocess.run(
-        ["git", "ls-files"], cwd=ROOT, check=True, capture_output=True, text=True
-    ).stdout.splitlines()
+    try:
+        names = subprocess.run(
+            ["git", "ls-files"], cwd=ROOT, check=True, capture_output=True, text=True
+        ).stdout.splitlines()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        # Not a git checkout (for example an extracted source distribution).
+        names = [
+            str(p.relative_to(ROOT))
+            for p in ROOT.rglob("*")
+            if p.is_file() and ".git" not in p.parts
+        ]
     return [
         ROOT / n
         for n in names

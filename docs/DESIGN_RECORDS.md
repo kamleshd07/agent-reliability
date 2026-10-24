@@ -12,3 +12,6 @@ historical documents still pass without the files being present. A link in a ret
 relocated record now reads "(relocated; see docs/DESIGN_RECORDS.md)".
 
 Security issues are reported privately through GitHub's "Report a vulnerability" (see [SECURITY.md](../SECURITY.md)).
+
+Known leftover: `docs/P28_SDK_EXPORTER_INDEPENDENT_REVIEW.md` still links to one relocated record. That file is covered by the
+byte-for-byte historical baseline and so is intentionally not edited; the link disappears when the file itself is relocated.
