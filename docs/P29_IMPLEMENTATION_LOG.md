@@ -1,7 +1,7 @@
 # P29 V1 SDK implementation log (part 1: S00-S04)
 
 Status: running log, local workspace only (`<workspace>/agent-reliability-p29`, baseline in
-[P29_WORKSPACE_BASELINE.md](P29_WORKSPACE_BASELINE.md)). Written by the implementing agent. **Nothing here is independently
+P29_WORKSPACE_BASELINE.md (relocated; see docs/DESIGN_RECORDS.md)). Written by the implementing agent. **Nothing here is independently
 verified, reviewed, committed, released or deployed.** Status words: IMPLEMENTED = code and tests exist and pass locally in this workspace
 (author-run); PARTIAL; NOT STARTED. They are not the architecture-section-0 labels VERIFIED or RELEASED, which this log does not claim.
 

@@ -72,6 +72,8 @@ exclude = [
     "/CLAUDE.md",
     "/AGENTS.md",
     "/docs/P28_*",
+    "/docs/GA_READINESS.md",
+    "/docs/DX_REVIEW.md",
     "/docs/P29_ACCEPTANCE_MATRIX.md",
     "/docs/P29_IMPLEMENTATION_LOG.md",
     "/docs/P29_INDEPENDENT_REVIEW.md",
