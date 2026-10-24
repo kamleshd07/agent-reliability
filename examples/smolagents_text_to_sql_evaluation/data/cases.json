@@ -1,0 +1,413 @@
+{
+  "table": "receipts",
+  "tolerance": 0.01,
+  "cases": [
+    {
+      "id": "Q01",
+      "question": "Can you give me the name of the client who got the most expensive receipt?",
+      "kind": "name",
+      "origin": "upstream",
+      "reference_sql": "select customer_name from receipts order by price desc limit 1",
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q02",
+      "question": "Which customer has the cheapest receipt?",
+      "kind": "name",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts order by price asc limit 1",
+      "expected": [
+        "Alan Payne"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q03",
+      "question": "What is the total price of all receipts?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select sum(price) from receipts",
+      "expected": [
+        110.46
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q04",
+      "question": "What is the average receipt price?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select avg(price) from receipts",
+      "expected": [
+        27.615
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q05",
+      "question": "How many receipts are there?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select count(*) from receipts",
+      "expected": [
+        4
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q06",
+      "question": "What is the highest tip amount?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select max(tip) from receipts",
+      "expected": [
+        5.43
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q07",
+      "question": "Who left the highest tip?",
+      "kind": "name",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts order by tip desc limit 1",
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q08",
+      "question": "What is the sum of all tips?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select sum(tip) from receipts",
+      "expected": [
+        7.87
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q09",
+      "question": "What is the price of receipt number 2?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select price from receipts where receipt_id = 2",
+      "expected": [
+        23.86
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q10",
+      "question": "Who is the customer on receipt number 4?",
+      "kind": "name",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts where receipt_id = 4",
+      "expected": [
+        "Margaret James"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q11",
+      "question": "How many receipts have a price above 20?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select count(*) from receipts where price > 20",
+      "expected": [
+        3
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q12",
+      "question": "List the customers whose receipt price is above 20.",
+      "kind": "names",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts where price > 20",
+      "expected": [
+        "Alex Mason",
+        "Woodrow Wilson",
+        "Margaret James"
+      ],
+      "forbidden": [
+        "Alan Payne"
+      ]
+    },
+    {
+      "id": "Q13",
+      "question": "Which customers left a tip of less than 1?",
+      "kind": "names",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts where tip < 1",
+      "expected": [
+        "Alex Mason"
+      ],
+      "forbidden": [
+        "Alan Payne",
+        "Woodrow Wilson",
+        "Margaret James"
+      ]
+    },
+    {
+      "id": "Q14",
+      "question": "Which customers left a tip of at least 1?",
+      "kind": "names",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts where tip >= 1",
+      "expected": [
+        "Alan Payne",
+        "Woodrow Wilson",
+        "Margaret James"
+      ],
+      "forbidden": [
+        "Alex Mason"
+      ]
+    },
+    {
+      "id": "Q15",
+      "question": "How much did Alan Payne pay for his receipt?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select price from receipts where customer_name = 'Alan Payne'",
+      "expected": [
+        12.06
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q16",
+      "question": "What percentage of his receipt price did Woodrow Wilson leave as a tip?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select round(100.0 * tip / price, 2) from receipts where customer_name = 'Woodrow Wilson'",
+      "expected": [
+        10.16
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q17",
+      "question": "What did Alex Mason pay in total, price plus tip?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select price + tip from receipts where customer_name = 'Alex Mason'",
+      "expected": [
+        24.1
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q18",
+      "question": "Who left the smallest tip?",
+      "kind": "name",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts order by tip asc limit 1",
+      "expected": [
+        "Alex Mason"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q19",
+      "question": "What is the combined price of receipts 1 and 3?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select sum(price) from receipts where receipt_id in (1, 3)",
+      "expected": [
+        65.49
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q20",
+      "question": "What is the difference between the most and the least expensive receipt price?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select max(price) - min(price) from receipts",
+      "expected": [
+        41.37
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q21",
+      "question": "Who has the second most expensive receipt?",
+      "kind": "name",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts order by price desc limit 1 offset 1",
+      "expected": [
+        "Alex Mason"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q22",
+      "question": "How many customers have a first name starting with the letter A?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select count(*) from receipts where customer_name like 'A%'",
+      "expected": [
+        2
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q23",
+      "question": "What is the average tip?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select avg(tip) from receipts",
+      "expected": [
+        1.9675
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q24",
+      "question": "What is the total amount spent across all receipts including tips?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select sum(price + tip) from receipts",
+      "expected": [
+        118.33
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q25",
+      "question": "List all customer names in alphabetical order.",
+      "kind": "names",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts order by customer_name",
+      "expected": [
+        "Alan Payne",
+        "Alex Mason",
+        "Margaret James",
+        "Woodrow Wilson"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q26",
+      "question": "Which customer left the highest tip as a percentage of their price?",
+      "kind": "name",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts order by tip / price desc limit 1",
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q27",
+      "question": "Which customers have a receipt number greater than 2?",
+      "kind": "names",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts where receipt_id > 2",
+      "expected": [
+        "Woodrow Wilson",
+        "Margaret James"
+      ],
+      "forbidden": [
+        "Alan Payne",
+        "Alex Mason"
+      ]
+    },
+    {
+      "id": "Q28",
+      "question": "What was Margaret James's receipt price rounded to the nearest dollar?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select round(price) from receipts where customer_name = 'Margaret James'",
+      "expected": [
+        21
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q29",
+      "question": "How many receipts have a tip greater than 1?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select count(*) from receipts where tip > 1",
+      "expected": [
+        2
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q30",
+      "question": "What is the average price of the receipts that have a tip above 1?",
+      "kind": "number",
+      "origin": "authored",
+      "reference_sql": "select avg(price) from receipts where tip > 1",
+      "expected": [
+        32.745
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q31",
+      "question": "Who paid the most?",
+      "kind": "name",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts order by price desc limit 1",
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q32",
+      "question": "Which customer paid the most in total including the tip?",
+      "kind": "name",
+      "origin": "authored",
+      "reference_sql": "select customer_name from receipts order by price + tip desc limit 1",
+      "expected": [
+        "Woodrow Wilson"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "Q33",
+      "question": "How much did Bob Smith pay?",
+      "kind": "absent",
+      "origin": "authored",
+      "reference_sql": null,
+      "expected": [],
+      "forbidden": []
+    },
+    {
+      "id": "Q34",
+      "question": "What is the email address on receipt number 3?",
+      "kind": "absent",
+      "origin": "authored",
+      "reference_sql": null,
+      "expected": [],
+      "forbidden": []
+    },
+    {
+      "id": "Q35",
+      "question": "On what date was receipt number 1 issued?",
+      "kind": "absent",
+      "origin": "authored",
+      "reference_sql": null,
+      "expected": [],
+      "forbidden": []
+    },
+    {
+      "id": "Q36",
+      "question": "What is the price of receipt number 9?",
+      "kind": "absent",
+      "origin": "authored",
+      "reference_sql": null,
+      "expected": [],
+      "forbidden": []
+    }
+  ]
+}
