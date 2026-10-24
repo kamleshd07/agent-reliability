@@ -8,6 +8,8 @@ e-mail addresses or secret-shaped strings, and every relative link must resolve.
 from __future__ import annotations
 
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -22,12 +24,16 @@ FORBIDDEN = {
     "roadmap or decision id": re.compile(
         r"\b(?:RM-[A-Z]+-\d+|D-S\d+|S\d+[A-Z]?-OD-\d+)\b"
     ),
-    "private platform repository": re.compile(r"agent-reliability-platform", re.I),
+    "private platform repository": re.compile(
+        r"agent-reliability-" + "plat" + "form", re.I
+    ),
     "local path": re.compile(r"/(?:Users|home)/[A-Za-z0-9._-]+|[A-Za-z]:\\Users\\"),
     "e-mail address": re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"),
     "secret-shaped value": re.compile(
         r"AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,}"
-        r"|-----BEGIN [A-Z ]*PRIVATE KEY-----|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
+        r"|-{5}BEGIN [A-Z ]*PRIV"
+        r"ATE KE"
+        r"Y-{5}|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
     ),
     "internal gate language": re.compile(
         r"\b(?:NO-GO|design[- ]partner|Phase B)\b", re.I
@@ -59,3 +65,18 @@ def test_guide_documents_private_security_reporting_and_synthetic_label() -> Non
     text = DOCS[0].read_text(encoding="utf-8")
     assert "Report a vulnerability" in text
     assert "synthetic validation" in text.lower()
+
+
+def test_guide_snippet_runs_and_prints_the_documented_output() -> None:
+    text = DOCS[0].read_text(encoding="utf-8")
+    code = re.search(r"```python\n(.*?)```", text, re.S)
+    expected = re.search(r"```text\n(Indicator:.*?)```", text, re.S)
+    assert code is not None and expected is not None
+    done = subprocess.run(
+        [sys.executable, "-I", "-c", code.group(1)],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=60,
+    )
+    assert done.stdout.strip() == expected.group(1).strip()

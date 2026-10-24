@@ -20,7 +20,7 @@ or unknown), and compute reliability against an explicit objective:
   to average results from different evaluators or evaluator versions instead of returning a
   misleading number.
 
-It runs locally. It sends nothing over the network, and it does not capture prompts,
+It runs locally. By default it sends nothing over the network (the optional HTTP exporter is off unless you configure it), and it does not capture prompts,
 responses or tool arguments unless you pass them to an evaluator yourself.
 
 It does **not**: trace your agent automatically, call a model to judge answers (the LLM-judge
@@ -57,7 +57,9 @@ python run_evaluation.py
 
 It evaluates a synthetic support agent in two versions over 38 synthetic requests, offline.
 Compare your console output with the README in that folder, and read `--format markdown` for
-the full report. Everything in it is synthetic: it shows what the reports look like, not how
+the full report. A full run is byte-for-byte reproducible: `python run_evaluation.py
+--output-dir out` followed by `diff out/report.json expected/report.json` prints nothing.
+Everything in it is synthetic: it shows what the reports look like, not how
 good the SDK is for your agent.
 
 ## 5. Instrument your own agent
@@ -157,7 +159,7 @@ semantics are in [SLO_SEMANTICS.md](SLO_SEMANTICS.md).
 
 ## 7. Read the result
 
-* **Reliability** is exact, not an estimate. With small samples one case moves it a lot.
+* **Reliability** is exact for the observations you gave it, not an estimate of anything beyond them. With small samples one case moves it a lot.
 * **SLO status** is met or breached against your target. **Budget remaining** below zero means
   the budget is overspent; the size shows by how much.
 * **Pass/fail/unknown counts** are kept separate; UNKNOWN is never silently counted as pass.
