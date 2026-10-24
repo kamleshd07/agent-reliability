@@ -6,6 +6,17 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Added (example): offline support-agent reliability evaluation
+
+- `examples/support_agent_evaluation/`: a deterministic, offline, synthetic evaluation of a tool-using
+  support agent (two versions, 38 labelled cases, committed expected reports) using only stable
+  APIs: `AgentReliability.run`, `EvaluatorRunner`, the built-in evaluators, `evaluate_reliability`,
+  `report_to_dict`. It shows SLIs, SLOs, error-budget consumption, silent failures versus ordinary
+  logs, a v1 -> v2 regression comparison, evaluator false positives/negatives against an independent
+  oracle, and the SDK refusing to mix two evaluator versions. Tests: `tests/unit/examples/`.
+  No SDK source, public API, dependency or wire contract changed. It is synthetic validation, not
+  evidence about real users.
+
 ### Added (experimental): judge calibration and evidence admission (P29, Session 4)
 
 - New Experimental namespace `agent_reliability.experimental.calibration` (stdlib only; no network; no

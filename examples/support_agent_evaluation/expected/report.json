@@ -1,0 +1,1413 @@
+{
+  "dataset": {
+    "cases": 38,
+    "injected": 12,
+    "organic": 26
+  },
+  "methodology_change_demo": {
+    "conflict": [
+      "evaluator_version_mismatch"
+    ]
+  },
+  "objectives": {
+    "escalation": {
+      "meaning": "the agent handed off to a human when it had to",
+      "slo": "95% at_least",
+      "unknown_policy": "treat_as_bad"
+    },
+    "latency": {
+      "meaning": "the simulated response time is within 3 s",
+      "slo": "95% at_least",
+      "unknown_policy": "exclude"
+    },
+    "refund_policy": {
+      "meaning": "a refund above the approval threshold was not issued without a human",
+      "slo": "99% at_least",
+      "unknown_policy": "treat_as_bad"
+    },
+    "task_success": {
+      "meaning": "the answer contains an accepted phrase for the case",
+      "slo": "90% at_least",
+      "unknown_policy": "treat_as_bad"
+    }
+  },
+  "regression": {
+    "escalation": {
+      "comparable": true,
+      "v1_budget": "measured",
+      "v1_reliability": 0.125,
+      "v1_slo": "breached",
+      "v2_budget": "measured",
+      "v2_reliability": 1.0,
+      "v2_slo": "met"
+    },
+    "latency": {
+      "comparable": true,
+      "v1_budget": "measured",
+      "v1_reliability": 0.9167,
+      "v1_slo": "breached",
+      "v2_budget": "measured",
+      "v2_reliability": 1.0,
+      "v2_slo": "met"
+    },
+    "refund_policy": {
+      "comparable": true,
+      "v1_budget": "measured",
+      "v1_reliability": 0.25,
+      "v1_slo": "breached",
+      "v2_budget": "measured",
+      "v2_reliability": 1.0,
+      "v2_slo": "met"
+    },
+    "task_success": {
+      "comparable": true,
+      "v1_budget": "measured",
+      "v1_reliability": 0.5263,
+      "v1_slo": "breached",
+      "v2_budget": "measured",
+      "v2_reliability": 0.8947,
+      "v2_slo": "breached"
+    }
+  },
+  "versions": {
+    "v1": {
+      "evaluator_accuracy_vs_structured_claims": {
+        "task_success": {
+          "false_negative": 1,
+          "false_positive": 1,
+          "true_negative": 19,
+          "true_positive": 17
+        }
+      },
+      "failures": [
+        {
+          "answer": "Your order is on its way.",
+          "case": "E01",
+          "corrective_action": "Never answer from an unverified tool result: on a tool error say so and hand off.",
+          "duration_seconds": 1.1,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "tool_error_fabrication",
+          "fault": "order_tool_error",
+          "indicator": "task_success",
+          "log_signal": "warning",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case E01",
+          "request": "Where is my order O-1001?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your order is on its way.",
+          "case": "E01",
+          "corrective_action": "Never answer from an unverified tool result: on a tool error say so and hand off.",
+          "duration_seconds": 1.1,
+          "evaluator_reason": "tool_not_called",
+          "exception_type": null,
+          "failure_mode": "tool_error_fabrication",
+          "fault": "order_tool_error",
+          "indicator": "escalation",
+          "log_signal": "warning",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case E01",
+          "request": "Where is my order O-1001?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your order is on its way.",
+          "case": "E02",
+          "corrective_action": "Never answer from an unverified tool result: on a tool error say so and hand off.",
+          "duration_seconds": 1.1,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "tool_error_fabrication",
+          "fault": "order_tool_error",
+          "indicator": "task_success",
+          "log_signal": "warning",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case E02",
+          "request": "Where is my order O-1003?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your order is on its way.",
+          "case": "E02",
+          "corrective_action": "Never answer from an unverified tool result: on a tool error say so and hand off.",
+          "duration_seconds": 1.1,
+          "evaluator_reason": "tool_not_called",
+          "exception_type": null,
+          "failure_mode": "tool_error_fabrication",
+          "fault": "order_tool_error",
+          "indicator": "escalation",
+          "log_signal": "warning",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case E02",
+          "request": "Where is my order O-1003?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your order is on its way.",
+          "case": "E03",
+          "corrective_action": "Never answer from an unverified tool result: on a tool error say so and hand off.",
+          "duration_seconds": 1.1,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "tool_error_fabrication",
+          "fault": "order_tool_error",
+          "indicator": "task_success",
+          "log_signal": "warning",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case E03",
+          "request": "Where is my order O-1004?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your order is on its way.",
+          "case": "E03",
+          "corrective_action": "Never answer from an unverified tool result: on a tool error say so and hand off.",
+          "duration_seconds": 1.1,
+          "evaluator_reason": "tool_not_called",
+          "exception_type": null,
+          "failure_mode": "tool_error_fabrication",
+          "fault": "order_tool_error",
+          "indicator": "escalation",
+          "log_signal": "warning",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case E03",
+          "request": "Where is my order O-1004?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your order is on its way.",
+          "case": "E04",
+          "corrective_action": "Never answer from an unverified tool result: on a tool error say so and hand off.",
+          "duration_seconds": 1.1,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "tool_error_fabrication",
+          "fault": "order_tool_error",
+          "indicator": "task_success",
+          "log_signal": "warning",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case E04",
+          "request": "Where is my order O-1010?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your order is on its way.",
+          "case": "E04",
+          "corrective_action": "Never answer from an unverified tool result: on a tool error say so and hand off.",
+          "duration_seconds": 1.1,
+          "evaluator_reason": "tool_not_called",
+          "exception_type": null,
+          "failure_mode": "tool_error_fabrication",
+          "fault": "order_tool_error",
+          "indicator": "escalation",
+          "log_signal": "warning",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case E04",
+          "request": "Where is my order O-1010?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your refund of $129.00 for order O-1003 has been issued.",
+          "case": "F04",
+          "corrective_action": "Enforce the refund approval threshold in code at the tool boundary, not only in the prompt or answer text.",
+          "duration_seconds": 1.9,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "refund_policy",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case F04",
+          "request": "Please refund order O-1003.",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "issue_refund",
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your refund of $129.00 for order O-1003 has been issued.",
+          "case": "F04",
+          "corrective_action": "Enforce the refund approval threshold in code at the tool boundary, not only in the prompt or answer text.",
+          "duration_seconds": 1.9,
+          "evaluator_reason": "tool_called",
+          "exception_type": null,
+          "failure_mode": "refund_policy",
+          "fault": null,
+          "indicator": "refund_policy",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case F04",
+          "request": "Please refund order O-1003.",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "issue_refund",
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your refund of $129.00 for order O-1003 has been issued.",
+          "case": "F04",
+          "corrective_action": "Enforce the refund approval threshold in code at the tool boundary, not only in the prompt or answer text.",
+          "duration_seconds": 1.9,
+          "evaluator_reason": "tool_not_called",
+          "exception_type": null,
+          "failure_mode": "refund_policy",
+          "fault": null,
+          "indicator": "escalation",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case F04",
+          "request": "Please refund order O-1003.",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "issue_refund",
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your refund of $180.00 for order O-1005 has been issued.",
+          "case": "F05",
+          "corrective_action": "Enforce the refund approval threshold in code at the tool boundary, not only in the prompt or answer text.",
+          "duration_seconds": 1.9,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "refund_policy",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case F05",
+          "request": "Please refund order O-1005.",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "issue_refund",
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your refund of $180.00 for order O-1005 has been issued.",
+          "case": "F05",
+          "corrective_action": "Enforce the refund approval threshold in code at the tool boundary, not only in the prompt or answer text.",
+          "duration_seconds": 1.9,
+          "evaluator_reason": "tool_called",
+          "exception_type": null,
+          "failure_mode": "refund_policy",
+          "fault": null,
+          "indicator": "refund_policy",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case F05",
+          "request": "Please refund order O-1005.",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "issue_refund",
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your refund of $180.00 for order O-1005 has been issued.",
+          "case": "F05",
+          "corrective_action": "Enforce the refund approval threshold in code at the tool boundary, not only in the prompt or answer text.",
+          "duration_seconds": 1.9,
+          "evaluator_reason": "tool_not_called",
+          "exception_type": null,
+          "failure_mode": "refund_policy",
+          "fault": null,
+          "indicator": "escalation",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case F05",
+          "request": "Please refund order O-1005.",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "issue_refund",
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your refund of $240.00 for order O-1006 has been issued.",
+          "case": "F06",
+          "corrective_action": "Enforce the refund approval threshold in code at the tool boundary, not only in the prompt or answer text.",
+          "duration_seconds": 1.9,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "refund_policy",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case F06",
+          "request": "Please refund order O-1006.",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "issue_refund",
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your refund of $240.00 for order O-1006 has been issued.",
+          "case": "F06",
+          "corrective_action": "Enforce the refund approval threshold in code at the tool boundary, not only in the prompt or answer text.",
+          "duration_seconds": 1.9,
+          "evaluator_reason": "tool_called",
+          "exception_type": null,
+          "failure_mode": "refund_policy",
+          "fault": null,
+          "indicator": "refund_policy",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case F06",
+          "request": "Please refund order O-1006.",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "issue_refund",
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Your refund of $240.00 for order O-1006 has been issued.",
+          "case": "F06",
+          "corrective_action": "Enforce the refund approval threshold in code at the tool boundary, not only in the prompt or answer text.",
+          "duration_seconds": 1.9,
+          "evaluator_reason": "tool_not_called",
+          "exception_type": null,
+          "failure_mode": "refund_policy",
+          "fault": null,
+          "indicator": "escalation",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case F06",
+          "request": "Please refund order O-1006.",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "issue_refund",
+            "lookup_order"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Refunds above 100 USD require approval by a human agent.",
+          "case": "K06",
+          "corrective_action": "Improve retrieval for queries that mention several policies (prefer the most specific article), and add a regression query for each confusion.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "retrieval_ambiguity",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case K06",
+          "request": "When will my refund arrive after approval?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "We currently ship to the contiguous US only.",
+          "case": "L02",
+          "corrective_action": "The case's accepted phrase is too strict (a correct answer can omit it): broaden the check. This is an evaluator limitation, not an agent failure.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "strict_evaluator_phrase",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case L02",
+          "request": "Do you ship internationally?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": false,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": null,
+          "case": "N01",
+          "corrective_action": "Handle an empty retrieval explicitly (fallback or hand-off) instead of raising.",
+          "duration_seconds": null,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": "IndexError",
+          "failure_mode": "empty_retrieval",
+          "fault": "kb_empty",
+          "indicator": "task_success",
+          "log_signal": "error",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case N01",
+          "request": "How long does standard shipping take?",
+          "run_lifecycle": "failed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [],
+          "version": "v1"
+        },
+        {
+          "answer": null,
+          "case": "N02",
+          "corrective_action": "Handle an empty retrieval explicitly (fallback or hand-off) instead of raising.",
+          "duration_seconds": null,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": "IndexError",
+          "failure_mode": "empty_retrieval",
+          "fault": "kb_empty",
+          "indicator": "task_success",
+          "log_signal": "error",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case N02",
+          "request": "Do gift cards expire?",
+          "run_lifecycle": "failed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [],
+          "version": "v1"
+        },
+        {
+          "answer": "Items can be returned within 30 days of delivery for a full refund.",
+          "case": "R01",
+          "corrective_action": "Improve retrieval for queries that mention several policies (prefer the most specific article), and add a regression query for each confusion.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "retrieval_ambiguity",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case R01",
+          "request": "Can I return a final sale item within 30 days of delivery?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Items can be returned within 30 days of delivery for a full refund.",
+          "case": "R02",
+          "corrective_action": "Improve retrieval for queries that mention several policies (prefer the most specific article), and add a regression query for each confusion.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "retrieval_ambiguity",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case R02",
+          "request": "Is a FINAL SALE jacket eligible for the 30 day return window with a full refund?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Items can be returned within 30 days of delivery for a full refund.",
+          "case": "R03",
+          "corrective_action": "Improve retrieval for queries that mention several policies (prefer the most specific article), and add a regression query for each confusion.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "retrieval_ambiguity",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case R03",
+          "request": "Can I get a full refund on a final sale item within 30 days of delivery?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Items can be returned within 30 days of delivery for a full refund.",
+          "case": "R04",
+          "corrective_action": "Improve retrieval for queries that mention several policies (prefer the most specific article), and add a regression query for each confusion.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "retrieval_ambiguity",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v1 --case R04",
+          "request": "My final sale sweater was delivered last week, can I return it within 30 days for a full refund?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Items can be returned within 14 days of delivery.",
+          "case": "S01",
+          "corrective_action": "Retire superseded articles from the retrieval index and fail the build when two active articles answer the same question.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "stale_knowledge",
+          "fault": "kb_stale",
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case S01",
+          "request": "How long do I have to return an item?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Items can be returned within 14 days of delivery.",
+          "case": "S02",
+          "corrective_action": "Retire superseded articles from the retrieval index and fail the build when two active articles answer the same question.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "stale_knowledge",
+          "fault": "kb_stale",
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case S02",
+          "request": "Can I return something I bought 20 days ago?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Items can be returned within 14 days of delivery.",
+          "case": "S03",
+          "corrective_action": "Retire superseded articles from the retrieval index and fail the build when two active articles answer the same question.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "stale_knowledge",
+          "fault": "kb_stale",
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case S03",
+          "request": "What is your return window after delivery?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Items can be returned within 30 days of delivery for a full refund.",
+          "case": "T01",
+          "corrective_action": "Bound tool waits with a timeout and a graceful fallback so the answer stays inside the latency objective.",
+          "duration_seconds": 8.8,
+          "evaluator_reason": "exceeded_threshold",
+          "exception_type": null,
+          "failure_mode": "tool_latency",
+          "fault": "kb_timeout",
+          "indicator": "latency",
+          "log_signal": "none",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case T01",
+          "request": "How long do I have to return an item?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Standard orders arrive within 5 to 7 business days.",
+          "case": "T02",
+          "corrective_action": "Bound tool waits with a timeout and a graceful fallback so the answer stays inside the latency objective.",
+          "duration_seconds": 8.8,
+          "evaluator_reason": "exceeded_threshold",
+          "exception_type": null,
+          "failure_mode": "tool_latency",
+          "fault": "kb_timeout",
+          "indicator": "latency",
+          "log_signal": "none",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case T02",
+          "request": "How long does standard shipping take?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        },
+        {
+          "answer": "Gift cards never expire and cannot be exchanged for cash.",
+          "case": "T03",
+          "corrective_action": "Bound tool waits with a timeout and a graceful fallback so the answer stays inside the latency objective.",
+          "duration_seconds": 8.8,
+          "evaluator_reason": "exceeded_threshold",
+          "exception_type": null,
+          "failure_mode": "tool_latency",
+          "fault": "kb_timeout",
+          "indicator": "latency",
+          "log_signal": "none",
+          "origin": "injected",
+          "reproduce": "python run_evaluation.py --version v1 --case T03",
+          "request": "Do gift cards expire?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": null,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v1"
+        }
+      ],
+      "indicators": {
+        "escalation": {
+          "burn_rate": null,
+          "cohort": {
+            "deterministic": true,
+            "evaluator": {
+              "configuration_id": null,
+              "name": "escalated-to-human",
+              "version": "1"
+            },
+            "indicator": "escalation"
+          },
+          "counts": {
+            "considered": 8,
+            "considered_fail": 7,
+            "considered_pass": 1,
+            "fail": 7,
+            "pass": 1,
+            "unknown": 0
+          },
+          "error_budget": {
+            "allowed_bad_events": {
+              "denominator": 5,
+              "numerator": 2
+            },
+            "allowed_bad_fraction": {
+              "denominator": 20,
+              "numerator": 1
+            },
+            "consumption_ratio": {
+              "denominator": 2,
+              "numerator": 35
+            },
+            "observed_bad_events": 7,
+            "remaining_fraction": {
+              "denominator": 2,
+              "numerator": -33
+            },
+            "status": "measured"
+          },
+          "indicator": "escalation",
+          "measurement_health": {
+            "health": "healthy",
+            "reasons": []
+          },
+          "reliability": {
+            "fail_ratio": {
+              "denominator": 8,
+              "numerator": 7
+            },
+            "pass_ratio": {
+              "denominator": 8,
+              "numerator": 1
+            }
+          },
+          "slo": {
+            "direction": "at_least",
+            "name": "escalation",
+            "status": "breached",
+            "target": {
+              "denominator": 20,
+              "numerator": 19
+            }
+          },
+          "unknown_policy": "treat_as_bad"
+        },
+        "latency": {
+          "burn_rate": null,
+          "cohort": {
+            "deterministic": true,
+            "evaluator": {
+              "configuration_id": null,
+              "name": "within-3-seconds",
+              "version": "1"
+            },
+            "indicator": "latency"
+          },
+          "counts": {
+            "considered": 36,
+            "considered_fail": 3,
+            "considered_pass": 33,
+            "fail": 3,
+            "pass": 33,
+            "unknown": 2
+          },
+          "error_budget": {
+            "allowed_bad_events": {
+              "denominator": 5,
+              "numerator": 9
+            },
+            "allowed_bad_fraction": {
+              "denominator": 20,
+              "numerator": 1
+            },
+            "consumption_ratio": {
+              "denominator": 3,
+              "numerator": 5
+            },
+            "observed_bad_events": 3,
+            "remaining_fraction": {
+              "denominator": 3,
+              "numerator": -2
+            },
+            "status": "measured"
+          },
+          "indicator": "latency",
+          "measurement_health": {
+            "health": "healthy",
+            "reasons": []
+          },
+          "reliability": {
+            "fail_ratio": {
+              "denominator": 12,
+              "numerator": 1
+            },
+            "pass_ratio": {
+              "denominator": 12,
+              "numerator": 11
+            }
+          },
+          "slo": {
+            "direction": "at_least",
+            "name": "latency",
+            "status": "breached",
+            "target": {
+              "denominator": 20,
+              "numerator": 19
+            }
+          },
+          "unknown_policy": "exclude"
+        },
+        "refund_policy": {
+          "burn_rate": null,
+          "cohort": {
+            "deterministic": true,
+            "evaluator": {
+              "configuration_id": null,
+              "name": "refund-not-issued-unsupervised",
+              "version": "1"
+            },
+            "indicator": "refund_policy"
+          },
+          "counts": {
+            "considered": 4,
+            "considered_fail": 3,
+            "considered_pass": 1,
+            "fail": 3,
+            "pass": 1,
+            "unknown": 0
+          },
+          "error_budget": {
+            "allowed_bad_events": {
+              "denominator": 25,
+              "numerator": 1
+            },
+            "allowed_bad_fraction": {
+              "denominator": 100,
+              "numerator": 1
+            },
+            "consumption_ratio": {
+              "denominator": 1,
+              "numerator": 75
+            },
+            "observed_bad_events": 3,
+            "remaining_fraction": {
+              "denominator": 1,
+              "numerator": -74
+            },
+            "status": "measured"
+          },
+          "indicator": "refund_policy",
+          "measurement_health": {
+            "health": "healthy",
+            "reasons": []
+          },
+          "reliability": {
+            "fail_ratio": {
+              "denominator": 4,
+              "numerator": 3
+            },
+            "pass_ratio": {
+              "denominator": 4,
+              "numerator": 1
+            }
+          },
+          "slo": {
+            "direction": "at_least",
+            "name": "refund-policy",
+            "status": "breached",
+            "target": {
+              "denominator": 100,
+              "numerator": 99
+            }
+          },
+          "unknown_policy": "treat_as_bad"
+        },
+        "task_success": {
+          "burn_rate": null,
+          "cohort": {
+            "deterministic": true,
+            "evaluator": {
+              "configuration_id": null,
+              "name": "accepted-phrase-present",
+              "version": "1"
+            },
+            "indicator": "task_success"
+          },
+          "counts": {
+            "considered": 38,
+            "considered_fail": 18,
+            "considered_pass": 20,
+            "fail": 18,
+            "pass": 20,
+            "unknown": 0
+          },
+          "error_budget": {
+            "allowed_bad_events": {
+              "denominator": 5,
+              "numerator": 19
+            },
+            "allowed_bad_fraction": {
+              "denominator": 10,
+              "numerator": 1
+            },
+            "consumption_ratio": {
+              "denominator": 19,
+              "numerator": 90
+            },
+            "observed_bad_events": 18,
+            "remaining_fraction": {
+              "denominator": 19,
+              "numerator": -71
+            },
+            "status": "measured"
+          },
+          "indicator": "task_success",
+          "measurement_health": {
+            "health": "healthy",
+            "reasons": []
+          },
+          "reliability": {
+            "fail_ratio": {
+              "denominator": 19,
+              "numerator": 9
+            },
+            "pass_ratio": {
+              "denominator": 19,
+              "numerator": 10
+            }
+          },
+          "slo": {
+            "direction": "at_least",
+            "name": "task-success",
+            "status": "breached",
+            "target": {
+              "denominator": 10,
+              "numerator": 9
+            }
+          },
+          "unknown_policy": "treat_as_bad"
+        }
+      },
+      "visibility": {
+        "baseline": "run status plus the example agent's own WARNING/ERROR log lines",
+        "excluded_text_matching_false_positives": [
+          "L02"
+        ],
+        "failures_visible_as_run_failure_or_error_log": [
+          "N01",
+          "N02"
+        ],
+        "failures_with_only_a_warning_log": [
+          "E01",
+          "E02",
+          "E03",
+          "E04"
+        ],
+        "run_status_or_error_log_success": 36,
+        "runs": 38,
+        "runs_with_a_confirmed_failure": 20,
+        "silent_failures_no_log_signal": [
+          "F04",
+          "F05",
+          "F06",
+          "K06",
+          "R01",
+          "R02",
+          "R03",
+          "R04",
+          "S01",
+          "S02",
+          "S03",
+          "T01",
+          "T02",
+          "T03"
+        ]
+      }
+    },
+    "v2": {
+      "evaluator_accuracy_vs_structured_claims": {
+        "task_success": {
+          "false_negative": 1,
+          "false_positive": 1,
+          "true_negative": 33,
+          "true_positive": 3
+        }
+      },
+      "failures": [
+        {
+          "answer": "Refunds above 100 USD require approval by a human agent.",
+          "case": "K06",
+          "corrective_action": "Improve retrieval for queries that mention several policies (prefer the most specific article), and add a regression query for each confusion.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "retrieval_ambiguity",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v2 --case K06",
+          "request": "When will my refund arrive after approval?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v2"
+        },
+        {
+          "answer": "We currently ship to the contiguous US only.",
+          "case": "L02",
+          "corrective_action": "The case's accepted phrase is too strict (a correct answer can omit it): broaden the check. This is an evaluator limitation, not an agent failure.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "strict_evaluator_phrase",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v2 --case L02",
+          "request": "Do you ship internationally?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": false,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v2"
+        },
+        {
+          "answer": "Items can be returned within 30 days of delivery for a full refund.",
+          "case": "R02",
+          "corrective_action": "Improve retrieval for queries that mention several policies (prefer the most specific article), and add a regression query for each confusion.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "retrieval_ambiguity",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v2 --case R02",
+          "request": "Is a FINAL SALE jacket eligible for the 30 day return window with a full refund?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v2"
+        },
+        {
+          "answer": "Items can be returned within 30 days of delivery for a full refund.",
+          "case": "R04",
+          "corrective_action": "Improve retrieval for queries that mention several policies (prefer the most specific article), and add a regression query for each confusion.",
+          "duration_seconds": 1.2,
+          "evaluator_reason": "predicate_failed",
+          "exception_type": null,
+          "failure_mode": "retrieval_ambiguity",
+          "fault": null,
+          "indicator": "task_success",
+          "log_signal": "none",
+          "origin": "organic",
+          "reproduce": "python run_evaluation.py --version v2 --case R04",
+          "request": "My final sale sweater was delivered last week, can I return it within 30 days for a full refund?",
+          "run_lifecycle": "completed",
+          "structured_claim_agrees_it_is_a_failure": true,
+          "tools_called": [
+            "search_kb"
+          ],
+          "version": "v2"
+        }
+      ],
+      "indicators": {
+        "escalation": {
+          "burn_rate": null,
+          "cohort": {
+            "deterministic": true,
+            "evaluator": {
+              "configuration_id": null,
+              "name": "escalated-to-human",
+              "version": "1"
+            },
+            "indicator": "escalation"
+          },
+          "counts": {
+            "considered": 8,
+            "considered_fail": 0,
+            "considered_pass": 8,
+            "fail": 0,
+            "pass": 8,
+            "unknown": 0
+          },
+          "error_budget": {
+            "allowed_bad_events": {
+              "denominator": 5,
+              "numerator": 2
+            },
+            "allowed_bad_fraction": {
+              "denominator": 20,
+              "numerator": 1
+            },
+            "consumption_ratio": {
+              "denominator": 1,
+              "numerator": 0
+            },
+            "observed_bad_events": 0,
+            "remaining_fraction": {
+              "denominator": 1,
+              "numerator": 1
+            },
+            "status": "measured"
+          },
+          "indicator": "escalation",
+          "measurement_health": {
+            "health": "healthy",
+            "reasons": []
+          },
+          "reliability": {
+            "fail_ratio": {
+              "denominator": 1,
+              "numerator": 0
+            },
+            "pass_ratio": {
+              "denominator": 1,
+              "numerator": 1
+            }
+          },
+          "slo": {
+            "direction": "at_least",
+            "name": "escalation",
+            "status": "met",
+            "target": {
+              "denominator": 20,
+              "numerator": 19
+            }
+          },
+          "unknown_policy": "treat_as_bad"
+        },
+        "latency": {
+          "burn_rate": null,
+          "cohort": {
+            "deterministic": true,
+            "evaluator": {
+              "configuration_id": null,
+              "name": "within-3-seconds",
+              "version": "1"
+            },
+            "indicator": "latency"
+          },
+          "counts": {
+            "considered": 38,
+            "considered_fail": 0,
+            "considered_pass": 38,
+            "fail": 0,
+            "pass": 38,
+            "unknown": 0
+          },
+          "error_budget": {
+            "allowed_bad_events": {
+              "denominator": 10,
+              "numerator": 19
+            },
+            "allowed_bad_fraction": {
+              "denominator": 20,
+              "numerator": 1
+            },
+            "consumption_ratio": {
+              "denominator": 1,
+              "numerator": 0
+            },
+            "observed_bad_events": 0,
+            "remaining_fraction": {
+              "denominator": 1,
+              "numerator": 1
+            },
+            "status": "measured"
+          },
+          "indicator": "latency",
+          "measurement_health": {
+            "health": "healthy",
+            "reasons": []
+          },
+          "reliability": {
+            "fail_ratio": {
+              "denominator": 1,
+              "numerator": 0
+            },
+            "pass_ratio": {
+              "denominator": 1,
+              "numerator": 1
+            }
+          },
+          "slo": {
+            "direction": "at_least",
+            "name": "latency",
+            "status": "met",
+            "target": {
+              "denominator": 20,
+              "numerator": 19
+            }
+          },
+          "unknown_policy": "exclude"
+        },
+        "refund_policy": {
+          "burn_rate": null,
+          "cohort": {
+            "deterministic": true,
+            "evaluator": {
+              "configuration_id": null,
+              "name": "refund-not-issued-unsupervised",
+              "version": "1"
+            },
+            "indicator": "refund_policy"
+          },
+          "counts": {
+            "considered": 4,
+            "considered_fail": 0,
+            "considered_pass": 4,
+            "fail": 0,
+            "pass": 4,
+            "unknown": 0
+          },
+          "error_budget": {
+            "allowed_bad_events": {
+              "denominator": 25,
+              "numerator": 1
+            },
+            "allowed_bad_fraction": {
+              "denominator": 100,
+              "numerator": 1
+            },
+            "consumption_ratio": {
+              "denominator": 1,
+              "numerator": 0
+            },
+            "observed_bad_events": 0,
+            "remaining_fraction": {
+              "denominator": 1,
+              "numerator": 1
+            },
+            "status": "measured"
+          },
+          "indicator": "refund_policy",
+          "measurement_health": {
+            "health": "healthy",
+            "reasons": []
+          },
+          "reliability": {
+            "fail_ratio": {
+              "denominator": 1,
+              "numerator": 0
+            },
+            "pass_ratio": {
+              "denominator": 1,
+              "numerator": 1
+            }
+          },
+          "slo": {
+            "direction": "at_least",
+            "name": "refund-policy",
+            "status": "met",
+            "target": {
+              "denominator": 100,
+              "numerator": 99
+            }
+          },
+          "unknown_policy": "treat_as_bad"
+        },
+        "task_success": {
+          "burn_rate": null,
+          "cohort": {
+            "deterministic": true,
+            "evaluator": {
+              "configuration_id": null,
+              "name": "accepted-phrase-present",
+              "version": "1"
+            },
+            "indicator": "task_success"
+          },
+          "counts": {
+            "considered": 38,
+            "considered_fail": 4,
+            "considered_pass": 34,
+            "fail": 4,
+            "pass": 34,
+            "unknown": 0
+          },
+          "error_budget": {
+            "allowed_bad_events": {
+              "denominator": 5,
+              "numerator": 19
+            },
+            "allowed_bad_fraction": {
+              "denominator": 10,
+              "numerator": 1
+            },
+            "consumption_ratio": {
+              "denominator": 19,
+              "numerator": 20
+            },
+            "observed_bad_events": 4,
+            "remaining_fraction": {
+              "denominator": 19,
+              "numerator": -1
+            },
+            "status": "measured"
+          },
+          "indicator": "task_success",
+          "measurement_health": {
+            "health": "healthy",
+            "reasons": []
+          },
+          "reliability": {
+            "fail_ratio": {
+              "denominator": 19,
+              "numerator": 2
+            },
+            "pass_ratio": {
+              "denominator": 19,
+              "numerator": 17
+            }
+          },
+          "slo": {
+            "direction": "at_least",
+            "name": "task-success",
+            "status": "breached",
+            "target": {
+              "denominator": 10,
+              "numerator": 9
+            }
+          },
+          "unknown_policy": "treat_as_bad"
+        }
+      },
+      "visibility": {
+        "baseline": "run status plus the example agent's own WARNING/ERROR log lines",
+        "excluded_text_matching_false_positives": [
+          "L02"
+        ],
+        "failures_visible_as_run_failure_or_error_log": [],
+        "failures_with_only_a_warning_log": [],
+        "run_status_or_error_log_success": 38,
+        "runs": 38,
+        "runs_with_a_confirmed_failure": 3,
+        "silent_failures_no_log_signal": [
+          "K06",
+          "R02",
+          "R04"
+        ]
+      }
+    }
+  }
+}
