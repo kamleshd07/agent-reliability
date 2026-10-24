@@ -172,3 +172,18 @@ def test_empty_tool_result_precedes_the_invented_answers() -> None:
         result = agent.run(case["question"], return_full_result=True)
         first = next(s for s in result.steps if "step_number" in s)
         assert (first["observations"] == "") is expect_empty
+
+
+def test_crashed_run_counts_against_tool_execution() -> None:
+    class Unavailable(smolagents.Model):
+        def generate(self, messages: Any, **kwargs: Any) -> Any:
+            raise ConnectionError("model server unavailable")
+
+    case = next(c for c in CASES if c["id"] == "Q05")
+    (record,) = harness.run_cases(
+        [case], DATA["tolerance"], mode="live", live_model_factory=lambda: Unavailable()
+    )
+    assert record.lifecycle == "failed"
+    assert record.step_error_types[-1] == "run_exception"
+    assert record.outcomes["tool_execution"].value == "fail"
+    assert record.outcomes["task_success"].value == "fail"

@@ -74,7 +74,7 @@ edit it (or remove it) for your own run.
 | `tool_execution` | `PredicateEvaluator` | at least 95% | no step raised a tool or parsing error, even one the agent recovered from |
 | `latency` | `LatencyThresholdEvaluator(10 s)` | at least 95% | wall-clock time of the run (recorded at recording time) |
 
-The SLOs and the 10-second threshold were written into `harness.py` before the first full run and have not been changed since; the repository history is a single commit, so you cannot verify that order, and the question set was likewise not edited after results. Gentlity does the counting;
+The SLOs and the 10-second threshold were written into `harness.py` before the first full run and have not been changed since; the code and the results were first committed together, so you cannot verify that order from the history, and the question set was likewise not edited after results. Gentlity does the counting;
 the harness only adapts the agent's step log (`return_full_result=True`) into evaluator inputs.
 The `task_success` evaluator receives the answer text plus the case record (which includes the reference, all synthetic); the tool evaluators receive tool **names** only. The SDK itself captures no prompts, responses or tool arguments.
 
