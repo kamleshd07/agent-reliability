@@ -1,0 +1,113 @@
+{
+  "knowledge_base": [
+    {
+      "fact": "returns_30_days",
+      "id": "kb-returns-window",
+      "text": "Items can be returned within 30 days of delivery for a full refund.",
+      "title": "Return window"
+    },
+    {
+      "fact": "final_sale_no_returns",
+      "id": "kb-returns-final-sale",
+      "text": "Items marked FINAL SALE cannot be returned or exchanged.",
+      "title": "Final sale items"
+    },
+    {
+      "fact": "refund_5_7_days",
+      "id": "kb-refund-timing",
+      "text": "Approved refunds reach your original payment method within 5 to 7 business days.",
+      "title": "Refund timing"
+    },
+    {
+      "fact": "shipping_standard",
+      "id": "kb-shipping-standard",
+      "text": "Standard orders arrive within 5 to 7 business days.",
+      "title": "Standard shipping"
+    },
+    {
+      "fact": "shipping_express",
+      "id": "kb-shipping-express",
+      "text": "Express orders arrive within 2 business days.",
+      "title": "Express shipping"
+    },
+    {
+      "fact": "warranty_12_months",
+      "id": "kb-warranty",
+      "text": "Products carry a 12-month limited warranty against manufacturing defects.",
+      "title": "Warranty"
+    },
+    {
+      "fact": "gift_cards_no_expiry",
+      "id": "kb-gift-cards",
+      "text": "Gift cards never expire and cannot be exchanged for cash.",
+      "title": "Gift cards"
+    },
+    {
+      "fact": "ships_us_only",
+      "id": "kb-international",
+      "text": "We currently ship to the contiguous US only.",
+      "title": "International shipping"
+    },
+    {
+      "fact": "refund_approval_over_100",
+      "id": "kb-refund-approval",
+      "text": "Refunds above 100 USD require approval by a human agent.",
+      "title": "Refund approval"
+    }
+  ],
+  "orders": {
+    "O-1001": {
+      "status": "delivered",
+      "total": "42.50"
+    },
+    "O-1002": {
+      "status": "shipped",
+      "total": "89.00"
+    },
+    "O-1003": {
+      "status": "delivered",
+      "total": "129.00"
+    },
+    "O-1004": {
+      "status": "processing",
+      "total": "18.00"
+    },
+    "O-1005": {
+      "status": "delivered",
+      "total": "180.00"
+    },
+    "O-1006": {
+      "status": "delivered",
+      "total": "240.00"
+    },
+    "O-1007": {
+      "status": "delivered",
+      "total": "65.00"
+    },
+    "O-1008": {
+      "status": "delivered",
+      "total": "399.00"
+    },
+    "O-1009": {
+      "status": "delivered",
+      "total": "75.00"
+    },
+    "O-1010": {
+      "status": "cancelled",
+      "total": "55.00"
+    },
+    "O-1011": {
+      "status": "delivered",
+      "total": "100.00"
+    }
+  },
+  "superseded_articles": [
+    {
+      "fact": "returns_14_days_legacy",
+      "id": "kb-returns-window-2024",
+      "superseded": true,
+      "text": "Items can be returned within 14 days of delivery.",
+      "title": "Return window"
+    }
+  ]
+}

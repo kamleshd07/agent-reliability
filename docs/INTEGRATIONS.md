@@ -32,6 +32,13 @@ logical execution. Do not monkey-patch framework internals or wrap every model
 token/helper. Explicit instrumentation keeps the run and evaluation semantics
 visible and continues to work when framework internals change.
 
+## A complete worked evaluation
+
+[`examples/support_agent_evaluation`](../examples/support_agent_evaluation/README.md) runs a
+synthetic tool-using support agent (two versions) through `sdk.run`, the built-in evaluators,
+SLOs, error budgets and a regression comparison, offline and deterministically. Start there if
+you want to see the whole loop on one agent before wiring your own.
+
 ## Evaluation placement
 
 Evaluate inside the run when you want evaluation recording to share that

@@ -89,6 +89,9 @@ jobs:
       - name: Verify distributed artifacts
         run: python scripts/verify_release_artifacts.py
 
+      - name: Verify the support-agent evaluation against the built wheel
+        run: python scripts/verify_support_agent_evaluation.py
+
   reference-vectors:
     name: Independent Node reference check of the P28 contract fixtures
     runs-on: ubuntu-latest
