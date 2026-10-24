@@ -13,7 +13,11 @@ hyphen; the Python import uses an underscore.
 python -m pip install agent-reliability
 ```
 
-For a repository checkout, use `python -m pip install -e .` instead.
+The runnable example scripts are in the repository, not in the pip package.
+To run `examples/basic_reliability.py` and the other examples, clone the
+repository first (`git clone https://github.com/kamleshd07/agent-reliability.git`,
+then `cd agent-reliability`); for a checkout you can also use
+`python -m pip install -e .` instead of the PyPI package.
 
 ## 2–5. Instrument, evaluate, define an SLO, and calculate
 
@@ -30,7 +34,14 @@ Read [the canonical source](../examples/basic_reliability.py). Its flow is:
    evaluator's identity, version, timestamp, and determinism to the result.
 3. `run.record_evaluation(...)` emits the reliability outcome for the run.
 4. `ReliabilityObservation.from_evaluation(...)` creates the analytical value
-   without manually copying provenance.
+   without manually copying provenance. Use it for every result produced by an
+   evaluator. (`ReliabilityObservation.manual(...)` records a hand-made
+   assertion with no provenance. The class is also a plain dataclass, so
+   `ReliabilityObservation(indicator=..., outcome=..., provenance=...)` works
+   and is equal to `from_evaluation` only if you pass the evaluator's
+   `provenance` yourself; leaving it out makes the observation manual, and the
+   engine refuses to mix manual and evaluated observations
+   (`manual_evaluated_mix`).)
 5. `evaluate_reliability(...)` applies an explicit `UnknownPolicy` and SLO.
 
 The deterministic output is:
@@ -41,6 +52,12 @@ Reliability: 75.00%
 SLO status: MET
 Budget remaining: 0.00%
 ```
+
+If an event sink or an evaluator raises, the SDK prints a one-line
+`agent_reliability instrumentation failure: ...` diagnostic to standard error
+and carries on: the failure never reaches your agent. An evaluator that raises
+produces an `EvaluationExecutionFailure`, which is not counted as an
+observation (so it also shrinks the sample).
 
 The default event sink discards instrumentation events. The local report is
 computed from the observations supplied by your code; the library does not
