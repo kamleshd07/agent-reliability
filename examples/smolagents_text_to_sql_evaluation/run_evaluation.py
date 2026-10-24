@@ -92,6 +92,7 @@ def main(argv: list[str] | None = None) -> int:
             "max_steps": harness.MAX_STEPS,
             "smolagents_version": metadata.version("smolagents"),
             "openai_version": metadata.version("openai"),
+            "sqlalchemy_version": metadata.version("sqlalchemy"),
             "agent_reliability_version": metadata.version("agent-reliability"),
             "python": platform.python_version(),
             "platform": platform.platform(),

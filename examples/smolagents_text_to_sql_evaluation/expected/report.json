@@ -26,7 +26,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -59,7 +58,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -92,7 +90,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -125,7 +122,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -158,7 +154,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -191,7 +186,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -224,7 +218,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -257,7 +250,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -290,7 +282,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -323,7 +314,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -356,7 +346,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -391,7 +380,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -424,7 +412,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -459,7 +446,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -492,7 +478,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -525,7 +510,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -558,7 +542,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -591,7 +574,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -624,7 +606,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -657,7 +638,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -690,7 +670,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -723,7 +702,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -756,7 +734,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -789,7 +766,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -825,7 +801,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -858,7 +833,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -892,7 +866,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -925,7 +898,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -958,7 +930,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -991,7 +962,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -1024,7 +994,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -1057,7 +1026,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -1088,7 +1056,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -1119,7 +1086,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -1146,14 +1112,15 @@
       },
       "question": "On what date was receipt number 1 issued?",
       "sql_queries": [
+        "SELECT date FROM receipts WHERE receipt_id = 1",
         "SELECT receipt_id, customer_name, price, tip FROM receipts WHERE receipt_id = 1"
       ],
       "step_error_types": [
         "AgentToolExecutionError"
       ],
       "steps": 3,
-      "tokens_in_out": null,
       "tool_names": [
+        "sql_engine",
         "sql_engine",
         "final_answer"
       ],
@@ -1183,7 +1150,6 @@
       ],
       "step_error_types": [],
       "steps": 2,
-      "tokens_in_out": null,
       "tool_names": [
         "sql_engine",
         "final_answer"
@@ -1464,6 +1430,7 @@
     "runtime": "ollama (local, OpenAI-compatible endpoint)",
     "seed": 0,
     "smolagents_version": "1.26.0",
+    "sqlalchemy_version": "2.1.6",
     "temperature": 0
   },
   "slo_design": {

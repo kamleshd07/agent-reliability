@@ -127,7 +127,6 @@ class CaseRun:
     sql_queries: tuple[str, ...] = ()
     steps: int = 0
     duration_seconds: float | None = None
-    tokens: tuple[int, int] | None = None
     exception_type: str | None = None
     lifecycle: str = "completed"
     outcomes: dict[str, EvaluationOutcome] = field(default_factory=dict)
@@ -161,6 +160,38 @@ def load_adjudication(tag: str) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _attempted_calls(step: dict[str, Any]) -> list[tuple[str, Any]]:
+    """Tool calls of a step as (name, arguments).
+
+    smolagents fills ``tool_calls`` only after every tool of the step ran, so a step whose
+    tool raised has the error but an empty list. For those steps the call the model
+    asked for is read back from its own output (native tool calls or ``Action:`` JSON).
+    """
+    calls = step.get("tool_calls") or []
+    if calls:
+        return [
+            (c["function"]["name"], c["function"]["arguments"])
+            if "function" in c
+            else (c["name"], c.get("arguments"))
+            for c in calls
+        ]
+    message = step.get("model_output_message") or {}
+    native = message.get("tool_calls") or []
+    if native:
+        return [(c["function"]["name"], c["function"]["arguments"]) for c in native]
+    text = step.get("model_output") or message.get("content") or ""
+    start = text.find("{") if isinstance(text, str) else -1
+    if start < 0:
+        return []
+    try:
+        blob, _ = json.JSONDecoder().raw_decode(text[start:])
+    except ValueError:
+        return []
+    if isinstance(blob, dict) and isinstance(blob.get("name"), str):
+        return [(blob["name"], blob.get("arguments"))]
+    return []
+
+
 def _agent_step_facts(
     result: Any,
 ) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]]:
@@ -174,10 +205,13 @@ def _agent_step_facts(
         error = step.get("error")
         if error:
             errors.append(str(error.get("type", "AgentError")))
-        for call in step.get("tool_calls") or []:
-            name = call["function"]["name"] if "function" in call else call["name"]
+        for name, arguments in _attempted_calls(step):
             tools.append(name)
-            arguments = (call.get("function") or call).get("arguments")
+            if isinstance(arguments, str):
+                try:
+                    arguments = json.loads(arguments)
+                except ValueError:
+                    arguments = None
             if name == "sql_engine" and isinstance(arguments, dict):
                 queries.append(str(arguments.get("query", "")))
     return tuple(errors), tuple(tools), tuple(queries)
@@ -211,11 +245,6 @@ def execute_case(
         result
     )
     record.steps = sum(1 for s in result.steps if "step_number" in s)
-    if result.token_usage is not None:
-        record.tokens = (
-            result.token_usage.input_tokens,
-            result.token_usage.output_tokens,
-        )
 
 
 def _require_faithful_replay(model: Any) -> None:
@@ -297,6 +326,10 @@ def run_cases(
                         raise model.divergence from exc
                     record.exception_type = type(exc).__name__
                     record.duration_seconds = None
+                    record.step_error_types = (
+                        *record.step_error_types,
+                        "run_exception",
+                    )
                     _evaluate(record, evaluators, runner, run)
                     raise
                 _evaluate(record, evaluators, runner, run)
@@ -392,7 +425,6 @@ def analyse(
             "duration_seconds": None
             if r.duration_seconds is None
             else round(r.duration_seconds, 2),
-            "tokens_in_out": list(r.tokens) if r.tokens else None,
             "outcomes": {k: v.value for k, v in r.outcomes.items()},
             "upstream_visible": upstream_visible(r),
             "adjudication": adjudication.get(r.case["id"]),

@@ -19,7 +19,7 @@ developer has run it yet), not hosted or production validation, and not a benchm
 | Model | `qwen2.5-coder:7b` through a local Ollama server, temperature 0, seed 0 |
 | Gentlity SDK | `agent-reliability` 1.3.0 from PyPI (no SDK change, no new SDK dependency) |
 | Cases | 36 questions: 1 is upstream's own example question, 35 are written by the Gentlity authors |
-| Python | 3.11 to 3.13 (recorded on 3.12) |
+| Python | recorded on 3.12; clean install and replay verified on 3.12 and 3.13; 3.11 is supported by the SDK and `smolagents` but was not run for this example |
 
 ## Run it (about 5 minutes, no model, no network after install)
 
@@ -56,12 +56,12 @@ task failures: 5; with no upstream error signal (silent): 5
 
 ```bash
 ollama pull qwen2.5-coder:7b && ollama serve &     # local; no account or API key
-python run_evaluation.py --mode live --record --tag my-run
+python run_evaluation.py --mode live --record --tag my-run   # --api-base defaults to localhost:11434; keep it on localhost
 python run_evaluation.py --tag my-run --output-dir out-my-run
 ```
 
 Two live recordings made for this evaluation gave identical final answers for all 36 cases
-(`transcripts/qwen2.5-coder-7b-run2.json` is the second one); a different machine, Ollama
+(`transcripts/qwen2.5-coder-7b-run2.json` is the second recording, kept only as evidence of that and not used by any report); a different machine, Ollama
 version or model build may differ. `adjudication_*.json` is keyed to one recording, so copy and
 edit it (or remove it) for your own run.
 
@@ -74,10 +74,9 @@ edit it (or remove it) for your own run.
 | `tool_execution` | `PredicateEvaluator` | at least 95% | no step raised a tool or parsing error, even one the agent recovered from |
 | `latency` | `LatencyThresholdEvaluator(10 s)` | at least 95% | wall-clock time of the run (recorded at recording time) |
 
-The SLOs and the 10-second threshold were fixed before the first run. Gentlity does the counting;
+The SLOs and the 10-second threshold were written into `harness.py` before the first full run and have not been changed since; the repository history is a single commit, so you cannot verify that order, and the question set was likewise not edited after results. Gentlity does the counting;
 the harness only adapts the agent's step log (`return_full_result=True`) into evaluator inputs.
-Evaluators receive the answer string and tool **names**; the SDK itself captures no prompts,
-responses or tool arguments.
+The `task_success` evaluator receives the answer text plus the case record (which includes the reference, all synthetic); the tool evaluators receive tool **names** only. The SDK itself captures no prompts, responses or tool arguments.
 
 ## Results (one recording, 36 cases)
 
@@ -98,12 +97,12 @@ responses or tool arguments.
 | Q16 "tip as a percentage of the price" | evaluator too strict | the agent said "10%"; exact value 10.16% | no |
 | Q15 "How much did Alan Payne pay?" | ambiguous question | the agent answered price plus tip (13.26); the authors' reference was price only | no |
 
-So the verdict of the SDK-computed SLO depends on adjudication: as scored, `task_success` is
-**breached** (86.1%); with the 2 non-failures removed from the bad events it is 91.7% (33 of 36)
-and the 90% objective is **met**. Q15 is a flaw in a question the authors wrote and Q16 is a
-tolerance the authors chose; neither is an agent defect. The one finding that is about the agent:
+The headline therefore has two honest readings. As scored by the evaluators, `task_success` is
+**breached** (86.1%, SDK-computed). After the authors' own hand adjudication removes the 2 non-failures from the bad events it is 91.7% (33 of 36) and the 90% objective is **met**; that second reading rests on the authors' judgement (Q15 and Q16 were identified as non-failures after the results were seen, and left unchanged in the data). Q15 is a flaw in a question the authors wrote and Q16 is a tolerance the authors chose; neither is an agent defect. The one finding that is about the agent:
 **all 3 genuine failures are unanswerable questions** (3 of the 4 such cases failed) and the
-32 answerable questions had no genuine failure. When a query returns nothing, this
+32 answerable questions had no genuine failure beyond Q16's small rounding imprecision. The
+unanswerable cases were included deliberately as negative controls, so "natural" here means
+"not injected", not "unprompted". When a query returns nothing, this
 model-and-agent combination invents an answer, and the upstream run still reports success.
 
 All failures here occurred naturally with this model: nothing was injected, no tool was made to
@@ -115,7 +114,9 @@ after a SQL error on a non-existent column) is the only run with a tool error.
 `python compare_baselines.py` prints, per failing case, what ordinary signals say. In this run:
 
 * **The agent's own outcome** (run state, step errors, empty output) flags **0 of the 3 genuine
-  failures**; it only flags Q35, which was correct.
+  failures**; it only flags Q35, which was correct. A custom check for "the tool returned nothing but
+  the agent answered confidently" would have flagged Q33 and Q36 (their observations are empty) but
+  not Q34; the upstream agent does not ship such a check.
 * **A plain assertion loop** (`expected in answer`) catches the same 3 genuine failures, but also
   fails Q04 and Q23 (`27.62` is not the text `27.615`), so it needs the same tolerance rules the
   Gentlity evaluator needed. Both use the same reference, so detection is equivalent by construction.
@@ -150,13 +151,13 @@ visible), not new detection. Whether that matters to your team is the question b
   other models, larger data or your agent.
 * **Authored questions.** 35 of 36 questions were written by the SDK authors, who also chose the
   reference answers; Q15 shows a reference can be arguable. Only Q01 comes from upstream.
+* **Tool calls that raise** are not in smolagents' `tool_calls`; the adapter reads the attempted call back from the model output so `tool_used` and the SQL list still include it.
 * **Replay is of one recording.** The model's responses are fixed; replay proves the pipeline is
   deterministic, not that a new run would behave identically (two live runs did).
 * **Latency** is recorded wall-clock time on the recording machine, not measured at replay.
-* **`absent`-case checking is keyword based** (`checks.ABSENT_PHRASES`); it can pass an answer that
-  merely contains "no" or "not". All answers were read by hand (`data/adjudication_*.json`).
+* **`absent`-case checking is keyword based** (`checks.ABSENT_PATTERN`): the answer must contain a refusal word and no number of its own; it can still pass an answer that contains "not" and a wrong non-numeric claim. All answers were read by hand (`data/adjudication_*.json`).
 * **`sql_engine` runs whatever SQL the model writes.** It is upstream's tool, kept as is. Each case
-  gets a fresh in-memory database so a write cannot reach the next case; do not point it at real data.
+  gets a fresh in-memory database so a write cannot reach the next case, but SQLite can still be asked to `ATTACH DATABASE` a file path, which creates a file on disk; a misbehaving model in `--mode live` could do that. Replay cannot (the recorded queries contain no `ATTACH`, `PRAGMA`, `DROP` or write statements). Run live mode in a scratch directory and do not point the tool at real data.
   `CodeAgent` (which executes model-written Python) was deliberately **not** used.
 * No hosted service, no semantic or LLM judge, no framework tracing, no CI wiring.
 * Upstream's own tests (v1.26.0, `test_agents`, `test_tools`, `test_memory`): 172 passed, 5 skipped,

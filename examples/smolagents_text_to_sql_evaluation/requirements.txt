@@ -1,5 +1,6 @@
 # Example-only dependencies. The Gentlity SDK itself has no runtime dependencies.
+# Versions below are the ones the committed recording and expected/ report were made with.
 agent-reliability>=1.3.0
 smolagents==1.26.0
-sqlalchemy>=2.0
-openai>=1.0          # only needed for --mode live (talks to a local Ollama server)
+sqlalchemy==2.1.6
+openai==3.37.0       # only needed for --mode live (talks to a local Ollama server)

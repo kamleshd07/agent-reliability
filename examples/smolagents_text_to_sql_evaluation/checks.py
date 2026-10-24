@@ -10,20 +10,10 @@ from __future__ import annotations
 import re
 from typing import Any
 
-ABSENT_PHRASES = (
-    "no ",
-    "not ",
-    "cannot",
-    "can't",
-    "unable",
-    "doesn't",
-    "does not",
-    "n/a",
-    "unknown",
-    "none",
-    "unavailable",
-    "isn't",
-    "there is no",
+ABSENT_PATTERN = re.compile(
+    r"\b(?:no|not|cannot|can't|unable|doesn't|does not|n/a|unknown|none|unavailable"
+    r"|isn't)\b",
+    re.IGNORECASE,
 )
 _NUMBER = re.compile(r"-?\d[\d,]*(?:\.\d+)?")
 
@@ -43,7 +33,10 @@ def answer_matches(case: dict[str, Any], answer: str, tolerance: float) -> bool:
     folded = answer.casefold()
     kind = case["kind"]
     if kind == "absent":
-        return any(phrase in folded + " " for phrase in ABSENT_PHRASES)
+        # a refusal must say the data is missing AND must not supply a value of its own
+        question_numbers = set(numbers_in(case["question"]))
+        invented = [v for v in numbers_in(answer) if v not in question_numbers]
+        return ABSENT_PATTERN.search(answer) is not None and not invented
     if any(name.casefold() in folded for name in case["forbidden"]):
         return False
     if kind in ("name", "names"):

@@ -101,3 +101,15 @@ def test_recorded_files_carry_no_local_paths_or_credentials() -> None:
         assert pattern.search(path.read_text(encoding="utf-8")) is None, path.name
     for path in [*(PACKAGE / "expected").glob("*"), *(PACKAGE / "data").glob("*")]:
         assert pattern.search(path.read_text(encoding="utf-8")) is None, path.name
+
+
+def test_absent_rule_needs_a_refusal_and_no_invented_number() -> None:
+    case = {
+        "kind": "absent",
+        "question": "price of receipt 9?",
+        "expected": [],
+        "forbidden": [],
+    }
+    assert checks.answer_matches(case, "There is no receipt 9.", 0.01)
+    assert not checks.answer_matches(case, "The price is 12.50 -- unknown source", 0.01)
+    assert not checks.answer_matches(case, "A piano costs more", 0.01)

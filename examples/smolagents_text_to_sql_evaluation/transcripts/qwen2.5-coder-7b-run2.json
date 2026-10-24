@@ -1140,6 +1140,7 @@
   "runtime": "ollama (local, OpenAI-compatible endpoint)",
   "seed": 0,
   "smolagents_version": "1.26.0",
+  "sqlalchemy_version": "2.1.6",
   "temperature": 0
  }
 }

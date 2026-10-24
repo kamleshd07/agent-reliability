@@ -5,9 +5,11 @@ Language: Python.
 
 Adapted from ``examples/text_to_sql.py`` in https://github.com/huggingface/smolagents
 (tag v1.26.0, commit 12c1bc8), Apache-2.0, Copyright Hugging Face. The table, its four
-rows and the ``sql_engine`` tool are the upstream ones; the only change is that a fresh
-in-memory database is built for every case, so a query that writes cannot leak into
-the next case. The upstream agent code itself is not modified or copied.
+rows and the ``sql_engine`` tool body are the upstream ones. Changes: the code is wrapped
+in a function that builds a fresh in-memory database for every case (so a write cannot
+leak into the next case), the schema-inspection printout and the ``CodeAgent`` part of
+upstream's script are left out. The upstream agent code itself is not modified or copied.
+License: https://www.apache.org/licenses/LICENSE-2.0 (the repository is Apache-2.0 too).
 """
 
 from __future__ import annotations

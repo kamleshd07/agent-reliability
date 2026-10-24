@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -115,3 +116,59 @@ def test_command_line_reproduces_one_case(capsys: pytest.CaptureFixture[str]) ->
     assert "task_success: 0.0%" in out
     with pytest.raises(SystemExit):
         main(["--case", "NOPE"])
+
+
+def test_failed_tool_call_is_still_a_tool_call(analysis: dict[str, Any]) -> None:
+    q35 = next(c for c in analysis["cases"] if c["case"] == "Q35")
+    assert "sql_engine" in q35["tool_names"]
+    assert "SELECT date FROM receipts WHERE receipt_id = 1" in q35["sql_queries"]
+    assert q35["step_error_types"] == ["AgentToolExecutionError"]
+
+
+def test_adapter_reads_native_and_text_calls_from_an_errored_step() -> None:
+    native = {
+        "step_number": 1,
+        "error": {"type": "AgentToolCallError"},
+        "tool_calls": [],
+        "model_output_message": {
+            "tool_calls": [
+                {"function": {"name": "sql_engine", "arguments": {"query": "select 1"}}}
+            ]
+        },
+    }
+    text = {
+        "step_number": 2,
+        "error": {"type": "AgentToolExecutionError"},
+        "tool_calls": [],
+        "model_output": 'Action:\n{"name": "sql_engine", "arguments": "{\\"query\\": \\"select 2\\"}"}',
+    }
+    junk = {
+        "step_number": 3,
+        "error": {"type": "AgentParsingError"},
+        "model_output": "no json",
+    }
+
+    result = SimpleNamespace(steps=[{"task": "x"}, native, text, junk])
+
+    errors, tools, queries = harness._agent_step_facts(result)
+    assert errors == (
+        "AgentToolCallError",
+        "AgentToolExecutionError",
+        "AgentParsingError",
+    )
+    assert tools == ("sql_engine", "sql_engine")
+    assert queries == ("select 1", "select 2")
+
+
+def test_empty_tool_result_precedes_the_invented_answers() -> None:
+    from examples.smolagents_text_to_sql_evaluation.replay import ReplayModel
+
+    transcript = harness.load_transcript(harness.DEFAULT_MODEL_TAG)
+    for case_id, expect_empty in (("Q33", True), ("Q36", True), ("Q34", False)):
+        case = next(c for c in CASES if c["id"] == case_id)
+        agent = harness._make_agent(
+            ReplayModel(transcript["cases"][case_id]["steps"], "m")
+        )
+        result = agent.run(case["question"], return_full_result=True)
+        first = next(s for s in result.steps if "step_number" in s)
+        assert (first["observations"] == "") is expect_empty
