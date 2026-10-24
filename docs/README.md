@@ -47,3 +47,4 @@ Follow these in order for a first integration: [Quickstart](QUICKSTART.md) →
 
 - [Contributor guide](../CONTRIBUTING.md)
 - [Security reporting](../SECURITY.md)
+- [Design and review records](DESIGN_RECORDS.md)

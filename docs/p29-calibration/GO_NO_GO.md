@@ -20,7 +20,7 @@ called, no spend occurred, no customer data was used, and nothing outside this r
 | Architecture review of the design, three rounds, then conformance review of the built code | design: APPROVE_WITH_CHANGES -> confirmed (8 HIGH + 10 MEDIUM + 5 HIGH + 5 MEDIUM closed in the design); built code: no BLOCKER/HIGH, may go to owner review ([report](reviews/S4_ARCHITECTURE_REVIEW.md)) |
 | Implementation review, re-check and confirmation | no BLOCKER/HIGH; mutation testing 107 + 44 mutants, every materially important survivor now killed, remaining survivors equivalent or platform-unreachable; final verdict APPROVE ([report](reviews/S4_IMPLEMENTATION_REVIEW.md)) |
 | Adversarial security review and re-check | no BLOCKER/HIGH; 4 MEDIUM + LOW findings fixed or documented; re-check verdict APPROVE ([report](reviews/S4_SECURITY_REVIEW.md)) |
-| Independent validation run (executed the tests itself) and re-validation | GO for owner review (not merge); one HIGH (a red lint check) found in round one and fixed ([report](reviews/S4_INDEPENDENT_VALIDATION.md)) |
+| Independent validation run (executed the tests itself) and re-validation | GO for owner review (not merge); one HIGH (a red lint check) found in round one and fixed (report (relocated; see docs/DESIGN_RECORDS.md)) |
 
 Findings that mattered (all fixed unless stated): the health-style guard was fine, but the first design could not enforce "uncalibrated must not silently become
 trusted evidence" by default (disclosed, owner decision OD-S4-2); a quadratic lookup made metrics take seconds (indexed); a tampered fingerprint crashed a decision
