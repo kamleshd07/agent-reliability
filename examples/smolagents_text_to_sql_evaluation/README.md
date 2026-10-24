@@ -17,7 +17,7 @@ developer has run it yet), not hosted or production validation, and not a benchm
 | Agent class | `ToolCallingAgent` (the model emits JSON tool calls; **no model-written code is executed**) |
 | Upstream scenario | `examples/text_to_sql.py`: table `receipts` (4 rows) and the `sql_engine` tool |
 | Model | `qwen2.5-coder:7b` through a local Ollama server, temperature 0, seed 0 |
-| Gentlity SDK | `agent-reliability` 1.3.0 from PyPI (no SDK change, no new SDK dependency) |
+| Gentlity SDK | `agent-reliability` from PyPI, 1.2.0 or later (the recording and `expected/` were made with 1.3.0; the replay is byte-identical on 1.2.0 as well; no SDK change, no new SDK dependency) |
 | Cases | 36 questions: 1 is upstream's own example question, 35 are written by the Gentlity authors |
 | Python | recorded on 3.12; clean install and replay verified on 3.12 and 3.13; 3.11 is supported by the SDK and `smolagents` but was not run for this example |
 
