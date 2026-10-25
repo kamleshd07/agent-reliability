@@ -37,7 +37,7 @@ SENTINEL = "customer jane@example.com asked about order 4417"
 SENSITIVE_LOOKING = [
     SENTINEL,
     "sk-live-4f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c",
-    "AKIAABCDEFGHIJKLMNOP",
+    "AKIAIOSFODNN7EXAMPLE",
     "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0In0.c2lnbmF0dXJl",
     "123-45-6789",
     "password=hunter2",
