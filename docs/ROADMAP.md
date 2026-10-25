@@ -125,5 +125,4 @@ Run/tool/model/chain execution capture is local and bounded. Explicit outcome
 evaluations and the existing lifecycle/evaluation HTTP exporter remain separate.
 P18/P20 producer transport, state/memory capture, additional frameworks, streaming,
 pricing and semantic auto-evaluation are deferred. See [the guide](AUTOMATIC_INSTRUMENTATION.md).
-Design/review/validation evidence is under `docs/p30/` and excluded from distributed artifacts.
-No merge or release approval is implied. D14 OPEN; Phase B NO-GO.
+This slice is Experimental: its API may change, and it is not part of the stable contract.

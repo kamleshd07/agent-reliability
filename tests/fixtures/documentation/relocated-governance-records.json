@@ -1,0 +1,145 @@
+{
+  "_comment": "Internal governance records relocated out of this public repository in two steps (founder-approved cleanup; second step: records whose review found no open finding, no code coupling and public coverage of any limitation). Only names, sizes and SHA-256 digests are kept here so that historical baselines can still be checked byte for byte.",
+  "records": {
+    "docs/DX_REVIEW.md": {
+      "bytes": 6101,
+      "sha256": "c7b2cf392c70e129635443fc4abe434a83eb35d91d667752d4158525a2ba7cd7"
+    },
+    "docs/M9_HARDENING_AUDIT.md": {
+      "bytes": 4614,
+      "sha256": "86cf97b21e9a2a34a7daf5e4a0588e076176bbf8849cbf39ea1eeae03ac05a83"
+    },
+    "docs/P28_CUSTOMER_READINESS_2026-10-19.md": {
+      "bytes": 8027,
+      "sha256": "3e61dab125376e3a920b5e15dd5795bef68364de9e03faae505a387f8e19ae6a"
+    },
+    "docs/P28_CUSTOMER_READINESS_INDEPENDENT_REVIEW.md": {
+      "bytes": 8833,
+      "sha256": "cf5e628fe06677fdeb0c9c65cb4c85253c55f1a570390234ccc83adcfc44ceaa"
+    },
+    "docs/P28_P29_CONSOLIDATION_TARGETED_VERIFICATION.md": {
+      "bytes": 15691,
+      "sha256": "c5d214ad8ff3a0efda5cb4f840c8b66d263334e6e114fd126ba34cef6e8acd6d"
+    },
+    "docs/P28_P29_FINAL_COMPLETION_REPORT.md": {
+      "bytes": 22878,
+      "sha256": "719bb7906082e52793f6dc6d1b20bcdb37111c338555055fd02e3d974f0d8c57"
+    },
+    "docs/P28_P29_FINAL_INDEPENDENT_REVIEW.md": {
+      "bytes": 18141,
+      "sha256": "ae648d554929b2dfb5b0382fa8a78a157586a2aebcc45cf05ec6c841f96f5d07"
+    },
+    "docs/P28_P29_FINAL_TARGETED_VERIFICATION.md": {
+      "bytes": 8872,
+      "sha256": "ada61c2cc54d74d4a380bf29b4b42b7270c7d2b01717dff26c18baedc65e5b92"
+    },
+    "docs/P28_P29_GITHUB_CI_EXECUTION_REPORT.md": {
+      "bytes": 17924,
+      "sha256": "eaef39e8d250cd11e209243fd3dbae54e2469da774491a810d67ad8c9f8649d1"
+    },
+    "docs/P28_P29_GIT_INTEGRATION_PLAN.md": {
+      "bytes": 14283,
+      "sha256": "cf7191de29b3c02afb2ded309c3d4f22f8b707ab25eb91993ad90e36867e32db"
+    },
+    "docs/P28_P29_GOVERNANCE_AND_CI_READINESS_REPORT.md": {
+      "bytes": 22427,
+      "sha256": "527b70479d9cf8a5ab6047d03395711e26f6011e5e7b2e93a4ec55cac0198e39"
+    },
+    "docs/P28_P29_GOVERNANCE_EXECUTION_REVIEW.md": {
+      "bytes": 12225,
+      "sha256": "67ae2f11df22c7bd6176d9cbbf40debcd72c4f36a6b5ffcc94d7e9574669cedd"
+    },
+    "docs/P28_P29_OWNER_DECISIONS_003.md": {
+      "bytes": 3710,
+      "sha256": "113f24b79688c07c447492657428c842e3f337fc1d1d9d73f1c5151736f408fe"
+    },
+    "docs/P28_P29_OWNER_DECISION_PACKET.md": {
+      "bytes": 11055,
+      "sha256": "b146ed9e22c9121f34fe9d30cebfafe48ee56fc7da0c02329acf1560dc0aea2d"
+    },
+    "docs/P28_P29_RELEASE_GATE_CONSOLIDATION.md": {
+      "bytes": 23316,
+      "sha256": "d29b522a41bc3beefc0f9de5eb5ed4a826c85617619f1c21c9e891b6174a2a86"
+    },
+    "docs/P28_P29_RELEASE_MANAGEMENT_RECORD.md": {
+      "bytes": 7591,
+      "sha256": "1a246968833d1fd02599ef3b84dbe697e42a39f1832ec24bff036fdb1049fae6"
+    },
+    "docs/P28_SDK_D1_INDEPENDENT_REVIEW.md": {
+      "bytes": 13750,
+      "sha256": "ed5c41b83d009e75d41cda9e1873a5853b1dc1e618052323250d42afa29b15e6"
+    },
+    "docs/P28_SDK_D1_REMEDIATION_REPORT.md": {
+      "bytes": 3753,
+      "sha256": "a8679ca32fb83d4920d577baaa09af0eaaedea63747745be08414f261b7f7c7f"
+    },
+    "docs/P28_SDK_D1_TARGETED_VERIFICATION.md": {
+      "bytes": 6572,
+      "sha256": "5e9e6211c018f0781dc1cffd11f6362f4401a590574fca7138c9683de112b212"
+    },
+    "docs/P28_SDK_EXPORTER_IMPLEMENTATION_REPORT.md": {
+      "bytes": 20399,
+      "sha256": "cc09d6b9b817a45393f73c3e269f586644c559d28a577813e31bd7fdca8f6944"
+    },
+    "docs/P28_SDK_EXPORTER_OWNER_DECISIONS_001.md": {
+      "bytes": 8505,
+      "sha256": "c9efa4c9eca38445521979add8d6558cda215ecf36725fd1ffb4ffc2be51b90a"
+    },
+    "docs/P28_SDK_EXPORTER_OWNER_DECISIONS_002.md": {
+      "bytes": 2475,
+      "sha256": "48eddc8cab84e0fe79382d7999a4b781e556ebff17c568528cf7004d57b7a5d0"
+    },
+    "docs/P28_SDK_EXPORTER_RELEASE_READINESS_REPORT.md": {
+      "bytes": 13766,
+      "sha256": "27b342a63f7bb93999c556abdffd158368b08f97a3c25ff40b62aaeacde95191"
+    },
+    "docs/P28_SDK_EXPORTER_RELEASE_REVIEW.md": {
+      "bytes": 15738,
+      "sha256": "916d26f65e56f6d3cbed2c47631988bc228618b4dcaf2ed74cb4ae070ed85576"
+    },
+    "docs/P28_SDK_EXPORTER_RELEASE_TARGETED_VERIFICATION.md": {
+      "bytes": 7259,
+      "sha256": "1c17b097dd975b9aa7f1945edbd511d6745701a138349489e7fac574315d1930"
+    },
+    "docs/P28_SDK_EXPORTER_REMEDIATION_REPORT.md": {
+      "bytes": 7052,
+      "sha256": "ab8004873a3576a35f2f39104b1cdb83c71322c75536f586a6020eba6c9259dc"
+    },
+    "docs/P28_SDK_EXPORTER_TARGETED_VERIFICATION.md": {
+      "bytes": 10231,
+      "sha256": "61f4da729961f04c996b05ed9b28e7b6a13f8b260bd981d91b7e722113bb1478"
+    },
+    "docs/P29_WORKSPACE_BASELINE.md": {
+      "bytes": 15320,
+      "sha256": "81ae93bafd8bb436069495afd3e9ecaebd96c6e3cb4996d4dbcf6e4331baff17"
+    },
+    "docs/PUBLIC_API_REVIEW.md": {
+      "bytes": 6930,
+      "sha256": "9d22224ed52c7091bdf7c02bd7e8ef4f41a0139db5bceb2a5e27647290a9a738"
+    },
+    "docs/p29-calibration/reviews/S4_INDEPENDENT_VALIDATION.md": {
+      "bytes": 29880,
+      "sha256": "03fd5a63e7a8d8ca6fc2008c82b9ce28b530284c7b36713c89f5a2698c89e0a0"
+    },
+    "docs/p30/IMPLEMENTATION_REPORT.md": {
+      "bytes": 3259,
+      "sha256": "f2884b5be826d6a50149344bfa7c5253fc3a9b08b140081fe61fb86728ae4f12"
+    },
+    "docs/p30/PRESERVATION.md": {
+      "bytes": 1327,
+      "sha256": "433f8a98c8ab5d136f1d81c53a12f82eaa8d2fb0ed6d064fcdd0aab51351686a"
+    },
+    "docs/p30/TRACEABILITY.md": {
+      "bytes": 3291,
+      "sha256": "ad4034364619612f665b484ba16282f3e1b69a30535a026de3a64f1b792197fe"
+    },
+    "docs/p30/reviews/IMPLEMENTATION_REVIEW.md": {
+      "bytes": 10702,
+      "sha256": "5760d0df8613a335752b3112f086ca374c28053f1f50aebe70bb95057cb303f2"
+    },
+    "docs/p30/reviews/INDEPENDENT_VALIDATION.md": {
+      "bytes": 7904,
+      "sha256": "3dd40e36e6b17506fe99ea220e12a1ac516edb17accf614832327534fab15b3c"
+    }
+  }
+}
