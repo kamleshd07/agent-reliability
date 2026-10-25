@@ -207,3 +207,5 @@ results.
 5. Would you act on the error-budget numbers? What would you need to trust them?
 6. What blocked you (install, data model, reports, naming)?
 7. Would you run this in CI against a fixed dataset? What would make that practical?
+
+A fuller walkthrough and a feedback template: [docs/EXTERNAL_EVALUATION.md](../../docs/EXTERNAL_EVALUATION.md).

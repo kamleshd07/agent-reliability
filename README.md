@@ -198,6 +198,7 @@ This feature is not present in the published 1.3.0 package until a later release
 
 ## Documentation
 
+- Evaluating on your own agent: [first-evaluation guide](https://github.com/kamleshd07/agent-reliability/blob/main/docs/EXTERNAL_EVALUATION.md)
 - New developer: [Quickstart](https://github.com/kamleshd07/agent-reliability/blob/main/docs/QUICKSTART.md) → [Concepts](https://github.com/kamleshd07/agent-reliability/blob/main/docs/CONCEPTS.md)
 - Integrator: [Integration guide](https://github.com/kamleshd07/agent-reliability/blob/main/docs/INTEGRATIONS.md) →
   [Evaluate](https://github.com/kamleshd07/agent-reliability/blob/main/docs/EVALUATE.md) →
