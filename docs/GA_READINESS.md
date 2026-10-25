@@ -13,7 +13,7 @@ M7 engineering sign-off are now resolved with evidence.
 | Gate | Result | Evidence |
 |---|---|---|
 | Supported Python | PASS | All 350 tests pass on CPython 3.11.5, 3.12, and 3.13; CI covers the same matrix. |
-| Public API | PASS | Frozen and classified in [GA_CONTRACT.md](GA_CONTRACT.md) and [PUBLIC_API_REVIEW.md](PUBLIC_API_REVIEW.md); compatibility tests protect exports, signatures, and enums. |
+| Public API | PASS | Frozen and classified in [GA_CONTRACT.md](GA_CONTRACT.md) and PUBLIC_API_REVIEW.md (relocated; see docs/DESIGN_RECORDS.md); compatibility tests protect exports, signatures, and enums. |
 | Semantic contract | PASS | Golden tests protect outcomes, UNKNOWN policies, exact arithmetic, boundary/no-data/zero-tolerance behavior, and provenance conflicts. |
 | OpenTelemetry | PASS | The stable Python bridge is optional; the external mapping is explicitly EXTERNAL-EVOLVING. Context, failure isolation, privacy, and the `>=1.44,<2` bounds were tested. |
 | Security/privacy | PASS | Adversarial tests found and closed a diagnostic `repr` secret path. BaseException/control-flow handling and bounded telemetry fields were reviewed. GitHub private vulnerability reporting is enabled account-wide for public repositories, which covers this repository. |

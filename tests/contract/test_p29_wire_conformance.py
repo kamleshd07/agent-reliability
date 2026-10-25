@@ -397,8 +397,20 @@ def test_p29_s09_ac06_p28_fixtures_and_contract_documents_are_byte_identical() -
         "src/agent_reliability/adapters/_http_delivery.py",
         "src/agent_reliability/adapters/http_event_sink.py",
     }
+    relocated = json.loads(
+        (
+            ROOT / "tests/fixtures/documentation/relocated-governance-records.json"
+        ).read_text()
+    )["records"]
     for name in guarded:
         expected = baseline[name]
+        if name in relocated:
+            # An internal governance record that was moved to a private archive: the
+            # baseline digest must still equal the digest recorded at relocation time,
+            # and the file must really be gone from this repository.
+            assert relocated[name]["sha256"] == expected, name
+            assert not (ROOT / name).exists(), name
+            continue
         if name in revisions:
             assert revisions[name]["previousSha256"] == expected, name
             expected = revisions[name]["sha256"]
