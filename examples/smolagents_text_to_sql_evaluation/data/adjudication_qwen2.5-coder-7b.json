@@ -1,0 +1,146 @@
+{
+  "Q01": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q02": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q03": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q04": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q05": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q06": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q07": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q08": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q09": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q10": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q11": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q12": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q13": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q14": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q15": {
+    "note": "the question does not say whether the tip is included; the agent answered price plus tip (13.26), a defensible reading. The reference (price only) is the authors' choice, so this FAIL reflects an ambiguous question written by the authors, not an agent defect",
+    "verdict": "ambiguous_case"
+  },
+  "Q16": {
+    "note": "the agent said the tip is 10% of the price; the exact value is 10.16%. A reviewer would accept rounding to a whole percent, the 0.01 tolerance does not",
+    "verdict": "evaluator_false_positive"
+  },
+  "Q17": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q18": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q19": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q20": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q21": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q22": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q23": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q24": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q25": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q26": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q27": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q28": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q29": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q30": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q31": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q32": {
+    "note": "answer read by hand and agrees with the SQL reference",
+    "verdict": "true_pass"
+  },
+  "Q33": {
+    "note": "the query returned no rows (no such customer) and the agent invented a price (10.50); the run state is success and no step errored",
+    "verdict": "true_failure"
+  },
+  "Q34": {
+    "note": "there is no email column; the agent answered with a customer name instead of saying the data is not available; silent",
+    "verdict": "true_failure"
+  },
+  "Q35": {
+    "note": "correct 'not available' answer; the first query referenced a column that does not exist and raised a tool error that the agent recovered from (counted by tool_execution)",
+    "verdict": "true_pass"
+  },
+  "Q36": {
+    "note": "the query returned no rows (no receipt 9) and the agent invented a price (12.50); silent",
+    "verdict": "true_failure"
+  }
+}
