@@ -41,7 +41,7 @@ retraining or provider switching.
 ## Notes
 
 * The primary record of owner decision P29-D10 is not in the repository (`P28_P29_GOVERNANCE_INDEPENDENT_REVIEW.md` F-14); its content is taken from the documents that quote it.
-* The independent architecture review of the first draft is `S4_ARCHITECTURE_REVIEW.md` (kept outside the repository by the reviewer, copied unedited into `reviews/` at the end).
+* The independent architecture review of the first draft is `S4_ARCHITECTURE_REVIEW.md` (kept outside the repository by the reviewer, copied unedited into `reviews/` at the end; that directory has since been archived privately).
 
 ## Owner decisions raised by this assessment
 

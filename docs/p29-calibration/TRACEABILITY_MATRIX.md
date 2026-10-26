@@ -1,12 +1,12 @@
-# Requirement-to-test traceability (author's matrix; independent validation in `reviews/`)
+# Requirement-to-test traceability (author's matrix; independent validation archived privately)
 
 Status: **Done** = implemented and tested locally; **Partial** = implemented with a stated gap; **Deferred** = not built (owner decision or out of scope).
 Test paths are under `tests/`. "Brief" = the owner's Session 4 brief; AC = its acceptance criteria (section 15).
 
 | # | Requirement | Implementation | Verifying tests | Status |
 |---|---|---|---|---|
-| 1 | Gap assessment before coding; no duplicated functionality | `GAP_ASSESSMENT.md`; new package reuses `CalibrationCase`, `wilson_interval`, rubric fingerprint, judge runner | architecture review (`reviews/`) | Done |
-| 2 | Independent architecture review before substantial coding | `reviews/S4_ARCHITECTURE_REVIEW.md` (3 rounds) | (review document) | Done |
+| 1 | Gap assessment before coding; no duplicated functionality | `GAP_ASSESSMENT.md`; new package reuses `CalibrationCase`, `wilson_interval`, rubric fingerprint, judge runner | architecture review (archived privately) | Done |
+| 2 | Independent architecture review before substantial coding | `S4_ARCHITECTURE_REVIEW.md` (3 rounds; archived privately) | (review document) | Done |
 | 3 | Versioned human-labelled reference datasets; split discipline; duplicate/overlap detection (brief 3) | `dataset.py`, schemas `reference-dataset/1`, `reference-case/1` | `unit/experimental_calibration/test_dataset.py`, `test_schemas.py` | Done |
 | 4 | Synthetic never claimed as human ground truth | derived provenance (weakest case), `attested`, policy construction rules, `demonstration` status | `test_dataset.py` (provenance), `test_policy.py`, `test_admission.py::test_synthetic_labels_never_calibrate...`, `::test_a_demonstration_policy_can_only_demonstrate` | Done |
 | 5 | Genuine human labelling and disagreement process documented | `DATASET_SCHEMA.md`; adjudication rules enforced at load | `test_dataset.py` (label rules) | Done (process documented; no human data is shipped) |
@@ -33,7 +33,7 @@ Test paths are under `tests/`. "Brief" = the owner's Session 4 brief; AC = its a
 | 26 | Pure Python API + offline demonstration; documentation (brief 11, 14) | `examples/judge_calibration_offline.py`, README, docs | `test_example_and_fixtures.py`, `test_docs.py` | Done |
 | 27 | Tests: perfect, all wrong, imbalance, single class, empty, missing labels, abstentions, malformed, undefined, repeatability, disagreement, conflicting identities, rubric mismatch, leakage, expiry, insufficient sample, drift, errors/timeouts, privacy, compatibility, health (brief 12) | see rows above | the files above; property tests | Done |
 | 28 | SDK suite on 3.11/3.12/3.13, ruff, mypy, build, clean install, HTTP exporter regression, P29 vectors, platform compatibility | see `COMPATIBILITY_REPORT.md` | full suite on three Pythons; `scripts/verify_release_artifacts.py`; platform runs | Done |
-| 29 | Three independent reviews and a separate validator; reports unedited (brief 13) | `reviews/` | (review documents) | Done: all four reports in [reviews/](reviews/); decision in [GO_NO_GO.md](GO_NO_GO.md) |
+| 29 | Three independent reviews and a separate validator; reports unedited (brief 13) | the review reports (archived privately) | (review documents) | Done: all four reports archived privately; decision in [GO_NO_GO.md](GO_NO_GO.md) |
 | 30 | Zero mandatory runtime dependencies; no stable wire change | `dependencies = []`; no stable file changed | `tests/compat/test_experimental_judge_api.py::test_core_dependencies_remain_empty...`; clean-install check | Done |
 | 31 | Performance and resource limits report | `PERFORMANCE.md`, `scripts/p29_calibration_benchmark.py` | `test_scaling.py` | Done |
 | 32 | Owner decisions OD-S4-1..6 recorded; policy identity recorded in decisions; ungated stays documented opt-in; no breaking change | [OWNER_DECISIONS_S4.md](OWNER_DECISIONS_S4.md), `policy.py`, `admission.py` | `test_admission.py::test_the_decision_records_the_policy_identity_and_configuration`, `::test_the_assessment_itself_is_independent_of_the_policy`, `test_s4_admission_hook.py` | Done (documentation; OD-S4-2/3/4 implementation deferred by decision) |
