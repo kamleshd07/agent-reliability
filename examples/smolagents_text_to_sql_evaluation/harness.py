@@ -32,6 +32,7 @@ from agent_reliability.evaluation import (
     PredicateEvaluator,
     ToolCalledEvaluator,
 )
+from agent_reliability.ports import EventSink
 from agent_reliability.ports.events import EvaluationRecorded, RunCompleted, RunFailed
 from agent_reliability.reliability import (
     AggregationConflict,
@@ -286,12 +287,24 @@ def run_cases(
     mode: str,
     tag: str = DEFAULT_MODEL_TAG,
     live_model_factory: Any = None,
+    sink: EventSink | None = None,
+    run_id_prefix: str | None = None,
 ) -> list[CaseRun]:
-    """Execute every case once under ``sdk.run`` (``mode`` is ``replay`` or ``live``)."""
+    """Execute every case once under ``sdk.run`` (``mode`` is ``replay`` or ``live``).
+
+    By default the SDK events are kept in memory and cross-checked against the
+    evaluations (the behaviour of every earlier version). Pass ``sink`` to send the same
+    events to another ``EventSink``, for example the HTTP exporter of a local platform;
+    the in-memory cross-check is then skipped because this function cannot read the
+    events back. ``run_id_prefix`` (default: ``mode``) names the producer run ids.
+    """
     transcript = load_transcript(tag) if mode == "replay" else None
     evaluators = build_evaluators(tolerance)
-    sink = InMemoryEventSink()
-    sdk = AgentReliability(sink=sink, run_id_generator=SequentialRunIds(mode))
+    memory_sink = InMemoryEventSink() if sink is None else None
+    sdk = AgentReliability(
+        sink=memory_sink if sink is None else sink,
+        run_id_generator=SequentialRunIds(run_id_prefix or mode),
+    )
     runner = EvaluatorRunner()
     version = metadata.version("smolagents")
     runs: list[CaseRun] = []
@@ -341,7 +354,8 @@ def run_cases(
             record.recorded_steps = recorder.steps
         runs.append(record)
         run_ids.append(run_id)
-    _confirm_lifecycle(runs, run_ids, sink)
+    if memory_sink is not None:
+        _confirm_lifecycle(runs, run_ids, memory_sink)
     return runs
 
 
