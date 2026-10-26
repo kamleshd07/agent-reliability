@@ -76,9 +76,9 @@ Scratch venv packages: pydantic, fastapi, pydantic-settings, sqlalchemy[asyncio]
 While part 2 ran, another session added `docs/P28_SDK_D1_INDEPENDENT_REVIEW.md` and `docs/P28_SDK_D1_REMEDIATION_REPORT.md` to the original SDK tree and changed `docs/HTTP_EXPORTER.md` and `tests/unit/test_http_exporter_tls_real.py` there
 (P28 D-1 remediation work by someone else; this work never wrote to that tree). (Superseded by section 11: the overlay was re-synced.) The P29 workspace baseline predated those edits; merging the P29 work onto a D-1-fixed exporter needs a re-run of this evidence.
 
-## 9. Review remediation re-run (after docs/P29_INDEPENDENT_REVIEW.md)
+## 9. Review remediation re-run (after the independent review, now archived privately)
 
-The independent reviewer returned APPROVE_WITH_REQUIRED_CORRECTIONS (no BLOCKER/HIGH). Findings were fixed in the workspace (see `docs/P29_REVIEW_REMEDIATION_REPORT.md`) and everything above was re-run: the table in section 1 and the
+The independent reviewer returned APPROVE_WITH_REQUIRED_CORRECTIONS (no BLOCKER/HIGH). Findings were fixed in the workspace (see the remediation report, now archived privately) and everything above was re-run: the table in section 1 and the
 stress repeats in section 3 are the **post-remediation** numbers (the pre-remediation run was 1523 / 1522 + 1 skipped and 66 stress tests).
 
 * Mutation checks of the new regression tests: 13 mutants (see the remediation report) were applied in place with `PYTHONDONTWRITEBYTECODE=1` and then restored; all 13 were KILLED, 0 survivors. A first pass was confused by a stale `.pyc`

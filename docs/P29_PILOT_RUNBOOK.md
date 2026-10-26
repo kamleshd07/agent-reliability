@@ -1,7 +1,7 @@
 # P29 pilot runbook (SDK side) and pilot gates
 
 Status: **SDK-side local artifacts only.** No pilot was run. No platform, shared TEST or production environment was contacted. The P28 exporter used here is the
-uncommitted working-tree version; its D-1 fix (TLS-verification failure classification) is present in that working tree (P28 reports: "D-1 FIXED AND VERIFIED" / "VERIFIED", quoted in `docs/P29_IMPLEMENTATION_LOG.md`) but **nothing is committed or released**. Nothing here is independently verified.
+uncommitted working-tree version; its D-1 fix (TLS-verification failure classification) is present in that working tree (P28 reports: "D-1 FIXED AND VERIFIED" / "VERIFIED", quoted in the P29 implementation log, now archived privately) but **nothing is committed or released**. Nothing here is independently verified.
 This runbook is the S11 deliverable that the SDK repository can own (P29-S11-AC07); the platform half (PL1 guide, integrated PC-1 + PC-2 tree, machine credential) is outside it.
 
 ## 1. Prerequisites
