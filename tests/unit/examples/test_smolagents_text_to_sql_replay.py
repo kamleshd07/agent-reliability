@@ -187,3 +187,20 @@ def test_crashed_run_counts_against_tool_execution() -> None:
     assert record.step_error_types[-1] == "run_exception"
     assert record.outcomes["tool_execution"].value == "fail"
     assert record.outcomes["task_success"].value == "fail"
+
+
+def test_run_cases_can_deliver_to_a_supplied_sink_with_a_run_id_prefix() -> None:
+    """A caller-supplied sink receives the same events; default behaviour is unchanged."""
+    from agent_reliability.adapters import InMemoryEventSink
+
+    sink = InMemoryEventSink()
+    cases = CASES[:2]
+    runs = harness.run_cases(
+        cases, DATA["tolerance"], mode="replay", sink=sink, run_id_prefix="pilot"
+    )
+    default = harness.run_cases(cases, DATA["tolerance"], mode="replay")
+
+    assert [r.outcomes for r in runs] == [r.outcomes for r in default]
+    events = sink.events
+    assert events
+    assert all(str(e.run_id).startswith("pilot") for e in events)
