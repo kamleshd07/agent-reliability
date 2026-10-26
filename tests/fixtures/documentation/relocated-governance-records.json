@@ -1,5 +1,5 @@
 {
-  "_comment": "Internal governance records relocated out of this public repository in two steps (founder-approved cleanup; second step: records whose review found no open finding, no code coupling and public coverage of any limitation). Only names, sizes and SHA-256 digests are kept here so that historical baselines can still be checked byte for byte.",
+  "_comment": "Internal governance records relocated out of this public repository in three steps (founder-approved cleanup; second step: records whose review found no open finding, no code coupling and public coverage of any limitation). Only names, sizes and SHA-256 digests are kept here so that historical baselines can still be checked byte for byte. Third step: eight security-review records (checker-bypass cases, exporter reproductions, calibration and instrumentation reviews) moved to the private archive; their public copies' digests are kept so that baseline checks still match, and the originals are preserved there.",
   "records": {
     "docs/DX_REVIEW.md": {
       "bytes": 6101,
@@ -49,6 +49,14 @@
       "bytes": 12225,
       "sha256": "67ae2f11df22c7bd6176d9cbbf40debcd72c4f36a6b5ffcc94d7e9574669cedd"
     },
+    "docs/P28_P29_GOVERNANCE_INDEPENDENT_REVIEW.md": {
+      "bytes": 25960,
+      "sha256": "844a674192ebdaaee413112fb19e4e7703e188dc066e4cd193d039b2e4afaacb"
+    },
+    "docs/P28_P29_GOVERNANCE_TARGETED_VERIFICATION.md": {
+      "bytes": 13192,
+      "sha256": "8fc79d805c8702cf9cef6aa11d0abb0e890367d7a41abe9ddfa528213c2ae7d2"
+    },
     "docs/P28_P29_OWNER_DECISIONS_003.md": {
       "bytes": 3710,
       "sha256": "113f24b79688c07c447492657428c842e3f337fc1d1d9d73f1c5151736f408fe"
@@ -80,6 +88,10 @@
     "docs/P28_SDK_EXPORTER_IMPLEMENTATION_REPORT.md": {
       "bytes": 20399,
       "sha256": "cc09d6b9b817a45393f73c3e269f586644c559d28a577813e31bd7fdca8f6944"
+    },
+    "docs/P28_SDK_EXPORTER_INDEPENDENT_REVIEW.md": {
+      "bytes": 22272,
+      "sha256": "1c77757b319d99edc4f389a7e051b1bbccbb356a5f76c20a5370ea08622f44bb"
     },
     "docs/P28_SDK_EXPORTER_OWNER_DECISIONS_001.md": {
       "bytes": 8505,
@@ -117,9 +129,21 @@
       "bytes": 6930,
       "sha256": "9d22224ed52c7091bdf7c02bd7e8ef4f41a0139db5bceb2a5e27647290a9a738"
     },
+    "docs/p29-calibration/reviews/S4_ARCHITECTURE_REVIEW.md": {
+      "bytes": 73072,
+      "sha256": "50c9280bff6c7d61e1c043fe71a112f16ddf5f0e7d8b5cd5e5e87616d5789af0"
+    },
+    "docs/p29-calibration/reviews/S4_IMPLEMENTATION_REVIEW.md": {
+      "bytes": 30951,
+      "sha256": "705409c134361b5dc83f92f21211203488f44b6ca693ca0156df825fcef41b8f"
+    },
     "docs/p29-calibration/reviews/S4_INDEPENDENT_VALIDATION.md": {
       "bytes": 29880,
       "sha256": "03fd5a63e7a8d8ca6fc2008c82b9ce28b530284c7b36713c89f5a2698c89e0a0"
+    },
+    "docs/p29-calibration/reviews/S4_SECURITY_REVIEW.md": {
+      "bytes": 20291,
+      "sha256": "f82dcef63f7154dff23d0188cc2f038ffc83f6c1ebb5525fc5fd39ac45f87d24"
     },
     "docs/p30/IMPLEMENTATION_REPORT.md": {
       "bytes": 3259,
@@ -133,6 +157,10 @@
       "bytes": 3291,
       "sha256": "ad4034364619612f665b484ba16282f3e1b69a30535a026de3a64f1b792197fe"
     },
+    "docs/p30/reviews/ARCHITECTURE_REVIEW.md": {
+      "bytes": 8378,
+      "sha256": "78440debc340bb7fe393ad17f011806f822593b4004792143e1e4756186cb998"
+    },
     "docs/p30/reviews/IMPLEMENTATION_REVIEW.md": {
       "bytes": 10702,
       "sha256": "5760d0df8613a335752b3112f086ca374c28053f1f50aebe70bb95057cb303f2"
@@ -140,6 +168,10 @@
     "docs/p30/reviews/INDEPENDENT_VALIDATION.md": {
       "bytes": 7904,
       "sha256": "3dd40e36e6b17506fe99ea220e12a1ac516edb17accf614832327534fab15b3c"
+    },
+    "docs/p30/reviews/SECURITY_REVIEW.md": {
+      "bytes": 9431,
+      "sha256": "449a984fda86174e7045fdef25bd8d9e56970a5760f7ad0e5111b51881c57a8a"
     }
   }
 }

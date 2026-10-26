@@ -13,13 +13,13 @@ called, no spend occurred, no customer data was used, and nothing outside this r
 | Real provider-backed calibration, real human labelling, spend, customer data? | **Not authorised and not performed.** |
 | Publication, tag, release, deployment, infrastructure | **Not done and not authorised.** |
 
-## Independent review record (reports unedited in [reviews/](reviews/))
+## Independent review record (reports unedited; archived in the maintainers' private governance archive)
 
 | Review | Result |
 |---|---|
-| Architecture review of the design, three rounds, then conformance review of the built code | design: APPROVE_WITH_CHANGES -> confirmed (8 HIGH + 10 MEDIUM + 5 HIGH + 5 MEDIUM closed in the design); built code: no BLOCKER/HIGH, may go to owner review ([report](reviews/S4_ARCHITECTURE_REVIEW.md)) |
-| Implementation review, re-check and confirmation | no BLOCKER/HIGH; mutation testing 107 + 44 mutants, every materially important survivor now killed, remaining survivors equivalent or platform-unreachable; final verdict APPROVE ([report](reviews/S4_IMPLEMENTATION_REVIEW.md)) |
-| Adversarial security review and re-check | no BLOCKER/HIGH; 4 MEDIUM + LOW findings fixed or documented; re-check verdict APPROVE ([report](reviews/S4_SECURITY_REVIEW.md)) |
+| Architecture review of the design, three rounds, then conformance review of the built code | design: APPROVE_WITH_CHANGES -> confirmed (8 HIGH + 10 MEDIUM + 5 HIGH + 5 MEDIUM closed in the design); built code: no BLOCKER/HIGH, may go to owner review (report archived privately) |
+| Implementation review, re-check and confirmation | no BLOCKER/HIGH; mutation testing 107 + 44 mutants, every materially important survivor now killed, remaining survivors equivalent or platform-unreachable; final verdict APPROVE (report archived privately) |
+| Adversarial security review and re-check | no BLOCKER/HIGH; 4 MEDIUM + LOW findings fixed or documented; re-check verdict APPROVE (report archived privately) |
 | Independent validation run (executed the tests itself) and re-validation | GO for owner review (not merge); one HIGH (a red lint check) found in round one and fixed (report (relocated; see docs/DESIGN_RECORDS.md)) |
 
 Findings that mattered (all fixed unless stated): the health-style guard was fine, but the first design could not enforce "uncalibrated must not silently become
@@ -98,7 +98,7 @@ evaluation failure); *judge calibration status* is whether that evaluator's verd
 ## Validation delta since the independent validator
 
 The validator reviewed `58e4507`. Verified by `git diff 58e4507 <head>`: the commit after it changed only documentation, the four copied reviewer reports (byte-identical to the originals) and **one added test** (the `lstat` fallback test); no `src/`, `scripts/`, `examples/`, `.github/` or fixture file.
-The final update adds documentation, three tests and **two lines to the sdist `exclude` list in `pyproject.toml`** (the new internal documents); that is a package-configuration change, so a **targeted independent recheck** was requested and is recorded in `reviews/S4_INDEPENDENT_VALIDATION.md`.
+The final update adds documentation, three tests and **two lines to the sdist `exclude` list in `pyproject.toml`** (the new internal documents); that is a package-configuration change, so a **targeted independent recheck** was requested and is recorded in `S4_INDEPENDENT_VALIDATION.md` (archived privately).
 
 ## Conditions on the GO for owner review
 

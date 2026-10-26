@@ -2,7 +2,7 @@
 
 This repository holds the library, its tests and its technical documentation. Internal design, review, verification and
 decision records produced while building it are kept in a private archive, not here. Some earlier records
-remain in this repository for now (for example the calibration and instrumentation review reports and the
+remain in this repository for now (for example the
 `docs/P28_*` / `docs/P29_*` documents that tests, scripts or packaging rules still reference); they are history, not a
 specification, and the user-facing contracts are the documents linked from the [documentation index](README.md).
 
@@ -13,5 +13,6 @@ relocated record now reads "(relocated; see docs/DESIGN_RECORDS.md)".
 
 Security issues are reported privately through GitHub's "Report a vulnerability" (see [SECURITY.md](../SECURITY.md)).
 
-Known leftover: `docs/P28_SDK_EXPORTER_INDEPENDENT_REVIEW.md` still links to one relocated record. That file is covered by the
-byte-for-byte historical baseline and so is intentionally not edited; the link disappears when the file itself is relocated.
+Security-review records (checker-bypass cases, exporter reproductions, calibration and instrumentation reviews) were relocated in a
+third step. Retained `docs/P28_*` documents are covered by the byte-for-byte historical baseline and are intentionally not edited, so
+they may still name a relocated record in plain text; those names are historical references, not links.

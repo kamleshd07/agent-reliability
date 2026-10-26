@@ -22,7 +22,7 @@ time*, with label provenance an attestation.
 | [GAP_ASSESSMENT.md](GAP_ASSESSMENT.md) | what P29 already had, what was missing |
 | [COMPATIBILITY_REPORT.md](COMPATIBILITY_REPORT.md), [TRACEABILITY_MATRIX.md](TRACEABILITY_MATRIX.md) | compatibility evidence; requirement-to-test map |
 | [OWNER_DECISIONS_S4.md](OWNER_DECISIONS_S4.md), [FUTURE_CALIBRATION_PLAN.md](FUTURE_CALIBRATION_PLAN.md) | recorded owner decisions; plan for real-world calibration (not executed) |
-| [GO_NO_GO.md](GO_NO_GO.md), [reviews/](reviews/) | decision and the independent reports, unedited |
+| [GO_NO_GO.md](GO_NO_GO.md) | decision; the independent reports, unedited, are archived privately |
 
 ## Five-minute offline walkthrough
 
