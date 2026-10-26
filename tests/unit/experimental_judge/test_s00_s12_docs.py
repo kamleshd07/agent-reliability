@@ -155,13 +155,15 @@ def test_p29_i_p29_4_a_semantic_result_writes_only_evaluation_evidence() -> None
 
 RUNBOOK = " ".join((ROOT / "docs/P29_PILOT_RUNBOOK.md").read_text().split())
 _LOG_PATH = ROOT / "docs/P29_IMPLEMENTATION_LOG.md"
-# The internal implementation log is not in the sdist; the tests that read it are
-# source-checkout checks and skip when it is absent.
+# The internal implementation log is archived privately and is not in this repository
+# or the sdist; the tests that read it are skipped when it is absent. The assertions
+# are unchanged and run wherever the log is present.
 LOG = " ".join(_LOG_PATH.read_text().split()) if _LOG_PATH.exists() else ""
 
 
 @pytest.mark.skipif(
-    not LOG, reason="internal implementation log not in this distribution"
+    not LOG,
+    reason="internal implementation log is archived privately, not in this repository",
 )
 def test_p29_s09_ac07_log_states_the_sink_exercised_and_makes_no_tls_claim() -> None:
     section = LOG.split("## S09 - P28 wiring", 1)[1].split("## S10", 1)[0]

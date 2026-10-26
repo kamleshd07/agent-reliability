@@ -1,9 +1,11 @@
 """Regression tests for the independent review findings.
 
-See docs/P29_INDEPENDENT_REVIEW.md.
+See the P29 independent review (archived privately; formerly
+docs/P29_INDEPENDENT_REVIEW.md).
 
-Each test was mutation-checked: it fails against the unfixed code (see
-docs/P29_REVIEW_REMEDIATION_REPORT.md for the mutants and results).
+Each test was mutation-checked: it fails against the unfixed code (see the
+remediation report, archived privately and formerly
+docs/P29_REVIEW_REMEDIATION_REPORT.md, for the mutants and results).
 """
 
 from __future__ import annotations
