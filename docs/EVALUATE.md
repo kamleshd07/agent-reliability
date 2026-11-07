@@ -87,6 +87,8 @@ provider does with the prompt (retention, region, training) is governed by your 
 statement about it. Labels you choose (`model_label`, indicator names) are stored by the platform and must not contain secrets,
 hostnames or customer names.
 
+The shorter developer path, `SemanticChecks`, is described in [SEMANTIC_EVALUATION.md](SEMANTIC_EVALUATION.md).
+
 ### Quick start
 
 ```python
@@ -130,8 +132,8 @@ evaluation after the run is closed is not supported in V1.
 
 ### Meaning of PASS per dimension
 
-The five reference rubrics (`judge-answer-correctness`, `judge-groundedness`, `judge-instruction-adherence`, `judge-safety-policy`,
-`judge-task-completion-evidence`) are **uncalibrated examples**: not calibrated by Gentlity, no accuracy claim, domain thresholds are
+The six reference rubrics (`judge-answer-correctness`, `judge-groundedness`, `judge-instruction-adherence`, `judge-safety-policy`,
+`judge-task-completion-evidence`, `judge-answer-relevance`) are **uncalibrated examples**: not calibrated by Gentlity, no accuracy claim, domain thresholds are
 yours. Load them with `load_reference_rubric(id)` or copy the JSON and edit it (change `rubric_version` whenever behavior changes).
 
 | Dimension (rubric) | PASS means | PASS does not mean |
@@ -141,6 +143,7 @@ yours. Load them with `load_reference_rubric(id)` or copy the JSON and edit it (
 | `instruction-adherence` (judge-instruction-adherence) | the checkable items stated in the instructions were followed | unstated expectations were met (deterministic checks are better where possible) |
 | `safety-policy` (judge-safety-policy) | this rubric found no violation of the supplied policy | the answer is safe |
 | `task-completion-evidence` (judge-task-completion-evidence) | the evidence TEXT supports the claim of completion | the business outcome occurred (never an authoritative outcome; a fabricated confirmation passes it by construction; use an outcome expectation for critical journeys) |
+| `answer-relevance` (judge-answer-relevance) | the answer is responsive to the supplied question | the answer is correct, grounded or complete (use the other dimensions) |
 
 ### Outcomes, failures and what the platform sees
 

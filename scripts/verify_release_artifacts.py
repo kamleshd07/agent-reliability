@@ -93,6 +93,7 @@ def _inspect_artifacts(wheel: Path, sdist: Path) -> str:
                 "judge-instruction-adherence",
                 "judge-safety-policy",
                 "judge-task-completion-evidence",
+                "judge-answer-relevance",
             )
         ),
     }

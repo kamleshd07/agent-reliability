@@ -48,6 +48,7 @@ DIMENSIONS = {
     "judge-instruction-adherence": "instruction-adherence",
     "judge-safety-policy": "safety-policy",
     "judge-task-completion-evidence": "task-completion-evidence",
+    "judge-answer-relevance": "answer-relevance",
 }
 
 

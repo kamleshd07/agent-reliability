@@ -77,6 +77,7 @@ DEFAULT_MISSING_INPUT: Final[dict[JudgeDimension, tuple[ContentRole, str]]] = {
         ContentRole.TASK_EVIDENCE,
         "evidence_insufficient",
     ),
+    JudgeDimension.ANSWER_RELEVANCE: (ContentRole.QUESTION, "question_missing"),
 }
 
 

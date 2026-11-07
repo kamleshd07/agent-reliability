@@ -38,7 +38,8 @@
         "groundedness",
         "instruction-adherence",
         "safety-policy",
-        "task-completion-evidence"
+        "task-completion-evidence",
+        "answer-relevance"
       ]
     },
     "human_label": {
