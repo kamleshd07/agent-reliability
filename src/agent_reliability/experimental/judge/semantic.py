@@ -32,7 +32,7 @@ import contextvars
 import enum
 import inspect
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Final
 
 from agent_reliability.domain import EvaluationOutcome
@@ -53,6 +53,7 @@ from agent_reliability.experimental.judge.sync import SyncLLMJudge
 from agent_reliability.experimental.judge.values import (
     ContentPart,
     ContentRole,
+    ContentTrust,
     EvaluationRequest,
     JudgeBudget,
     JudgeDimension,
@@ -84,6 +85,17 @@ CHECKS: Final[Mapping[str, tuple[str, JudgeDimension]]] = {
     ),
 }
 
+#: Optional inputs each check accepts; anything else is rejected (typos are errors).
+_INPUTS: Final[Mapping[str, frozenset[str]]] = {
+    "groundedness": frozenset({"context", "question"}),
+    "relevance": frozenset({"question", "context"}),
+    "correctness": frozenset({"reference", "question"}),
+    "requirements": frozenset({"requirements", "question"}),
+    "completion": frozenset({"evidence", "question"}),
+}
+#: Inputs that may be marked trusted (operator-authored text only).
+_TRUSTABLE: Final = frozenset({"requirements", "reference"})
+
 
 class SemanticStatus(enum.StrEnum):
     DETERMINATE = "determinate"
@@ -112,7 +124,7 @@ class SemanticVerdict:
     output_tokens: int | None = None
 
     #: A model's opinion is never authoritative proof of a business outcome.
-    authoritative: bool = False
+    authoritative: bool = field(default=False, init=False)
 
     @property
     def is_agent_failure_signal(self) -> bool:
@@ -204,6 +216,7 @@ class SemanticChecks:
             else (BudgetTracker(budget) if budget else None)
         )
         self._indicators: dict[str, str] = {}
+        self._judges: dict[str, Any] = {}
         bindings: list[IndicatorBinding] = []
         for name in checks:
             rubric = custom.get(name) or load_reference_rubric(CHECKS[name][0])
@@ -218,12 +231,16 @@ class SemanticChecks:
             )
             indicator = f"{indicator_prefix}{name}"
             self._indicators[name] = indicator
+            self._judges[name] = judge
+            gate = admission
+            if callable(gate) and not hasattr(gate, "decide"):
+                gate = gate(name, judge)  # a factory: build a gate bound to this judge
             bindings.append(
                 IndicatorBinding(
                     indicator,
                     judge,
                     sampling=sampling or SamplingPolicy(),
-                    admission=admission,
+                    admission=gate,
                 )
             )
         self._coordinator = JudgeCoordinator(
@@ -240,8 +257,16 @@ class SemanticChecks:
         return self._coordinator
 
     @property
+    def selected(self) -> frozenset[str]:
+        return frozenset(self._indicators)
+
+    @property
     def is_async(self) -> bool:
         return self._async
+
+    def evaluator(self, check: str) -> Any:
+        """The judge behind a check (for building a calibration gate bound to it)."""
+        return self._judges[check]
 
     def indicator(self, check: str) -> str:
         return self._indicators[check]
@@ -282,28 +307,57 @@ class SemanticScope:
         await self._inner.__aexit__(*exc)
 
     # -- requests -----------------------------------------------------------
-    def _request(self, check: str, answer: str, **given: Any) -> EvaluationRequest:
-        dimension = CHECKS[check][1]
+    def _request(
+        self, check: str, answer: str, given: dict[str, Any], trusted: Sequence[str]
+    ) -> EvaluationRequest:
+        if check not in CHECKS:
+            raise ValueError(f"unknown check {check!r}; choose from {sorted(CHECKS)}")
+        if check not in self._checks.selected:
+            raise ValueError(
+                f"check {check!r} was not selected for this SemanticChecks"
+            )
+        if not isinstance(answer, str):
+            raise TypeError("answer must be a str (use '' for an empty reply)")
+        unknown = sorted(set(given) - _INPUTS[check])
+        if unknown:
+            raise ValueError(
+                f"unexpected input(s) {unknown} for check {check!r}; "
+                f"allowed: {sorted(_INPUTS[check])}"
+            )
+        unlisted = sorted(set(trusted) - _TRUSTABLE)
+        if unlisted:
+            raise ValueError(f"only {sorted(_TRUSTABLE)} can be marked trusted")
         context = given.get("context")
-        context_parts = tuple(
-            ContentPart(ContentRole.CONTEXT, t) for t in (context or ())
-        )
-        question = given.get("question")
-        reference = given.get("reference")
+        if isinstance(context, str):
+            context = [context]
+        if context is not None and (
+            not isinstance(context, Sequence)
+            or not all(isinstance(c, str) for c in context)
+        ):
+            raise TypeError("context must be a str or a sequence of str")
         requirements = given.get("requirements")
         if isinstance(requirements, (list, tuple)):
             requirements = "\n".join(f"- {r}" for r in requirements)
-        evidence = given.get("evidence")
+
+        def part(role: ContentRole, text: Any, name: str) -> tuple[ContentPart, ...]:
+            if text is None:
+                return ()
+            if not isinstance(text, str):
+                raise TypeError(f"{name} must be a str")
+            # Requirements and references are sent UNTRUSTED unless the operator
+            # authored them and says so: user text must never be operator-trusted.
+            trust = ContentTrust.TRUSTED if name in trusted else ContentTrust.UNTRUSTED
+            return (ContentPart(role, text, trust),)
+
         parts = (
-            *_parts((ContentRole.QUESTION, question), (ContentRole.ANSWER, answer)),
-            *context_parts,
-            *_parts(
-                (ContentRole.REFERENCE, reference),
-                (ContentRole.INSTRUCTIONS, requirements),
-                (ContentRole.TASK_EVIDENCE, evidence),
-            ),
+            *part(ContentRole.QUESTION, given.get("question"), "question"),
+            *part(ContentRole.ANSWER, answer, "answer"),
+            *(ContentPart(ContentRole.CONTEXT, c) for c in (context or ())),
+            *part(ContentRole.REFERENCE, given.get("reference"), "reference"),
+            *part(ContentRole.INSTRUCTIONS, requirements, "requirements"),
+            *part(ContentRole.TASK_EVIDENCE, given.get("evidence"), "evidence"),
         )
-        return EvaluationRequest(dimension, parts)
+        return EvaluationRequest(CHECKS[check][1], parts)
 
     def _verdict(
         self,
@@ -338,7 +392,9 @@ class SemanticScope:
                 SemanticStatus.EVALUATOR_FAILURE,
                 None,
                 None,
-                report.exception_type,
+                # A check still in flight when its scope drained is reported as
+                # "cancelled" with no class; the platform records it as a timeout.
+                report.exception_type or "JudgeTimeoutError",
                 disposition,
                 **common,
             )
@@ -358,11 +414,13 @@ class SemanticScope:
             **common,
         )
 
-    def check(self, check: str, answer: str, **given: Any) -> SemanticVerdict:
+    def check(
+        self, check: str, answer: str, *, trusted: Sequence[str] = (), **given: Any
+    ) -> SemanticVerdict:
         """Blocking evaluation (``SyncJudgeProvider``)."""
         if self._checks.is_async:
             raise TypeError("this SemanticChecks has an async provider: use acheck()")
-        request = self._request(check, answer, **given)
+        request = self._request(check, answer, given, trusted)
         box: list[JudgeInvocationReport] = []
         token = _box.set(box)
         try:
@@ -373,11 +431,13 @@ class SemanticScope:
             _box.reset(token)
         return self._verdict(check, disposition, box)
 
-    async def acheck(self, check: str, answer: str, **given: Any) -> SemanticVerdict:
+    async def acheck(
+        self, check: str, answer: str, *, trusted: Sequence[str] = (), **given: Any
+    ) -> SemanticVerdict:
         """Async evaluation (``JudgeProvider``); cancellation records nothing."""
         if not self._checks.is_async:
             raise TypeError("this SemanticChecks has a blocking provider: use check()")
-        request = self._request(check, answer, **given)
+        request = self._request(check, answer, given, trusted)
         box: list[JudgeInvocationReport] = []
         token = _box.set(box)
         try:

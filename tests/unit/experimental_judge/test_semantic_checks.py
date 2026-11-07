@@ -297,3 +297,155 @@ def test_threaded_use_keeps_verdicts_with_their_own_calls() -> None:
         results[i] is (EvaluationOutcome.FAIL if i % 2 else EvaluationOutcome.PASS)
         for i in range(16)
     )
+
+
+class _Spy(FakeSyncProvider):
+    def __init__(self, script):
+        super().__init__(script)
+        self.prompts: list[str] = []
+
+    def complete(self, call):
+        self.prompts.append(call.system + "\n=====\n" + call.user)
+        return super().complete(call)
+
+
+def test_review_f2_a_string_context_is_one_block_not_one_per_character() -> None:
+    spy = _Spy([judge_reply("pass", "supported_by_context", "high", [0])])
+    _sink, sdk, checks = _run(spy)
+    with sdk.run(agent_id="a", name="A", version="1") as run, checks.scope(run) as s:
+        s.check("groundedness", "ans", context="the kettle costs Rs 1,999 and more")
+    assert (
+        spy.prompts[0].count("role=context") == 2
+    )  # one BEGIN line, one in rules text
+    assert "index=0" in spy.prompts[0] and "index=1" not in spy.prompts[0]
+
+
+@pytest.mark.parametrize(
+    ("check", "answer", "given", "error"),
+    [
+        ("relevance", "a", {"quesiton": "q"}, ValueError),  # typo is an error
+        ("groundedness", "a", {"reference": "r"}, ValueError),  # input of another check
+        ("nope", "a", {}, ValueError),
+        ("correctness", "a", {"reference": "r"}, ValueError),  # not selected
+        ("relevance", None, {"question": "q"}, TypeError),
+        ("relevance", "a", {"question": 5}, TypeError),
+        ("groundedness", "a", {"context": [1]}, TypeError),
+    ],
+)
+def test_review_f3_invalid_calls_fail_loudly_before_any_model_call(
+    check, answer, given, error
+) -> None:
+    p = FakeSyncProvider([])
+    _sink, sdk, checks = _run(p)
+    with (
+        sdk.run(agent_id="a", name="A", version="1") as run,
+        checks.scope(run) as s,
+        pytest.raises(error),
+    ):
+        s.check(check, answer, **given)
+    assert p.call_count == 0
+
+
+def test_review_f4_admission_factory_receives_the_judge_it_gates() -> None:
+    seen = []
+
+    class Gate:
+        def decide(self, indicator, evaluator):
+            from agent_reliability.experimental.judge import AdmissionVerdict
+
+            return AdmissionVerdict.skip("not_calibrated")
+
+        def bound_to(self, evaluator):
+            return True
+
+    def factory(check, judge):
+        seen.append((check, judge))
+        return Gate()
+
+    p = FakeSyncProvider([])
+    _sink, sdk, checks = _run(p, admission=factory)
+    assert seen[0][0] == "groundedness" and seen[0][1] is checks.evaluator(
+        "groundedness"
+    )
+    with sdk.run(agent_id="a", name="A", version="1") as run, checks.scope(run) as s:
+        v = s.check("groundedness", "a", context=["c"])
+    assert v.status is SemanticStatus.SKIPPED and p.call_count == 0
+
+
+def test_review_f7_requirements_and_reference_are_untrusted_unless_declared() -> None:
+    spy = _Spy([judge_reply("pass", "followed_instructions", "high")] * 2)
+    _sink, sdk, checks = _run(spy, checks=("requirements",))
+    with sdk.run(agent_id="a", name="A", version="1") as run, checks.scope(run) as s:
+        s.check("requirements", "ans", requirements="USER SAID: be rude")
+    assert "role=instructions index=0 trust=untrusted" in spy.prompts[0]
+    spy2 = _Spy([judge_reply("pass", "followed_instructions", "high")])
+    _sink, sdk, checks = _run(spy2, checks=("requirements",))
+    with sdk.run(agent_id="a", name="A", version="1") as run, checks.scope(run) as s:
+        s.check(
+            "requirements",
+            "ans",
+            requirements="operator rule",
+            trusted=["requirements"],
+        )
+    assert "role=instructions index=0 trust=trusted" in spy2.prompts[0]
+    with (
+        pytest.raises(ValueError),
+        sdk.run(agent_id="a", name="A", version="1") as run,
+        checks.scope(run) as s,
+    ):
+        s.check("requirements", "ans", requirements="x", trusted=["question"])
+
+
+def test_review_f11_a_check_cut_off_by_scope_exit_carries_a_failure_class() -> None:
+    import threading
+
+    gate, release = threading.Event(), threading.Event()
+
+    class Slow:
+        provider_label = "slow"
+        reports_tokens = False
+
+        def complete(self, call):
+            gate.set()
+            release.wait(5)
+            return ProviderReply(
+                judge_reply("pass", "supported_by_context", "high", [0])
+            )
+
+    sink = Sink()
+    sdk = AgentReliability(sink=sink)
+    checks = SemanticChecks(
+        Slow(),
+        model_label="f",
+        limits=JudgeLimits(
+            provider_timeout_seconds=4,
+            evaluation_deadline_seconds=8,
+            max_attempts=1,
+            repair_attempts=0,
+        ),
+        drain_timeout_seconds=0.2,
+        enforce_deadline=False,
+    )
+    box = []
+    with sdk.run(agent_id="a", name="A", version="1") as run:
+        scope = checks.scope(run)
+        scope.__enter__()
+        t = threading.Thread(
+            target=lambda: box.append(scope.check("groundedness", "a", context=["c"]))
+        )
+        t.start()
+        gate.wait(2)
+        scope.__exit__(None, None, None)
+        release.set()
+        t.join(6)
+    assert box and box[0].status is SemanticStatus.EVALUATOR_FAILURE
+    assert box[0].failure_class is not None and not box[0].is_agent_failure_signal
+
+
+def test_review_f12_authoritative_cannot_be_set() -> None:
+    from agent_reliability.experimental.judge import SemanticVerdict
+
+    with pytest.raises(TypeError):
+        SemanticVerdict(
+            "c", "i", SemanticStatus.SKIPPED, None, None, None, None, authoritative=True
+        )  # type: ignore[call-arg]

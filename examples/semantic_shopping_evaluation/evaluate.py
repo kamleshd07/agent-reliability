@@ -23,7 +23,7 @@ from agent_reliability.experimental.judge import (
 from agent_reliability.sdk import AgentReliability
 
 from ..judge_providers import local_runtime_provider
-from .golden import cases
+from .golden import cases, relabel
 
 CHECK_OF = {"groundedness": "groundedness", "relevance": "relevance"}
 
@@ -195,18 +195,23 @@ def metrics(
     return out
 
 
-def report(path: str) -> None:
+def report(path: str, mode: str = "original", source: str | None = None) -> None:
+    """mode: original | corrected | clear (see golden.relabel); source: agent_run | constructed."""
     data = json.loads(Path(path).read_text(encoding="utf-8"))
-    print(
-        json.dumps(
-            {"model_label": data["model_label"], "metrics": metrics(data["rows"])},
-            indent=2,
-        )
-    )
+    rows = relabel(data["rows"], mode)
+    if source:
+        rows = [r for r in rows if r["source"] == source]
+    out = {
+        "model_label": data["model_label"],
+        "label_mode": mode,
+        "source": source or "all",
+        "metrics": metrics(rows),
+    }
+    print(json.dumps(out, indent=2))
 
 
 if __name__ == "__main__":
     {
         "run": lambda: run(sys.argv[2], sys.argv[3], *(int(a) for a in sys.argv[4:5])),
-        "report": lambda: report(sys.argv[2]),
+        "report": lambda: report(sys.argv[2], *sys.argv[3:5]),
     }[sys.argv[1]]()

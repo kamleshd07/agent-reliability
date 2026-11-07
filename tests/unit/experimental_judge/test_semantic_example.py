@@ -77,3 +77,52 @@ def test_quickstart_runs_offline() -> None:
         and "determinate fail" in done.stdout
         and "authoritative=False" in done.stdout
     )
+
+
+def test_label_corrections_are_transparent_and_consistent() -> None:
+    from examples.semantic_shopping_evaluation.golden import (
+        AMBIGUOUS,
+        CORRECTIONS,
+        relabel,
+    )
+
+    labels = {c["case_id"]: c["labels"] for c in cases()}
+    for (case_id, check), (original, corrected, reason) in CORRECTIONS.items():
+        assert labels[case_id][check] == original != corrected and len(reason) > 20
+    for case_id, check in AMBIGUOUS:
+        assert labels[case_id][check] is not None
+    run = json.loads(
+        (EXPECTED / "verdicts-gemma4-12b-tok1536.json").read_text(encoding="utf-8")
+    )
+    rows = run["rows"]
+    original = relabel(rows, "original")
+    corrected = relabel(rows, "corrected")
+    clear = relabel(rows, "clear")
+    assert original == rows  # preserved as measured
+    assert len(corrected) == len(rows) and len(clear) == len(rows) - len(AMBIGUOUS)
+    changed = [
+        (a["case_id"], a["check"])
+        for a, b in zip(rows, corrected, strict=True)
+        if a["expected"] != b["expected"]
+    ]
+    assert sorted(changed) == sorted(CORRECTIONS)
+    m = metrics(corrected)
+    assert (
+        m["groundedness"]["agreement_on_judge_determinate"]["agree"]
+        == m["groundedness"]["agreement_on_judge_determinate"]["n"]
+    )
+    with pytest.raises(ValueError):
+        relabel(rows, "nope")
+
+
+def test_the_judge_never_produced_unknown_on_its_own_in_the_recorded_runs() -> None:
+    for name in ("verdicts-gemma4-12b.json", "verdicts-gemma4-12b-tok1536.json"):
+        rows = json.loads((EXPECTED / name).read_text(encoding="utf-8"))["rows"]
+        unknown = [r for r in rows if r["status"] == "unknown"]
+        assert {(r["case_id"], r["check"]) for r in unknown} == {
+            ("c16", "groundedness"),
+            ("r11", "relevance"),
+        }
+        assert all(
+            r["latency_ms"] == 0 for r in unknown
+        )  # deterministic pre-checks, no model call

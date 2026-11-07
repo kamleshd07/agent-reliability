@@ -17,6 +17,6 @@ python -m examples.semantic_shopping_evaluation.evaluate report examples/semanti
 python -m examples.semantic_shopping_evaluation.evaluate run gemma4:12b out.json 1536   # needs a local runtime serving the model; slow and non-deterministic
 ```
 
-Label provenance: written by the implementing assistant before any judge ran; not independent human adjudication; please review `golden.py`.
-The same model produced and judged the real answers. Two labels were found wrong after the fact (`r01`, `c19`) and are kept as labelled, with the
-correction disclosed in the documentation. Deterministic checks stay authoritative; the semantic indicators complement them.
+Label provenance: written by the implementing assistant, not by a human; please review `golden.py`. The same model produced and judged the real answers.
+Four labels were corrected after an independent review (`CORRECTIONS` in `golden.py`); the originals and the stored verdicts are kept, and
+`evaluate report FILE original|corrected|clear [agent_run|constructed]` recomputes the metrics under each view. Deterministic checks stay authoritative; the semantic indicators complement them.

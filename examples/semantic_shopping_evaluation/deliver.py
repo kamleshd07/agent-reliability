@@ -123,7 +123,7 @@ def main(config_path: str) -> None:
                     check,
                     case["answer"] + " " + MARKER,
                     context=[*case["context"], MARKER],
-                    question=case["question"],
+                    question=case["question"] + " " + MARKER,
                 )
                 verdicts.append(
                     {
@@ -161,6 +161,37 @@ def main(config_path: str) -> None:
                 }
             )
     snapshot = sink.close(60)
+    det = config.get("det_deployment_id")
+    deterministic = None
+    if det:  # deterministic evidence in its OWN deployment: measurement health is counted per deployment and window
+        from agent_reliability.domain import EvaluationOutcome
+
+        d = config["det_identity"]
+        det_sink = HTTPEventSink(
+            endpoint=config["endpoint"],
+            credential_provider=lambda: token,
+            deployment_id=UUID(det),
+            expected_agent=AgentIdentity(
+                d["agent_id"], d["name"], d["version"], d["environment"]
+            ),
+            indicator_allowlist=["price-exact"],
+            retry_max_attempts=3,
+        )
+        det_sdk = AgentReliability(sink=det_sink)
+        for i in range(6):
+            with det_sdk.run(
+                agent_id=d["agent_id"],
+                name=d["name"],
+                version=d["version"],
+                environment=d["environment"],
+            ) as run:
+                run.record(
+                    indicator="price-exact",
+                    outcome=EvaluationOutcome.PASS if i < 5 else EvaluationOutcome.FAIL,
+                )
+        deterministic = {
+            k.value: n for k, n in det_sink.close(60).counts_by_disposition.items() if n
+        }
     counts = {
         str(k.value): int(n) for k, n in snapshot.counts_by_disposition.items() if n
     }
@@ -174,6 +205,7 @@ def main(config_path: str) -> None:
                     "pause_reason": snapshot.pause_reason,
                 },
                 "coverage": checks.coverage(),
+                "deterministic_delivery": deterministic,
             },
             indent=2,
         )
