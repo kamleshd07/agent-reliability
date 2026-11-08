@@ -369,7 +369,7 @@ def _build_report(
             "fingerprint": rubric.fingerprint(),
         },
         "model_label": model_label,
-        "template_id": TEMPLATE_ID,
+        "template_id": parts[-4] if len(parts) > 4 else TEMPLATE_ID,
         "configuration_id": config_id,
         "min_confidence": parts[-3].removeprefix("mc-") if len(parts) > 4 else "medium",
         "judge_repeats": int(parts[-2][2:]) if len(parts) > 4 else 1,

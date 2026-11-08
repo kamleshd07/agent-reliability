@@ -222,6 +222,10 @@ def _decimal(value: object, name: str, *, positive: bool) -> Decimal:
     return value
 
 
+#: Known prompt templates, oldest first. ``jp1`` must never change.
+PROMPT_TEMPLATES: Final = ("jp1", "jp2")
+
+
 @dataclass(frozen=True, slots=True)
 class JudgePolicy:
     """Decision-policy settings. ``min_confidence=None`` defers to the rubric."""
@@ -229,8 +233,13 @@ class JudgePolicy:
     min_confidence: Confidence | None = None
     repeats: int = 1
     capture_reason: bool = False
+    #: Prompt template. ``jp1`` (default) is the historical template, byte-identical
+    #: to earlier releases. ``jp2`` differs only when no context block is sent.
+    prompt_template: str = "jp1"
 
     def __post_init__(self) -> None:
+        if self.prompt_template not in PROMPT_TEMPLATES:
+            raise ValueError(f"prompt_template must be one of {PROMPT_TEMPLATES}")
         if self.min_confidence is not None and not isinstance(
             self.min_confidence, Confidence
         ):

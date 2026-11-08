@@ -26,6 +26,7 @@ from agent_reliability.experimental.judge.identity import TEMPLATE_ID
 from agent_reliability.experimental.judge.provider import ProviderFinish, ProviderReply
 from agent_reliability.experimental.judge.rubric import Rubric
 from agent_reliability.experimental.judge.values import (
+    PROMPT_TEMPLATES,
     Confidence,
     ContentPart,
     ContentRole,
@@ -154,7 +155,17 @@ def draw_nonce(
     raise RuntimeError("nonce source did not produce an unused nonce")
 
 
-def _system_message(rubric: Rubric) -> str:
+def _system_message(
+    rubric: Rubric, template_id: str = TEMPLATE_ID, context_count: int = 0
+) -> str:
+    # jp2 differs from jp1 in exactly one case: no context block is sent, so the
+    # citation instructions must not ask for context indexes (a model would cite
+    # the question/answer ``index=0`` header instead, and the strict parser rejects
+    # it). jp1 text is untouched.
+    no_context = template_id == "jp2" and context_count == 0
+    citations_member = (
+        '"citations":[],' if no_context else '"citations":[<context block indexes>],'
+    )
     codes = rubric.reason_codes
     lines = [
         "You are an evaluation judge. Evaluate the ANSWER for the dimension "
@@ -172,16 +183,25 @@ def _system_message(rubric: Rubric) -> str:
         "",
         "Reply with exactly one JSON object and nothing else (no Markdown, "
         "no commentary). Members, and no others:",
-        '{"schema":"gentlity.judge-output/1","verdict":"pass|fail|unknown",'
-        '"code":"<allowed code for the verdict>","confidence":"high|medium|low",'
-        '"citations":[<context block indexes>],'
-        '"reason":"<optional, at most 300 characters>"}',
+        (
+            '{"schema":"gentlity.judge-output/1","verdict":"pass|fail|unknown",'
+            '"code":"<allowed code for the verdict>","confidence":"high|medium|low",'
+            + citations_member
+            + '"reason":"<optional, at most 300 characters>"}'
+        ),
         "Rules:",
         '- "code" must be one of the allowed codes listed under the chosen verdict.',
-        '- "citations" is always present; use [] when nothing is cited. Each entry '
-        "is the index of a context block (role=context) that supports the verdict.",
+        (
+            '- No context blocks are supplied in this evaluation: "citations" must '
+            "be []. The question and answer blocks are not context blocks and must "
+            "not be cited."
+            if no_context
+            else '- "citations" is always present; use [] when nothing is cited. '
+            "Each entry is the index of a context block (role=context) that "
+            "supports the verdict."
+        ),
     ]
-    if rubric.require_citations:
+    if rubric.require_citations and not no_context:
         lines.append('- A "pass" verdict must cite at least one context block.')
     lines += [
         '- Choose "unknown" when the evidence is insufficient to judge.',
@@ -201,12 +221,15 @@ def build_prompt(
     *,
     nonce: str,
     repair_error_class: str | None = None,
+    template_id: str = TEMPLATE_ID,
 ) -> BuiltPrompt:
-    """Build the ``jp1`` prompt from already selected parts.
+    """Build the ``jp1`` (default) or ``jp2`` prompt from already selected parts.
 
     Evaluated content appears only in the user message, inside nonce-marked
     blocks; the system message holds only trusted rubric text.
     """
+    if template_id not in PROMPT_TEMPLATES:
+        raise ValueError(f"template_id must be one of {PROMPT_TEMPLATES}")
     blocks: list[str] = []
     seen: dict[ContentRole, int] = {}
     for part in parts:
@@ -226,7 +249,10 @@ def build_prompt(
             "Reply again with only the JSON object."
         )
     user = "\n".join(blocks) + "\n" + "\n".join(tail)
-    return BuiltPrompt(system=_system_message(rubric), user=user)
+    context_count = sum(1 for p in parts if p.role is ContentRole.CONTEXT)
+    return BuiltPrompt(
+        system=_system_message(rubric, template_id, context_count), user=user
+    )
 
 
 # --------------------------------------------------------------------------

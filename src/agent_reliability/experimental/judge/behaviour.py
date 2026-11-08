@@ -77,7 +77,7 @@ _PROBES: Final[tuple[tuple[dict[str, Any], str], ...]] = (
 )
 
 
-def template_digest() -> str:
+def template_digest(template_id: str = TEMPLATE_ID) -> str:
     """SHA-256 of the prompt template as the real builder renders it.
 
     Renders the builder for a fixed probe rubric (with and without the citation
@@ -95,12 +95,16 @@ def template_digest() -> str:
         )
         for repair in (None, "probe_error_class"):
             prompt = build_prompt(
-                rubric, parts, nonce=_PROBE_NONCE, repair_error_class=repair
+                rubric,
+                parts,
+                nonce=_PROBE_NONCE,
+                repair_error_class=repair,
+                template_id=template_id,
             )
             rendered.append({"system": prompt.system, "user": prompt.user})
     canonical = json.dumps(
         {
-            "template_id": TEMPLATE_ID,
+            "template_id": template_id,
             "output_schema": JUDGE_OUTPUT_SCHEMA,
             "max_reason_chars": MAX_REASON_CHARS,
             "temperature": REQUESTED_TEMPERATURE,
@@ -145,7 +149,7 @@ def behaviour_of(
         min_confidence=effective_min_confidence(rubric, policy).value,
         capture_reason=policy.capture_reason,
         require_citations=rubric.require_citations,
-        template_id=TEMPLATE_ID,
-        template_digest=template_digest(),
+        template_id=policy.prompt_template,
+        template_digest=template_digest(policy.prompt_template),
         engine_revision=ENGINE_REVISION,
     )
