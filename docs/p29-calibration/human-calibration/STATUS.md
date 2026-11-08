@@ -54,3 +54,7 @@ The private key mapping opaque ids to golden-set case ids was generated alongsid
 - **Still outstanding owner work:** two independent blind human labellers and a separate adjudicator. No labels exist, none were simulated, no human approval was simulated, and SG-1 to SG-6 are not satisfied.
 - `dimension_not_applicable` is used only inside this labelling tooling; there is no shipped contract change.
 
+## Update 2026-11-08 (Qwen3-14B smoke test)
+
+Qwen3-14B was downloaded locally (official Ollama library; digest recorded) and smoke-tested on synthetic data: **22-42 % evaluator failures against the approved 2 % ceiling**, caused by relevance replies citing a non-existent context block. It is therefore **not ready for a held-out run** as configured, and it is **not calibrated**. Details: `QWEN3_14B_SMOKE_2026-11-08.md`. No thresholds were changed; human labelling and adjudication are still outstanding.
+
