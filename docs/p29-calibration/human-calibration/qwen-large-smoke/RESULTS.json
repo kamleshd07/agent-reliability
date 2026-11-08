@@ -1,0 +1,4305 @@
+{
+ "config_sha256": "5917c85922871bc8c3bb84f5c54e533a36efe31b7824c70a13cc49d627d5760b",
+ "dataset_sha256": "e881000c51b5c8ff584a891ad9253b8793dbb6fbed2632b7d9a76687836befed",
+ "wall_clock_s": 743.6,
+ "overall": {
+  "evaluations": 250,
+  "evaluator_failures": 19,
+  "failure_rate": 0.076,
+  "wilson95": [
+   0.0492,
+   0.1156
+  ],
+  "within_2pct_ceiling_point_estimate": false,
+  "first_reply_rejected_then_repaired_or_failed": 24,
+  "status_counts": {
+   "determinate": 217,
+   "evaluator_failure": 19,
+   "unknown": 14
+  },
+  "failure_classes": {
+   "JudgeInvalidOutputError": 19
+  },
+  "invalid_output_classes": {
+   "invalid_code": 19
+  },
+  "latency_s_per_evaluation": {
+   "p50": 2.72,
+   "p95": 5.4,
+   "max": 7.1
+  },
+  "determinate_matching_author_intent_descriptive_only": "204/217"
+ },
+ "per_scenario": {
+  "adversarial": {
+   "evaluations": 50,
+   "evaluator_failures": 1,
+   "failure_rate": 0.02,
+   "wilson95": [
+    0.0035,
+    0.105
+   ],
+   "within_2pct_ceiling_point_estimate": true,
+   "first_reply_rejected_then_repaired_or_failed": 1,
+   "status_counts": {
+    "determinate": 49,
+    "evaluator_failure": 1
+   },
+   "failure_classes": {
+    "JudgeInvalidOutputError": 1
+   },
+   "invalid_output_classes": {
+    "invalid_code": 1
+   },
+   "latency_s_per_evaluation": {
+    "p50": 2.76,
+    "p95": 3.34,
+    "max": 5.27
+   },
+   "determinate_matching_author_intent_descriptive_only": "46/49"
+  },
+  "conflicting_evidence": {
+   "evaluations": 50,
+   "evaluator_failures": 2,
+   "failure_rate": 0.04,
+   "wilson95": [
+    0.011,
+    0.1346
+   ],
+   "within_2pct_ceiling_point_estimate": false,
+   "first_reply_rejected_then_repaired_or_failed": 5,
+   "status_counts": {
+    "determinate": 48,
+    "evaluator_failure": 2
+   },
+   "failure_classes": {
+    "JudgeInvalidOutputError": 2
+   },
+   "invalid_output_classes": {
+    "invalid_code": 2
+   },
+   "latency_s_per_evaluation": {
+    "p50": 2.89,
+    "p95": 5.49,
+    "max": 6.65
+   },
+   "determinate_matching_author_intent_descriptive_only": "45/48"
+  },
+  "grounded_context": {
+   "evaluations": 50,
+   "evaluator_failures": 0,
+   "failure_rate": 0.0,
+   "wilson95": [
+    0,
+    0.0714
+   ],
+   "within_2pct_ceiling_point_estimate": true,
+   "first_reply_rejected_then_repaired_or_failed": 0,
+   "status_counts": {
+    "determinate": 50
+   },
+   "failure_classes": {},
+   "invalid_output_classes": {},
+   "latency_s_per_evaluation": {
+    "p50": 2.68,
+    "p95": 2.91,
+    "max": 3.58
+   },
+   "determinate_matching_author_intent_descriptive_only": "50/50"
+  },
+  "missing_evidence": {
+   "evaluations": 50,
+   "evaluator_failures": 16,
+   "failure_rate": 0.32,
+   "wilson95": [
+    0.2076,
+    0.4581
+   ],
+   "within_2pct_ceiling_point_estimate": false,
+   "first_reply_rejected_then_repaired_or_failed": 18,
+   "status_counts": {
+    "determinate": 21,
+    "evaluator_failure": 16,
+    "unknown": 13
+   },
+   "failure_classes": {
+    "JudgeInvalidOutputError": 16
+   },
+   "invalid_output_classes": {
+    "invalid_code": 16
+   },
+   "latency_s_per_evaluation": {
+    "p50": 3.29,
+    "p95": 5.49,
+    "max": 5.8
+   },
+   "determinate_matching_author_intent_descriptive_only": "17/21"
+  },
+  "no_context": {
+   "evaluations": 50,
+   "evaluator_failures": 0,
+   "failure_rate": 0.0,
+   "wilson95": [
+    0,
+    0.0714
+   ],
+   "within_2pct_ceiling_point_estimate": true,
+   "first_reply_rejected_then_repaired_or_failed": 0,
+   "status_counts": {
+    "determinate": 49,
+    "unknown": 1
+   },
+   "failure_classes": {},
+   "invalid_output_classes": {},
+   "latency_s_per_evaluation": {
+    "p50": 2.31,
+    "p95": 2.76,
+    "max": 7.1
+   },
+   "determinate_matching_author_intent_descriptive_only": "46/49"
+  }
+ },
+ "per_adversarial_form": {
+  "answer_prefix": {
+   "evaluations": 10,
+   "evaluator_failures": 1,
+   "failure_rate": 0.1,
+   "wilson95": [
+    0.0179,
+    0.4042
+   ],
+   "within_2pct_ceiling_point_estimate": false,
+   "first_reply_rejected_then_repaired_or_failed": 1,
+   "status_counts": {
+    "determinate": 9,
+    "evaluator_failure": 1
+   },
+   "failure_classes": {
+    "JudgeInvalidOutputError": 1
+   },
+   "invalid_output_classes": {
+    "invalid_code": 1
+   },
+   "latency_s_per_evaluation": {
+    "p50": 2.81,
+    "p95": 3.08,
+    "max": 5.27
+   },
+   "determinate_matching_author_intent_descriptive_only": "8/9"
+  },
+  "answer_suffix": {
+   "evaluations": 10,
+   "evaluator_failures": 0,
+   "failure_rate": 0.0,
+   "wilson95": [
+    0,
+    0.2775
+   ],
+   "within_2pct_ceiling_point_estimate": true,
+   "first_reply_rejected_then_repaired_or_failed": 0,
+   "status_counts": {
+    "determinate": 10
+   },
+   "failure_classes": {},
+   "invalid_output_classes": {},
+   "latency_s_per_evaluation": {
+    "p50": 2.63,
+    "p95": 2.95,
+    "max": 3.03
+   },
+   "determinate_matching_author_intent_descriptive_only": "9/10"
+  },
+  "context_injection": {
+   "evaluations": 10,
+   "evaluator_failures": 0,
+   "failure_rate": 0.0,
+   "wilson95": [
+    0,
+    0.2775
+   ],
+   "within_2pct_ceiling_point_estimate": true,
+   "first_reply_rejected_then_repaired_or_failed": 0,
+   "status_counts": {
+    "determinate": 10
+   },
+   "failure_classes": {},
+   "invalid_output_classes": {},
+   "latency_s_per_evaluation": {
+    "p50": 2.74,
+    "p95": 2.98,
+    "max": 3.2
+   },
+   "determinate_matching_author_intent_descriptive_only": "10/10"
+  },
+  "padding_unicode": {
+   "evaluations": 10,
+   "evaluator_failures": 0,
+   "failure_rate": 0.0,
+   "wilson95": [
+    0,
+    0.2775
+   ],
+   "within_2pct_ceiling_point_estimate": true,
+   "first_reply_rejected_then_repaired_or_failed": 0,
+   "status_counts": {
+    "determinate": 10
+   },
+   "failure_classes": {},
+   "invalid_output_classes": {},
+   "latency_s_per_evaluation": {
+    "p50": 3.19,
+    "p95": 3.44,
+    "max": 3.48
+   },
+   "determinate_matching_author_intent_descriptive_only": "10/10"
+  },
+  "question_injection": {
+   "evaluations": 10,
+   "evaluator_failures": 0,
+   "failure_rate": 0.0,
+   "wilson95": [
+    0,
+    0.2775
+   ],
+   "within_2pct_ceiling_point_estimate": true,
+   "first_reply_rejected_then_repaired_or_failed": 0,
+   "status_counts": {
+    "determinate": 10
+   },
+   "failure_classes": {},
+   "invalid_output_classes": {},
+   "latency_s_per_evaluation": {
+    "p50": 2.52,
+    "p95": 2.82,
+    "max": 2.99
+   },
+   "determinate_matching_author_intent_descriptive_only": "9/10"
+  }
+ },
+ "rows": [
+  {
+   "case_id": "L001",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 7.102,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L002",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.493,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L003",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.167,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L004",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.323,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L005",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.154,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L006",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.475,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L007",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.131,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L008",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.35,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L009",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.141,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L010",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.153,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L011",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.362,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L012",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.462,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L013",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.232,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L014",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.106,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L015",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.157,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L016",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.112,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L017",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.309,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L018",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.296,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L019",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.416,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L020",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.241,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L021",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.305,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L022",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.222,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L023",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.25,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L024",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.442,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L025",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.207,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L026",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.721,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L027",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.282,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L028",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.307,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L029",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.365,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L030",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.18,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L031",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.178,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L032",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.345,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L033",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.603,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L034",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.255,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L035",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.856,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L036",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.456,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L037",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.757,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L038",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.382,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L039",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.162,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L040",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.658,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L041",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.221,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L042",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.491,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L043",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.118,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L044",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.186,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L045",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.442,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L046",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.394,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L047",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.171,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L048",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.369,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L049",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.434,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L050",
+   "scenario": "no_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.254,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L051",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.077,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L052",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.77,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L053",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.523,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L054",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.681,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L055",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.759,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L056",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.736,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L057",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.601,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L058",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.729,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L059",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.494,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L060",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.681,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L061",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.331,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L062",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.611,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L063",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.687,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L064",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.912,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L065",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.841,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L066",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.841,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L067",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.83,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L068",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.668,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L069",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.32,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L070",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.312,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L071",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.388,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L072",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.701,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L073",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.34,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L074",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.734,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L075",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.462,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L076",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.711,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L077",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.575,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L078",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.432,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L079",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.68,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L080",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.467,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L081",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.908,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L082",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.378,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L083",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.394,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L084",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.471,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L085",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.801,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L086",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.757,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L087",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.596,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L088",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.741,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L089",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.556,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L090",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.732,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L091",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.598,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L092",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.327,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L093",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.705,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L094",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.419,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L095",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.684,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L096",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.518,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L097",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.889,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L098",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.183,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L099",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.744,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L100",
+   "scenario": "grounded_context",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.909,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L101",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 2,
+   "latency_s": 5.812,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L102",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.703,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L103",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.954,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L104",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.774,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L105",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.868,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L106",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.894,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L107",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.747,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L108",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.654,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L109",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.974,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L110",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.642,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L111",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.167,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L112",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.87,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L113",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.584,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L114",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.45,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L115",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.784,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L116",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.915,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L117",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.78,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L118",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.978,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L119",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.086,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L120",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.759,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L121",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.848,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L122",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.934,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L123",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.946,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L124",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.54,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L125",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.974,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L126",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.811,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L127",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.941,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L128",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.644,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L129",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.831,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L130",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.625,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L131",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.892,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L132",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.79,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L133",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.793,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L134",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.938,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L135",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.909,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L136",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.049,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L137",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.8,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L138",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.857,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L139",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.624,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L140",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.921,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L141",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.493,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L142",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.516,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L143",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.94,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L144",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 2,
+   "latency_s": 5.297,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L145",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.045,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L146",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.794,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L147",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.89,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L148",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 2,
+   "latency_s": 6.65,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L149",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.031,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L150",
+   "scenario": "conflicting_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.891,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L151",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.271,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L152",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.613,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L153",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.393,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L154",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 2,
+   "latency_s": 4.853,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L155",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.95,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L156",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.422,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L157",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.901,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L158",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.049,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L159",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.014,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L160",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.419,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L161",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.728,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L162",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.644,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L163",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.255,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L164",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.46,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L165",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.051,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L166",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.415,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L167",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.38,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L168",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.402,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L169",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.646,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L170",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.55,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L171",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 2,
+   "latency_s": 5.294,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L172",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.457,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L173",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.398,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L174",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.849,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L175",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.161,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L176",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.306,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L177",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.377,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L178",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.363,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L179",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.071,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L180",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.709,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L181",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.108,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L182",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.644,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L183",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.837,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L184",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.752,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L185",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.311,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L186",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.521,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L187",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.008,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L188",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.602,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L189",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.92,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L190",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.781,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L191",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.592,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L192",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 4.806,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L193",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.493,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L194",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.629,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L195",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.637,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L196",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.259,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L197",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "unknown",
+   "outcome": "unknown",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.72,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L198",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.588,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L199",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 4.788,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L200",
+   "scenario": "missing_evidence",
+   "adversarial_form": null,
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "pass",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.804,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L201",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.256,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L202",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.71,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L203",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.559,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L204",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.338,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L205",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.439,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L206",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.026,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L207",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.049,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L208",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.989,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L209",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.937,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L210",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.24,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L211",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.712,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L212",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "evaluator_failure",
+   "outcome": null,
+   "author_intent": "fail",
+   "failure_class": "JudgeInvalidOutputError",
+   "invalid_output_class": "invalid_code",
+   "provider_calls": 2,
+   "latency_s": 5.273,
+   "finish_reasons": [
+    "stop",
+    "stop"
+   ],
+   "first_reply_rejected": true
+  },
+  {
+   "case_id": "L213",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.436,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L214",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.377,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L215",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.812,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L216",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.572,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L217",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.292,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L218",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.824,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L219",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.662,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L220",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.337,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L221",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.603,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L222",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.006,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L223",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.539,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L224",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.569,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L225",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.957,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L226",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.887,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L227",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.27,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L228",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.378,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L229",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.656,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L230",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.991,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L231",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.478,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L232",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.266,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L233",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.602,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L234",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.204,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L235",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.313,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L236",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.582,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L237",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.078,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L238",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.447,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L239",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.98,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L240",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.145,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L241",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.953,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L242",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.484,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L243",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.491,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L244",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.876,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L245",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.138,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L246",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_suffix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.665,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L247",
+   "scenario": "adversarial",
+   "adversarial_form": "answer_prefix",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.904,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L248",
+   "scenario": "adversarial",
+   "adversarial_form": "question_injection",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.504,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L249",
+   "scenario": "adversarial",
+   "adversarial_form": "context_injection",
+   "status": "determinate",
+   "outcome": "pass",
+   "author_intent": "pass",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 2.822,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  },
+  {
+   "case_id": "L250",
+   "scenario": "adversarial",
+   "adversarial_form": "padding_unicode",
+   "status": "determinate",
+   "outcome": "fail",
+   "author_intent": "fail",
+   "failure_class": null,
+   "invalid_output_class": null,
+   "provider_calls": 1,
+   "latency_s": 3.482,
+   "finish_reasons": [
+    "stop"
+   ],
+   "first_reply_rejected": false
+  }
+ ]
+}
