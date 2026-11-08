@@ -412,6 +412,8 @@ def test_merge_writes_loadable_datasets_without_inventing_labels(
                 assert doc["human_label"] == "unknown"
             assert doc["label_provenance"] in ("human_multi", "human_adjudicated")
         assert {d["source"] for d in docs} <= {"agent_run", "constructed"}
+        # The labeller-only reason code never reaches the shipped dataset contract.
+        assert "dimension_not_applicable" not in text
     manifest = json.loads(
         Path(result["groundedness"]["manifest"]).read_text(encoding="utf-8")
     )
@@ -550,3 +552,16 @@ def test_cli_exports_and_validates(
         (DOC_DIR / "blank-sheet" / "export_manifest.json").read_text(encoding="utf-8")
     )
     assert key_hash == committed["private_key_sha256"]
+
+
+def test_labeller_only_reason_code_is_not_in_any_shipped_source_or_rubric() -> None:
+    root = Path(__file__).resolve().parents[3]
+    shipped = list((root / "src").rglob("*"))
+    offenders = [
+        str(p)
+        for p in shipped
+        if p.is_file()
+        and p.suffix in {".py", ".json"}
+        and "dimension_not_applicable" in p.read_text(encoding="utf-8")
+    ]
+    assert offenders == []

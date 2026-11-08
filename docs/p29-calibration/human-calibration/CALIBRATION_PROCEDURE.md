@@ -16,6 +16,26 @@ It extends [FUTURE_CALIBRATION_PLAN.md](../FUTURE_CALIBRATION_PLAN.md); it does 
    (input + output tokens) at the provider's published price (zero for Option A, but time still bounded).
 5. The evaluation dataset size (see "Sample sizes"); the existing 53 cases are not enough for a calibration claim.
 
+## Judge candidate (owner-proposed, not approved, not calibrated)
+
+The owner named **Qwen3-14B** (Alibaba Qwen family) as the initial different-family judge candidate. It is a different family from the Gemma-family model that wrote
+the agent answers and the original same-model judgements, which is what the procedure requires. Nothing here claims it is calibrated; no run has happened.
+
+Local verification performed on 2026-11-08 (no model was pulled and no judge call was made):
+
+| Check | Result |
+|---|---|
+| Runtime | Ollama 0.40.13 serving on loopback |
+| Hardware | 24 GB unified memory, 15 logical CPUs |
+| Models present | `gemma4:12b`, `qwen2.5-coder:7b`. **Qwen3-14B is not installed.** |
+| Feasibility | a 4-bit Qwen3-14B is roughly 9-10 GB, which fits 24 GB with the OS and the repository tooling; throughput, context length and reasoning-token behaviour are unverified |
+
+Before any calibration run the owner (or engineering with the owner's go-ahead) must: pull the model, record the exact tag and digest in the run record, run the
+smoke checks below, and decide the generation settings in advance. Qwen3 is a reasoning-capable model: the earlier Gemma run showed that truncated reasoning
+(`finish=length`) surfaces as evaluator failures, so use the thinking-disabled mode if the runtime offers it, otherwise a generous output budget, and report the
+evaluator-failure rate against the 2 % threshold. Smoke checks: structured-output compliance on the judge schema over 20 synthetic prompts, determinism at the chosen
+temperature, latency per call, and a leakage-free held-out split. A model that fails the smoke checks is replaced, not tuned on the evaluation split.
+
 ## Step by step
 
 1. **Freeze.** Commit the rubric versions (`judge-groundedness@2026-10.r1`, `judge-answer-relevance@2026-11.r1`), the thresholds file and its

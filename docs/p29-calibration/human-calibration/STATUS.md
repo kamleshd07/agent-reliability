@@ -39,3 +39,11 @@ The private key mapping opaque ids to golden-set case ids was generated alongsid
 5. **Owner:** approve the **different-family judge model** and, if hosted or paid, the provider, maximum calls and maximum spend. Nothing is approved; no hosted call has been made.
 6. **Engineering after 1-5:** expand the set toward at least 30 adjudicated cases per class per dimension, merge, run the held-out assessment once with at least 3 repeats, and record the result against the pre-declared thresholds, including a negative result.
 7. **Owner:** decide what, if anything, any result changes. A result here would not by itself satisfy SG-1..SG-6, approve a release (OD-S4-6) or change customer readiness.
+
+## Update 2026-11-08 (owner instructions)
+
+- **Judge candidate:** Qwen3-14B proposed by the owner as the initial different-family judge. Verified locally: runtime and hardware are adequate in principle; the model is **not installed** and nothing was run. It is not calibrated. See `CALIBRATION_PROCEDURE.md`.
+- **Thresholds:** unchanged and **pending owner review**; `thresholds_sha256` is still `31fb3e7a87ae4e287ff68854ba7fe145be76fa7d883cbdec0377057d5c561263`.
+- **`dimension_not_applicable`:** stays local to the labelling tooling and instructions. It is not in any shipped rubric or source file, and it is never written into the merged calibration datasets (pinned by tests). Adding it to the rubric contract needs a separately reviewed contract change.
+- **Human work is unchanged:** no human evaluation exists; recruiting independent labellers and an adjudicator, confirming thresholds, and approving the judge run remain with the owner.
+
