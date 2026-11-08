@@ -143,9 +143,13 @@ def diagnose(args):
         }
         for c in cases()[:3]
     ]
-    rows = run(checks, items)
     report = []
-    for row, call in zip(rows, log, strict=True):
+    pairs = []
+    for item in items:
+        log.clear()
+        row = run(checks, [item])[0]
+        pairs += [(row, c) for c in log]  # every provider call, incl. any repair call
+    for row, call in pairs:
         headers = re.findall(
             r"<<<BEGIN [0-9a-f]+ (role=\S+ index=\d+) trust=\S+>>>", call["user"]
         )
