@@ -167,7 +167,7 @@ def diagnose(args):
                 "context_blocks_sent": context_count,
                 "rubric_require_citations": rubric.require_citations,
                 "system_citation_rule": [
-                    l for ln in call["system"].splitlines() if "citation" in ln.lower()
+                    ln for ln in call["system"].splitlines() if "citation" in ln.lower()
                 ],
                 "model_members": {
                     k: doc.get(k)
