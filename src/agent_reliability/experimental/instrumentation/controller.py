@@ -8,7 +8,7 @@ import math
 import random
 import threading
 from collections import deque
-from collections.abc import Collection
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass, replace
 from typing import Any, TypedDict
 
@@ -18,7 +18,16 @@ from agent_reliability.sdk.client import RunSession
 from agent_reliability.sdk.context import RunHandle
 
 from .collector import Collector
-from .model import MAX_COUNT, CaptureLimits, ExecutionState, ExecutionTrace, alias
+from .export import TraceExporter
+from .model import (
+    ACTION_CLASSES,
+    MAX_COUNT,
+    TOOL_CLASSES,
+    CaptureLimits,
+    ExecutionState,
+    ExecutionTrace,
+    alias,
+)
 
 
 class _Identity(TypedDict):
@@ -26,6 +35,33 @@ class _Identity(TypedDict):
     name: str
     version: str
     environment: str | None
+
+
+def _semantics(
+    approved: frozenset[str],
+    classes: Mapping[str, str] | None,
+    actions: Mapping[str, str] | None,
+) -> dict[str, tuple[str | None, str | None]]:
+    """Declared (never inferred) tool/action classes for approved tool names."""
+    result: dict[str, tuple[str | None, str | None]] = {}
+    for mapping, vocabulary in ((classes, TOOL_CLASSES), (actions, ACTION_CLASSES)):
+        if mapping is None:
+            continue
+        if not isinstance(mapping, Mapping):
+            raise TypeError("tool classes must be a mapping of approved tool names")
+        for name, value in mapping.items():
+            if name not in approved or value not in vocabulary:
+                raise ValueError(
+                    "tool classes must name approved tools using closed values"
+                )
+    for name in approved:
+        pair = (
+            (classes or {}).get(name),
+            (actions or {}).get(name),
+        )
+        if pair != (None, None):
+            result[name] = pair
+    return result
 
 
 class _ExecutionFailure(Exception):
@@ -42,6 +78,7 @@ class InstrumentationStatus:
     unsampled: int
     admission_dropped: int
     failures: int
+    export_failures: int = 0
 
 
 class InstrumentedRunnable:
@@ -65,6 +102,9 @@ class InstrumentedRunnable:
         model_id: str | None,
         limits: CaptureLimits,
         sample_rate: float,
+        tool_classes: Mapping[str, str] | None = None,
+        tool_actions: Mapping[str, str] | None = None,
+        exporter: TraceExporter | None = None,
     ) -> None:
         if not isinstance(sdk, AgentReliability):
             raise TypeError("sdk must be an AgentReliability instance")
@@ -91,6 +131,15 @@ class InstrumentedRunnable:
             "environment": alias(environment) if environment is not None else None,
         }
         self._tools = frozenset(alias(item) for item in tool_names)
+        if len(self._tools) + (model_id is not None) > 512:
+            raise ValueError(
+                "tool names plus the model alias must not exceed the 512 "
+                "components the platform accepts per agent version"
+            )
+        self._semantics = _semantics(self._tools, tool_classes, tool_actions)
+        if exporter is not None and not callable(getattr(exporter, "submit", None)):
+            raise TypeError("exporter must provide submit(trace)")
+        self._exporter = exporter
         self._provider = alias(provider_id) if provider_id is not None else None
         self._model = alias(model_id) if model_id is not None else None
         # Only setup imports the adapter; neutral models stay dependency-free.
@@ -105,7 +154,7 @@ class InstrumentedRunnable:
         self._random = random.Random(0)  # reproducible outcome-independent sampling
         self._lock = threading.Lock()
         self._traces: deque[ExecutionTrace] = deque(maxlen=limits.max_retained_runs)
-        self._status = InstrumentationStatus(True, False, 0, 0, 0, 0, 0, 0)
+        self._status = InstrumentationStatus(True, False, 0, 0, 0, 0, 0, 0, 0)
 
     @property
     def status(self) -> InstrumentationStatus:
@@ -190,6 +239,7 @@ class InstrumentedRunnable:
                 self._limits,
                 self._provider,
                 self._model,
+                self._semantics,
             )
             prepared = self._adapter.callback_config(
                 config, collector, self._tools, root
@@ -199,6 +249,16 @@ class InstrumentedRunnable:
             handle._mark_measurement_health(MeasurementHealthReason.PARTIAL_EVIDENCE)
             collector = None
         return session, handle, collector, prepared
+
+    def _export(self, trace: ExecutionTrace) -> None:
+        # Non-blocking hand-off; any exporter failure is counted, never raised.
+        if self._exporter is None:
+            return
+        try:
+            self._exporter.submit(trace)
+        except Exception:
+            with self._lock:
+                self._increment("export_failures")
 
     def _finish(
         self,
@@ -221,6 +281,7 @@ class InstrumentedRunnable:
                 with self._lock:
                     if not self._status.closed:
                         self._traces.append(trace)
+                self._export(trace)
         except Exception:
             self._failure()
             if handle is not None:
@@ -305,10 +366,15 @@ def instrument(
     model_id: str | None = None,
     limits: CaptureLimits | None = None,
     sample_rate: float = 1.0,
+    tool_classes: Mapping[str, str] | None = None,
+    tool_actions: Mapping[str, str] | None = None,
+    exporter: TraceExporter | None = None,
 ) -> InstrumentedRunnable:
-    """Opt into experimental, local-only LangChain execution capture.
+    """Opt into experimental LangChain execution capture.
 
-    Outcome evaluations remain explicit. No content capture or new export path.
+    Traces stay local unless an ``exporter`` is supplied; then only the closed,
+    content-free execution facts described in docs/AUTOMATIC_INSTRUMENTATION.md leave
+    the process. Outcome evaluations remain explicit and are never inferred.
     """
     if framework != "langchain":
         raise ValueError("unsupported instrumentation framework")
@@ -326,4 +392,7 @@ def instrument(
         model_id=model_id,
         limits=limits if limits is not None else CaptureLimits(),
         sample_rate=sample_rate,
+        tool_classes=tool_classes,
+        tool_actions=tool_actions,
+        exporter=exporter,
     )

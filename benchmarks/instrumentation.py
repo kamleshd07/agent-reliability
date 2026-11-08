@@ -74,7 +74,23 @@ def main() -> None:
         """Constant synthetic result, no I/O."""
         return "ok"
 
-    def wrap(runnable: Any) -> Any:
+    import httpx
+
+    from agent_reliability.adapters.http_execution_exporter import (
+        ExecutionHTTPExporter,
+    )
+
+    exporter = ExecutionHTTPExporter(
+        base_url="http://127.0.0.1:9",
+        credential_provider=lambda: "benchmark",
+        deployment_id=__import__("uuid").UUID(int=1),
+        max_queue_jobs=1024,
+        _transport=httpx.MockTransport(
+            lambda request: httpx.Response(201, json={"status": "accepted"})
+        ),
+    )
+
+    def wrap(runnable: Any, export: Any = None) -> Any:
         return instrument(
             runnable,
             sdk=AgentReliability(),
@@ -83,6 +99,7 @@ def main() -> None:
             version="1",
             tool_names=("synthetic_tool",),
             limits=CaptureLimits(max_retained_runs=2),
+            exporter=export,
         )
 
     trivial = RunnableLambda(lambda value: value)
@@ -91,6 +108,7 @@ def main() -> None:
         lambda value: [synthetic_tool.invoke("synthetic") for _ in range(20)]
     )
     high = wrap(frequent)
+    high_exported = wrap(frequent, exporter)
     large = RunnableLambda(
         lambda value: [synthetic_tool.invoke("synthetic") for _ in range(1200)]
     )
@@ -119,6 +137,14 @@ def main() -> None:
             "one invocation with20tool calls",
             lambda: frequent.invoke(None),
             lambda: high.invoke(None),
+            min(args.iterations, 50),
+        ),
+        (
+            "twenty_tool_calls_exported",
+            "one invocation with 20 tool calls plus in-memory export hand-off "
+            "(mock transport, no network)",
+            lambda: frequent.invoke(None),
+            lambda: high_exported.invoke(None),
             min(args.iterations, 50),
         ),
         (
@@ -154,10 +180,16 @@ def main() -> None:
                 "instrumented_peak_bytes_one_call": peak(measured),
             }
         )
+    exported_status = exporter.close(10)
     trace = bounded.traces[-1]
     assert len(trace.events) <= 2002 and not trace.complete
     assert bounded.status.active_runs == 0 and len(bounded.traces) <= 2
     report = {
+        "exporter_status_after_run": {
+            "submitted_jobs": exported_status.submitted_jobs,
+            "delivered_jobs": exported_status.delivered_jobs,
+            "dropped_queue_full": exported_status.dropped_queue_full,
+        },
         "environment": {
             "python": platform.python_version(),
             "os": platform.platform(),

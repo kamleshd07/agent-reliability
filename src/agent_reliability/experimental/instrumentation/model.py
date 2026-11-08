@@ -12,6 +12,32 @@ ExecutionState = Literal["completed", "failed", "cancelled", "incomplete"]
 _ALIAS = re.compile(r"[A-Za-z0-9._-]{1,128}\Z", re.ASCII)
 MAX_COUNT = 2**63 - 1
 
+# Closed vocabularies shared with the platform's execution-classification contract.
+TOOL_CLASSES = frozenset(
+    {
+        "data_store",
+        "network_api",
+        "retrieval",
+        "browser",
+        "code_execution",
+        "file_system",
+        "messaging",
+        "other",
+        "unknown",
+    }
+)
+ACTION_CLASSES = frozenset({"read", "write", "execute", "other", "unknown"})
+TOOL_OUTCOMES = frozenset(
+    {
+        "success",
+        "timeout",
+        "unavailable",
+        "permission_denied",
+        "cancelled",
+        "execution_error",
+    }
+)
+
 
 def alias(value: str) -> str:
     if type(value) is not str or _ALIAS.fullmatch(value) is None:
@@ -96,6 +122,39 @@ class ExecutionEvent:
     model_id: str | None = None
     usage: TokenUsage | None = None
     synthetic: bool = False
+    # Tool spans only: a closed technical outcome and optional declared classes.
+    # Never derived from names, messages or payloads.
+    outcome: str | None = None
+    tool_class: str | None = None
+    action_class: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ComponentSummary:
+    """Per-component execution facts. Duration is callback elapsed time, summed
+    over observed spans; nested or concurrent spans overlap, so totals can exceed
+    wall-clock time."""
+
+    kind: SpanKind
+    component: str | None
+    calls: int
+    failed: int
+    cancelled: int
+    incomplete: int
+    total_duration_ns: int
+    max_duration_ns: int
+
+
+@dataclass(frozen=True, slots=True)
+class ExecutionSummary:
+    run_id: str
+    state: ExecutionState | None
+    duration_ns: int | None
+    components: tuple[ComponentSummary, ...]
+    total_tokens: int | None
+    token_unknown_models: int
+    retry_signals: int
+    complete: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -117,3 +176,51 @@ class ExecutionTrace:
     @property
     def tool_calls(self) -> int:
         return sum(e.kind == "tool" and e.phase == "start" for e in self.events)
+
+    def summary(self) -> ExecutionSummary:
+        """Where time went, which tools ran and what failed; content-free."""
+        groups: dict[tuple[SpanKind, str | None], list[ExecutionEvent]] = {}
+        root_state: ExecutionState | None = None
+        root_duration: int | None = None
+        tokens = 0
+        reported = False
+        unknown = 0
+        for event in self.events:
+            if event.phase != "terminal":
+                continue
+            if event.kind == "run":
+                root_state, root_duration = event.state, event.duration_ns
+                continue
+            label = event.component if event.kind == "tool" else event.model_id
+            groups.setdefault((event.kind, label), []).append(event)
+            if event.kind == "model":
+                if event.usage is not None and event.usage.availability == "reported":
+                    reported = True
+                    tokens += event.usage.total_tokens or 0
+                else:
+                    unknown += 1
+        rows = tuple(
+            ComponentSummary(
+                kind,
+                label,
+                len(items),
+                sum(e.state == "failed" for e in items),
+                sum(e.state == "cancelled" for e in items),
+                sum(e.state == "incomplete" for e in items),
+                sum(e.duration_ns or 0 for e in items),
+                max((e.duration_ns or 0 for e in items), default=0),
+            )
+            for (kind, label), items in sorted(
+                groups.items(), key=lambda kv: (kv[0][0], kv[0][1] or "")
+            )
+        )
+        return ExecutionSummary(
+            self.run_id,
+            root_state,
+            root_duration,
+            rows,
+            tokens if reported else None,
+            unknown,
+            self.diagnostics.retry_signals,
+            self.complete,
+        )

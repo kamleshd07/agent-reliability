@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "source": "agent-reliability",
+  "producer_run_id": "00000000-0000-4000-8000-000000000001",
+  "assertions": [
+    {
+      "step_id": "t1",
+      "classification_revision": 1,
+      "tool_class": "retrieval",
+      "action_class": "read",
+      "execution_outcome": "timeout"
+    }
+  ]
+}
