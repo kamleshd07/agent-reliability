@@ -36,3 +36,15 @@ P18/P20 detail transport remains deferred and cannot be inferred from local trac
 full LangGraph semantics, second framework, semantic auto-evaluation, state/memory or pricing support. Unsupported
 framework versions fail at setup; upgrade requires new pinned conformance tests and review. Existing customer
 third-party tracing and trusted custom sinks keep their own privacy/behavior contracts.
+
+## Supported LangChain range (exporter slice, 2026-11-08)
+
+The `langchain` extra is `langchain-core>=1.0,<2` (previously `==1.6.13`). The adapter, wrapper and exporter suites
+(`tests/integration/test_langchain_instrumentation.py`, `test_langchain_execution_export.py`, `tests/unit/instrumentation`) were run
+on a fresh Python 3.13 environment per release: **1.0.0, 1.2.31, 1.6.13, 1.7.6: 104 passed each**. With `langchain` 1.4.9 and
+`langgraph` 1.2.20 added, a real `create_agent` agent test and the documented example pass (106 passed, 2 skipped there because the
+skips are langchain-less guards). `langchain-core` 0.3.86 is refused at setup. Type-checking the adapter with the extra installed:
+`mypy src` reports no issues, which resolves the earlier "7 optional-extra mypy findings" (they were missing-import errors only).
+Releases between the tested ones are not individually tested. A LangChain callback-semantics change in a future 1.x release would
+surface as failing tests in this matrix; there is no automatic CI matrix over every release.
+

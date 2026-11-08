@@ -6,6 +6,16 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Added (Experimental): LangChain execution observability export (P30, RM-SDK-006)
+
+- `agent_reliability.adapters.http_execution_exporter.ExecutionHTTPExporter`: bounded, failure-isolated, idempotent delivery of
+  content-free execution facts (steps, tool outcomes, declared tool/action classes, provider-reported token counts) to the platform's
+  existing execution-structure, classification and model-usage endpoints. `instrument(..., exporter=, tool_classes=, tool_actions=)`.
+- `ExecutionTrace.summary()`; tool terminal events carry a closed `outcome` derived from the exception type only.
+- The `langchain` extra now accepts `langchain-core>=1.0,<2` (tested 1.0.0, 1.2.31, 1.6.13, 1.7.6); 0.x and 2.x are refused at setup.
+- `examples/langchain_agent_observability.py` (real `create_agent` agent, offline by default); docs in `docs/AUTOMATIC_INSTRUMENTATION.md`.
+- No stable API, wire contract, dependency, evaluation semantic or default changed; nothing is sent unless an exporter is passed.
+
 ### Added (Experimental): semantic evaluation facade and answer-relevance rubric
 
 - `agent_reliability.experimental.judge.SemanticChecks` / `SemanticScope` / `SemanticVerdict`: one-call groundedness, relevance, correctness,

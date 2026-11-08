@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import threading
 import time
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from .model import (
     MAX_COUNT,
+    TOOL_OUTCOMES,
     CaptureDiagnostics,
     CaptureLimits,
     ExecutionEvent,
@@ -29,6 +31,8 @@ class _Span:
     started_ns: int
     component: str | None
     framework_parent: UUID | None
+    tool_class: str | None = None
+    action_class: str | None = None
     closed: bool = False
 
 
@@ -41,7 +45,9 @@ class Collector:
         limits: CaptureLimits,
         provider_id: str | None,
         model_id: str | None,
+        tool_semantics: Mapping[str, tuple[str | None, str | None]] | None = None,
     ) -> None:
+        self._semantics = tool_semantics or {}
         self.run_id = run_id
         self._parent = parent_run_id
         self._root = framework_root
@@ -120,6 +126,7 @@ class Collector:
                 time.perf_counter_ns(),
                 component,
                 parent,
+                *self._semantics.get(component or "", (None, None)),
             )
             self._spans[key] = span
             self._events.append(
@@ -144,8 +151,17 @@ class Collector:
         usage: TokenUsage | None,
         *,
         synthetic: bool = False,
+        outcome: str | None = None,
     ) -> None:
         span.closed = True
+        if span.kind != "tool" or synthetic:
+            outcome = None
+        elif state == "completed":
+            outcome = "success"
+        elif state == "cancelled":
+            outcome = "cancelled"
+        elif outcome not in TOOL_OUTCOMES or outcome in ("success", "cancelled"):
+            outcome = "execution_error"
         self._events.append(
             ExecutionEvent(
                 self.run_id,
@@ -162,6 +178,9 @@ class Collector:
                 model_id=self._model if span.kind == "model" else None,
                 usage=(usage or TokenUsage()) if span.kind == "model" else None,
                 synthetic=synthetic,
+                outcome=outcome,
+                tool_class=span.tool_class if span.kind == "tool" else None,
+                action_class=span.action_class if span.kind == "tool" else None,
             )
         )
 
@@ -172,6 +191,7 @@ class Collector:
         usage: TokenUsage | None = None,
         *,
         expected_kind: SpanKind | None = None,
+        outcome: str | None = None,
     ) -> None:
         with self._lock:
             if self._closed:
@@ -184,7 +204,7 @@ class Collector:
             elif span.closed:
                 self._count("duplicates")
             else:
-                self._end(span, state, usage)
+                self._end(span, state, usage, outcome=outcome)
 
     def finish(self, state: ExecutionState) -> ExecutionTrace:
         with self._lock:

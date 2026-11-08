@@ -1,0 +1,136 @@
+{
+  "exporter_status_after_run": {
+    "submitted_jobs": 254,
+    "delivered_jobs": 254,
+    "dropped_queue_full": 0
+  },
+  "environment": {
+    "python": "3.13.16",
+    "os": "macOS-26.7.1-arm64-arm-64bit-Mach-O",
+    "architecture": "arm64",
+    "logical_cpus": 15,
+    "langchain_core": "1.7.6"
+  },
+  "method": {
+    "timer": "perf_counter_ns",
+    "repeats": 5,
+    "trivial_iterations_per_repeat": 200,
+    "warmup_calls_per_measurement": 3,
+    "retained_trace_limit": 2,
+    "tracemalloc": "peak incremental allocation of one call; imports warm; prior retained traces may exist",
+    "no_network_or_paid_models": true
+  },
+  "results": [
+    {
+      "scenario": "trivial_runnable",
+      "unit": "one invocation",
+      "uninstrumented": {
+        "samples": 1000,
+        "p50_us": 29.75,
+        "p95_us": 33.0,
+        "p99_us": 70.167
+      },
+      "instrumented": {
+        "samples": 1000,
+        "p50_us": 72.708,
+        "p95_us": 79.208,
+        "p99_us": 114.417
+      },
+      "p50_overhead_percent": 144.39663865546217,
+      "uninstrumented_peak_bytes_one_call": 9524,
+      "instrumented_peak_bytes_one_call": 14390
+    },
+    {
+      "scenario": "twenty_tool_calls",
+      "unit": "one invocation with20tool calls",
+      "uninstrumented": {
+        "samples": 250,
+        "p50_us": 1119.2295,
+        "p95_us": 1227.25,
+        "p99_us": 1317.125
+      },
+      "instrumented": {
+        "samples": 250,
+        "p50_us": 1462.104,
+        "p95_us": 1606.416,
+        "p99_us": 1899.541
+      },
+      "p50_overhead_percent": 30.6348697921204,
+      "uninstrumented_peak_bytes_one_call": 54130,
+      "instrumented_peak_bytes_one_call": 75224
+    },
+    {
+      "scenario": "twenty_tool_calls_exported",
+      "unit": "one invocation with20tool calls plus in-memory export hand-off (mock transport, no network)",
+      "uninstrumented": {
+        "samples": 250,
+        "p50_us": 1121.8755,
+        "p95_us": 1264.958,
+        "p99_us": 1386.666
+      },
+      "instrumented": {
+        "samples": 250,
+        "p50_us": 1598.4995,
+        "p95_us": 2425.167,
+        "p99_us": 5945.416
+      },
+      "p50_overhead_percent": 42.484571594619894,
+      "uninstrumented_peak_bytes_one_call": 41610,
+      "instrumented_peak_bytes_one_call": 75224
+    },
+    {
+      "scenario": "concurrent_async",
+      "unit": "batch of16cooperative invocations including event-loop setup",
+      "uninstrumented": {
+        "samples": 100,
+        "p50_us": 850.75,
+        "p95_us": 942.292,
+        "p99_us": 1204.334
+      },
+      "instrumented": {
+        "samples": 100,
+        "p50_us": 1481.3125,
+        "p95_us": 1571.625,
+        "p99_us": 1679.084
+      },
+      "p50_overhead_percent": 74.11842491918894,
+      "uninstrumented_peak_bytes_one_call": 122812,
+      "instrumented_peak_bytes_one_call": 193452
+    },
+    {
+      "scenario": "large_truncated_trace",
+      "unit": "one invocation with1200tool calls",
+      "uninstrumented": {
+        "samples": 5,
+        "p50_us": 64838.5,
+        "p95_us": 65200.667,
+        "p99_us": 65200.667
+      },
+      "instrumented": {
+        "samples": 5,
+        "p50_us": 82138.667,
+        "p95_us": 82524.125,
+        "p99_us": 82524.125
+      },
+      "p50_overhead_percent": 26.681935886857346,
+      "uninstrumented_peak_bytes_one_call": 173322,
+      "instrumented_peak_bytes_one_call": 1075039
+    }
+  ],
+  "large_trace": {
+    "captured_events": 2002,
+    "tool_calls_captured": 999,
+    "complete": false,
+    "diagnostics": {
+      "dropped": 201,
+      "orphans": 201
+    }
+  },
+  "limitations": [
+    "synthetic local warm-process microbenchmark",
+    "no absolute callback deadline or capacity estimate",
+    "sequential baseline then instrumented may be affected by system drift",
+    "high percentage overhead on trivial work is not hidden",
+    "peak allocation is not process RSS or a hard byte guarantee"
+  ]
+}

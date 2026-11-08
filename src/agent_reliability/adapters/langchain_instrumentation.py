@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import re
 from collections.abc import Callable
 from functools import wraps
 from importlib.metadata import PackageNotFoundError, version
@@ -14,8 +15,11 @@ try:
     _version = version("langchain-core")
 except PackageNotFoundError:
     raise ImportError("install agent-reliability[langchain] for this adapter") from None
-if _version != "1.6.13":
-    raise ImportError("this experimental adapter requires langchain-core==1.6.13")
+if re.match(r"1\.\d+(\.|$)", _version) is None:
+    raise ImportError(
+        "this experimental adapter requires langchain-core>=1.0,<2 "
+        "(see docs/AUTOMATIC_INSTRUMENTATION.md for the tested range)"
+    )
 
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.callbacks.base import BaseCallbackManager
@@ -54,6 +58,17 @@ def _uuid(value: object) -> UUID:
     if type(value) is str and len(value) == 36:
         return UUID(value)
     raise ValueError("invalid callback identity")
+
+
+def outcome_of(error: BaseException) -> str:
+    """Closed technical outcome from the exception *type* only; never name or text."""
+    if isinstance(error, TimeoutError):
+        return "timeout"
+    if isinstance(error, PermissionError):
+        return "permission_denied"
+    if isinstance(error, ConnectionError):
+        return "unavailable"
+    return "execution_error"
 
 
 def _usage(response: object) -> TokenUsage:
@@ -121,9 +136,14 @@ class _Handler(BaseCallbackHandler):
         kind: SpanKind,
         state: ExecutionState = "completed",
         usage: TokenUsage | None = None,
+        outcome: str | None = None,
     ) -> None:
         self.collector.end(
-            _uuid(values.get("run_id")), state, usage, expected_kind=kind
+            _uuid(values.get("run_id")),
+            state,
+            usage,
+            expected_kind=kind,
+            outcome=outcome,
         )
 
     @_guard
@@ -177,6 +197,7 @@ class _Handler(BaseCallbackHandler):
             kwargs,
             "tool",
             "cancelled" if isinstance(error, asyncio.CancelledError) else "failed",
+            outcome=outcome_of(error),
         )
 
     @_guard

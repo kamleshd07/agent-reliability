@@ -48,3 +48,21 @@ GO for owner review of an experimental opt-in slice; no performance-SLO or negli
 against real customer workloads before wider adoption, measure streams/graphs only when supported, and repeat
 across CPU/OS/framework versions. Sampling and lower capture limits can reduce work but change coverage; partial
 capture must never be presented as complete. Release and publication remain owner gates.
+
+## Execution export hand-off (re-measured for the exporter slice)
+
+Re-run with `python benchmarks/instrumentation.py` on Python 3.13.16, LangChain Core 1.7.6, macOS 26.7.1/arm64, 15 logical CPUs
+(same method as above; raw values in [PERFORMANCE_DATA_P30_EXPORT.json](PERFORMANCE_DATA_P30_EXPORT.json)). The exporter used a
+mock transport, so these numbers include building and enqueueing the requests and worker-thread contention, not network time.
+
+| Scenario | Baseline p50 µs | Instrumented p50 µs | Absolute increase µs | p50 overhead |
+|---|---:|---:|---:|---:|
+| trivial_runnable | 29.8 | 72.7 | 43.0 | 144.4% |
+| twenty_tool_calls (local capture only) | 1119.2 | 1462.1 | 342.9 | 30.6% |
+| twenty_tool_calls_exported (capture + hand-off) | 1121.9 | 1598.5 | 476.6 | 42.5% |
+| concurrent_async (16 runs) | 850.8 | 1481.3 | 630.6 | 74.1% |
+| large_truncated_trace (1200 tools) | 64838.5 | 82138.7 | 17300.2 | 26.7% |
+
+Export hand-off cost is about 134 µs per 20-tool run on top of capture. 254 jobs were submitted and delivered with zero drops.
+Single-machine, no confidence intervals, no network, no paid provider: not a throughput, capacity or production-latency claim.
+
