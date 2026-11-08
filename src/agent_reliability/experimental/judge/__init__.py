@@ -76,6 +76,13 @@ from agent_reliability.experimental.judge.reference import (
     load_reference_rubric,
 )
 from agent_reliability.experimental.judge.rubric import Criterion, ReasonCodes, Rubric
+from agent_reliability.experimental.judge.semantic import (
+    CHECKS,
+    SemanticChecks,
+    SemanticScope,
+    SemanticStatus,
+    SemanticVerdict,
+)
 from agent_reliability.experimental.judge.structured import StructuredOutputEvaluator
 from agent_reliability.experimental.judge.sync import SyncLLMJudge
 from agent_reliability.experimental.judge.values import (
@@ -94,6 +101,7 @@ from agent_reliability.experimental.judge.values import (
 )
 
 __all__ = [
+    "CHECKS",
     "FAILURE_CLASS_NAMES",
     "REFERENCE_RUBRIC_IDS",
     "TEMPLATE_ID",
@@ -148,6 +156,10 @@ __all__ = [
     "ReportComparison",
     "Rubric",
     "SamplingPolicy",
+    "SemanticChecks",
+    "SemanticScope",
+    "SemanticStatus",
+    "SemanticVerdict",
     "StructuredOutputEvaluator",
     "SyncJudgeProvider",
     "SyncLLMJudge",

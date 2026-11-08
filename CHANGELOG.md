@@ -6,6 +6,15 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Added (Experimental): semantic evaluation facade and answer-relevance rubric
+
+- `agent_reliability.experimental.judge.SemanticChecks` / `SemanticScope` / `SemanticVerdict`: one-call groundedness, relevance, correctness,
+  requirements and completion checks over the existing judge machinery. A verdict separates determinate, unknown, evaluator failure and skipped;
+  an evaluator failure is never a FAIL; no model verdict is authoritative. No wire member, dependency or network/environment access added.
+- New `JudgeDimension.ANSWER_RELEVANCE` and reference rubric `judge-answer-relevance` (uncalibrated); calibration schemas accept the new dimension.
+- `docs/SEMANTIC_EVALUATION.md`, `examples/semantic_quickstart.py`, `examples/semantic_shopping_evaluation/` (real local-model agent, 53-case golden set,
+  measured agreement, false positives/negatives, UNKNOWN behaviour, latency and tokens).
+
 ### Added (example): offline support-agent reliability evaluation
 
 - `examples/support_agent_evaluation/`: a deterministic, offline, synthetic evaluation of a tool-using

@@ -43,6 +43,7 @@ class JudgeDimension(enum.StrEnum):
     INSTRUCTION_ADHERENCE = "instruction-adherence"
     SAFETY_POLICY = "safety-policy"
     TASK_COMPLETION_EVIDENCE = "task-completion-evidence"
+    ANSWER_RELEVANCE = "answer-relevance"
 
 
 class ContentRole(enum.StrEnum):

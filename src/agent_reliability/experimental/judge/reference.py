@@ -1,6 +1,6 @@
 """Reference rubrics shipped as package data (P29 S06, P29-D12 option A).
 
-Five uncalibrated *examples*: the SDK makes no accuracy claim, the customer owns
+Six uncalibrated *examples*: the SDK makes no accuracy claim, the customer owns
 calibration. They are plain ``gentlity.rubric/1`` JSON documents.
 """
 
@@ -19,6 +19,7 @@ REFERENCE_RUBRIC_IDS: Final = (
     "judge-instruction-adherence",
     "judge-safety-policy",
     "judge-task-completion-evidence",
+    "judge-answer-relevance",
 )
 
 

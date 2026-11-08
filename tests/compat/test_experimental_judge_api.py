@@ -51,6 +51,11 @@ EXPECTED_ALL = [
     "CalibrationCase",
     "StructuredOutputEvaluator",
     "ExecutorSyncProvider",
+    "CHECKS",
+    "SemanticChecks",
+    "SemanticScope",
+    "SemanticStatus",
+    "SemanticVerdict",
     "load_reference_rubric",
     "REFERENCE_RUBRIC_IDS",
     "JudgeObserver",
@@ -126,6 +131,7 @@ def test_enum_values_snapshot() -> None:
         "instruction-adherence",
         "safety-policy",
         "task-completion-evidence",
+        "answer-relevance",
     ]
     assert values(judge.ContentRole) == [
         "question",
