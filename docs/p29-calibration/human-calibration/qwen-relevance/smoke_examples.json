@@ -1,0 +1,161 @@
+{
+ "note": "Synthetic smoke examples, written 2026-11-08, SEPARATE from the golden set and from any held-out evaluation data. Author intent labels are NOT human calibration labels.",
+ "examples": [
+  {
+   "id": "r01",
+   "dim": "relevance",
+   "question": "What is the warranty period on the Vela blender?",
+   "answer": "The Vela blender comes with a two-year warranty.",
+   "expected": "pass"
+  },
+  {
+   "id": "r02",
+   "dim": "relevance",
+   "question": "Does the Corin backpack have a laptop sleeve?",
+   "answer": "Yes, the Corin backpack has a padded sleeve that fits laptops up to 15 inches.",
+   "expected": "pass"
+  },
+  {
+   "id": "r03",
+   "dim": "relevance",
+   "question": "How long does standard delivery take to Pune?",
+   "answer": "Standard delivery to Pune usually takes three to five working days.",
+   "expected": "pass"
+  },
+  {
+   "id": "r04",
+   "dim": "relevance",
+   "question": "Can I return the Nila headphones after opening?",
+   "answer": "Opened Nila headphones can be returned within seven days if they are undamaged.",
+   "expected": "pass"
+  },
+  {
+   "id": "r05",
+   "dim": "relevance",
+   "question": "Which colours does the Tavi water bottle come in?",
+   "answer": "The Tavi water bottle is available in green, black and steel.",
+   "expected": "pass"
+  },
+  {
+   "id": "r06",
+   "dim": "relevance",
+   "question": "What is the weight of the Orin tripod?",
+   "answer": "Tripods are a great way to keep photographs steady in low light.",
+   "expected": "fail"
+  },
+  {
+   "id": "r07",
+   "dim": "relevance",
+   "question": "Is the Pavi desk lamp dimmable?",
+   "answer": "We have many lamps and our store opens at 9 am every day.",
+   "expected": "fail"
+  },
+  {
+   "id": "r08",
+   "dim": "relevance",
+   "question": "What is the price of the Juno kettle?",
+   "answer": "That is a good question about kettles. Kettles are useful.",
+   "expected": "fail"
+  },
+  {
+   "id": "r09",
+   "dim": "relevance",
+   "question": "Does the Hexa router support dual band?",
+   "answer": "You asked about the Hexa router. Dual band is a topic about routers.",
+   "expected": "fail"
+  },
+  {
+   "id": "r10",
+   "dim": "relevance",
+   "question": "What is the capacity of the Mira lunch box?",
+   "answer": "The Mira lunch box holds 900 ml.",
+   "expected": "pass"
+  },
+  {
+   "id": "r11",
+   "dim": "relevance",
+   "question": "Does the Sera mixer come with a jar?",
+   "answer": "Our delivery partners operate in most cities across the country.",
+   "expected": "fail"
+  },
+  {
+   "id": "r12",
+   "dim": "relevance",
+   "question": "What size is the Kavi yoga mat?",
+   "answer": "The Kavi yoga mat measures 183 by 61 centimetres.",
+   "expected": "pass"
+  },
+  {
+   "id": "g01",
+   "dim": "groundedness",
+   "answer": "The Vela blender has a 600 watt motor.",
+   "context": [
+    "Vela blender: 600 watt motor, 1.5 litre jar, two-year warranty."
+   ],
+   "expected": "pass"
+  },
+  {
+   "id": "g02",
+   "dim": "groundedness",
+   "answer": "The Corin backpack weighs 700 grams.",
+   "context": [
+    "Corin backpack: weight 700 g, 25 litre capacity."
+   ],
+   "expected": "pass"
+  },
+  {
+   "id": "g03",
+   "dim": "groundedness",
+   "answer": "The Nila headphones have a 40 hour battery.",
+   "context": [
+    "Nila headphones: battery life up to 40 hours, Bluetooth 5.3."
+   ],
+   "expected": "pass"
+  },
+  {
+   "id": "g04",
+   "dim": "groundedness",
+   "answer": "The Tavi bottle keeps drinks cold for 24 hours.",
+   "context": [
+    "Tavi bottle: 750 ml, keeps drinks cold for 12 hours."
+   ],
+   "expected": "fail"
+  },
+  {
+   "id": "g05",
+   "dim": "groundedness",
+   "answer": "The Orin tripod extends to two metres.",
+   "context": [
+    "Orin tripod: maximum height 1.4 m, folded 45 cm."
+   ],
+   "expected": "fail"
+  },
+  {
+   "id": "g06",
+   "dim": "groundedness",
+   "answer": "The Pavi lamp is available in white.",
+   "context": [
+    "Pavi desk lamp: finish matte black, LED, 8 watt."
+   ],
+   "expected": "fail"
+  },
+  {
+   "id": "g07",
+   "dim": "groundedness",
+   "answer": "The Mira box is microwave safe.",
+   "context": [
+    "Mira lunch box: 900 ml, microwave safe lid and body, dishwasher safe."
+   ],
+   "expected": "pass"
+  },
+  {
+   "id": "g08",
+   "dim": "groundedness",
+   "answer": "The Hexa router supports Wi-Fi 6.",
+   "context": [
+    "Hexa router: dual band, Wi-Fi 5, four antennas."
+   ],
+   "expected": "fail"
+  }
+ ]
+}
