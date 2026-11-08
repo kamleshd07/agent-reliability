@@ -9,20 +9,33 @@ described in [EVALUATE.md](EVALUATE.md). It adds no wire member, no dependency a
 
 ```python
 from agent_reliability.experimental.judge import SemanticChecks
-from agent_reliability.adapters.http_event_sink import HTTPEventSink   # pip install "agent-reliability[http]"
+from agent_reliability.adapters.http_event_sink import (
+    HTTPEventSink,
+)  # pip install "agent-reliability[http]"
 from agent_reliability.sdk import AgentReliability
 
-checks = SemanticChecks(my_provider, model_label="local-gemma",          # 2. define the evaluator: YOUR model object, no keys read by the SDK
-                        checks=("groundedness", "relevance"))
-sink = HTTPEventSink(...,                                                # 1. SDK + sink (HTTP_EXPORTER.md). The sink drops any indicator
-                     indicator_allowlist=[checks.indicator("groundedness"),  # that is not allowlisted, so list the semantic ones
-                                          checks.indicator("relevance")])
+checks = SemanticChecks(
+    my_provider,
+    model_label="local-gemma",  # 2. define the evaluator: YOUR model object, no keys read by the SDK
+    checks=("groundedness", "relevance"),
+)
+sink = HTTPEventSink(
+    ...,  # 1. SDK + sink (HTTP_EXPORTER.md). The sink drops any indicator
+    indicator_allowlist=[
+        checks.indicator(
+            "groundedness"
+        ),  # that is not allowlisted, so list the semantic ones
+        checks.indicator("relevance"),
+    ],
+)
 sdk = AgentReliability(sink=sink)
 with sdk.run(agent_id="kettle-bot", name="Kettle bot", version="1.0") as run:
-    answer = my_agent(question)                                          # 3. execute your agent
-    with checks.scope(run) as scope:                                     # 4. evaluate the actual result
+    answer = my_agent(question)  # 3. execute your agent
+    with checks.scope(run) as scope:  # 4. evaluate the actual result
         verdict = scope.check("groundedness", answer, context=[doc], question=question)
-print(checks.coverage())                                                 # 5. the sink sends it; read reliability AND failure/UNKNOWN rates
+print(
+    checks.coverage()
+)  # 5. the sink sends it; read reliability AND failure/UNKNOWN rates
 ```
 
 Then create an SLO on the indicator (`semantic-groundedness`) in the platform ([PLATFORM_QUICKSTART.md](PLATFORM_QUICKSTART.md)) and read
