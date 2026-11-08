@@ -1,9 +1,11 @@
+# ruff: noqa: E501
 """Regression: relevance sends no context block, so a citation of index 0 stays invalid.
 
 Found by the Qwen3-14B smoke diagnostic (docs/p29-calibration/human-calibration/qwen-relevance):
 the model cited the question/answer ``index=0`` header. The strict validator is correct and
 must not be relaxed; the local smoke rubric variant must load and keep it strict.
 """
+
 import json
 import pathlib
 
