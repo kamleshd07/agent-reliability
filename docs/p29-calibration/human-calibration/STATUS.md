@@ -47,3 +47,10 @@ The private key mapping opaque ids to golden-set case ids was generated alongsid
 - **`dimension_not_applicable`:** stays local to the labelling tooling and instructions. It is not in any shipped rubric or source file, and it is never written into the merged calibration datasets (pinned by tests). Adding it to the rubric contract needs a separately reviewed contract change.
 - **Human work is unchanged:** no human evaluation exists; recruiting independent labellers and an adjudicator, confirming thresholds, and approving the judge run remain with the owner.
 
+## Update 2026-11-08 (owner approval of the thresholds, internal validation only)
+
+- The owner **approved the proposed thresholds for internal validation only**, digest `31fb3e7a87ae4e287ff68854ba7fe145be76fa7d883cbdec0377057d5c561263`. This is recorded here and in the platform roadmap decision `P29-CAL-THRESHOLDS`; `PREDECLARED_THRESHOLDS.json` is deliberately **not edited** (its text still says "PROPOSED" and "NONE RECORDED" because editing it would change what the digest pins). The approval is applied by passing the digest to the `merge` command.
+- The thresholds must not be changed after any held-out result is observed. They are **not** customer-release approval.
+- **Still outstanding owner work:** two independent blind human labellers and a separate adjudicator. No labels exist, none were simulated, no human approval was simulated, and SG-1 to SG-6 are not satisfied.
+- `dimension_not_applicable` is used only inside this labelling tooling; there is no shipped contract change.
+
