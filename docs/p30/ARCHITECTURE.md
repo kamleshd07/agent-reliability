@@ -19,7 +19,7 @@ No existing SDK component registry exists; platform P18a has 1000 steps, depth16
 
 ## Framework selection and verified sources
 
-Select **LangChain Core Runnable callbacks**, initially pinned/tested `langchain-core==1.6.13` (PyPI metadata
+Select **LangChain Core Runnable callbacks**, initially pinned/tested `langchain-core==1.6.13` (widened to `>=1.0,<2` in the exporter slice, see COMPATIBILITY.md) (PyPI metadata
 inspected during this session; Python>=3.10). This provides synchronous and asynchronous public callback hooks,
 per-invocation callback configuration and local fake Runnable/tool/chat-model implementations. LCEL Runnables
 are the supported surface; LangGraph and agent-specific semantic boundaries are not claimed without tests.
@@ -60,7 +60,7 @@ is explicitly parented to our SDK run root, even when its framework parent belon
 
 `experimental/instrumentation/` owns immutable normalized events, bounded collector/controller and policy.
 `adapters/langchain_instrumentation.py` owns all framework imports/hooks. Core neutral imports use stdlib only.
-Optional extra `langchain` pins tested 1.6.13 initially; it does not install full LangChain or a provider SDK.
+Optional extra `langchain` pinned tested 1.6.13 initially (now `>=1.0,<2`); it does not install full LangChain or a provider SDK.
 Missing dependency/unsupported version is a sanitized setup ImportError/ValueError before business invocation.
 No stable SDK API or event union changes. This is an additive experimental API with no version/release bump.
 
@@ -128,10 +128,10 @@ nonnegative bounded integers (bool refused). Missing/invalid/ambiguous total mea
 never infer totals or estimate tokens from text. Multiple candidate usages are not summed silently. No pricing,
 monetary cost or content opt-in exists. Model span latency is callback elapsed time, not pure provider-network time.
 
-The stable EventSink union and HTTP schema v2 remain unchanged. SDK root lifecycle and separately explicit
-evaluations may use the **existing** exporter and indicator policy. Detailed P30 step/tool/model/token events
-stay in bounded local trace snapshots; there is no new sink or unrestricted HTTP path. Mapping local details to
-P18/P20 endpoints is deferred to a separately reviewed language-neutral producer contract, not improvised here.
+The stable EventSink union and HTTP schema v2 remain unchanged. **Exporter slice (2026-11-08, owner decision P30-SCOPE):** an optional
+`ExecutionHTTPExporter` sends the content-free execution facts to the platform's *existing, already-published* P18a structure, P18b
+classification and P20a model-usage endpoints (no new platform contract, schema or SQL). Only closed vocabularies, bounded aliases,
+timestamps and integer token counts are sent; see docs/AUTOMATIC_INSTRUMENTATION.md. Without an exporter traces stay local.
 A successful run/tool is execution evidence only: no automatic EvaluationRecorded/PASS, no fabricated evaluator
 provenance. Reliability has no measured outcome until the caller explicitly evaluates/records an indicator.
 The adapter never enables/disables LangSmith or other customer-installed third-party tracing; customers

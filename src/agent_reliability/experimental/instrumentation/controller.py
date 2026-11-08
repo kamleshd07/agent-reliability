@@ -131,6 +131,11 @@ class InstrumentedRunnable:
             "environment": alias(environment) if environment is not None else None,
         }
         self._tools = frozenset(alias(item) for item in tool_names)
+        if len(self._tools) + (model_id is not None) > 512:
+            raise ValueError(
+                "tool names plus the model alias must not exceed the 512 "
+                "components the platform accepts per agent version"
+            )
         self._semantics = _semantics(self._tools, tool_classes, tool_actions)
         if exporter is not None and not callable(getattr(exporter, "submit", None)):
             raise TypeError("exporter must provide submit(trace)")

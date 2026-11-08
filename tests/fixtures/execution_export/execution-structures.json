@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "source": "agent-reliability",
+  "producer_run_id": "00000000-0000-4000-8000-000000000001",
+  "deployment_id": "00000000-0000-4000-8000-0000000000d1",
+  "steps": [
+    {
+      "step_id": "s1",
+      "parent_step_id": null,
+      "step_type": "other",
+      "component_name": null,
+      "state": "completed",
+      "started_at": "2026-01-02T03:04:05.001000Z",
+      "ended_at": "2026-01-02T03:04:05.030000Z"
+    },
+    {
+      "step_id": "m1",
+      "parent_step_id": "s1",
+      "step_type": "model",
+      "component_name": "model-a",
+      "state": "completed",
+      "started_at": "2026-01-02T03:04:05.002000Z",
+      "ended_at": "2026-01-02T03:04:05.012000Z"
+    },
+    {
+      "step_id": "t1",
+      "parent_step_id": "s1",
+      "step_type": "tool",
+      "component_name": "search",
+      "state": "failed",
+      "started_at": "2026-01-02T03:04:05.013000Z",
+      "ended_at": "2026-01-02T03:04:05.018000Z"
+    },
+    {
+      "step_id": "t2",
+      "parent_step_id": "s1",
+      "step_type": "tool",
+      "component_name": null,
+      "state": "started",
+      "started_at": "2026-01-02T03:04:05.019000Z",
+      "ended_at": null
+    }
+  ]
+}

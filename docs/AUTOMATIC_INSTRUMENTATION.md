@@ -135,9 +135,16 @@ A finished trace summarises itself, content-free:
 
 ```python
 summary = observed.traces[-1].summary()
-for row in summary.components:  # kind: model / tool / step, component: approved alias or None
+for (
+    row
+) in summary.components:  # kind: model / tool / step, component: approved alias or None
     print(row.kind, row.component, row.calls, row.failed, row.total_duration_ns)
-print(summary.total_tokens, summary.token_unknown_models, summary.retry_signals, summary.complete)
+print(
+    summary.total_tokens,
+    summary.token_unknown_models,
+    summary.retry_signals,
+    summary.complete,
+)
 ```
 
 Durations are callback elapsed time summed over spans; nested or concurrent spans overlap, so totals can exceed wall-clock
@@ -152,18 +159,27 @@ The complete runnable example with a real `langchain.agents.create_agent` agent 
 from agent_reliability.adapters.http_execution_exporter import ExecutionHTTPExporter
 
 exporter = ExecutionHTTPExporter(
-    base_url="https://gentlity.example",          # scheme and authority only; paths are fixed by the contract
+    base_url="https://gentlity.example",  # scheme and authority only; paths are fixed by the contract
     credential_provider=lambda: os.environ["GENTLITY_MACHINE_TOKEN"],
     deployment_id=UUID(os.environ["GENTLITY_DEPLOYMENT_ID"]),
 )
-observed = instrument(agent, sdk=sdk, agent_id="order-agent", name="order-agent", version="1",
-                      tool_names=("order_status",),
-                      tool_classes={"order_status": "data_store"}, tool_actions={"order_status": "read"},
-                      exporter=exporter)
+observed = instrument(
+    agent,
+    sdk=sdk,
+    agent_id="order-agent",
+    name="order-agent",
+    version="1",
+    tool_names=("order_status",),
+    tool_classes={"order_status": "data_store"},
+    tool_actions={"order_status": "read"},
+    exporter=exporter,
+)
 try:
     observed.invoke(...)
 finally:
-    status = exporter.close(10)   # flush and stop; inspect status.failed_jobs / dropped_queue_full / abandoned_jobs
+    status = exporter.close(
+        10
+    )  # flush and stop; inspect status.failed_jobs / dropped_queue_full / abandoned_jobs
 ```
 
 Use `agent_id`, `name`, `version` and `environment` identical to the evidence sink's `AgentIdentity` so the execution
@@ -262,6 +278,15 @@ not production latency, maximum throughput or negligible-overhead claims.
 - Wrong run attribution on the platform: the wrapper identity must match the evidence sink's `AgentIdentity` exactly.
 
 ## Known limitations
+
+- Identity must match everywhere: the wrapper's agent identity, the exporter's `deployment_id` and the evidence sink's `deployment_id`/`AgentIdentity`
+  must all describe the same deployment. Do not change the exporter's `source` unless the evidence path uses the same value.
+- The declared `model_id` alias labels every model call of the run (mixed-model workflows should leave it unset). Tools run in plain
+  thread-pool threads or in nested wrappers without LangChain context propagation are not observed, and the trace cannot tell.
+- Partial traces mark the SDK run's health `PARTIAL_EVIDENCE`; the execution endpoints themselves carry no partial marker.
+  Steps cancelled by run exit get the observation time as end time. `request_deadline_seconds` bounds connection, each read and the
+  response-body read, not a trickling response header. The exporter's `_transport` argument is a test seam, not API.
+- `close(timeout)` returns within about the given timeout plus a bounded join; a request in flight at the deadline is counted as abandoned.
 
 - Only `.invoke`/`.ainvoke` of the wrapper are instrumented; `.stream`, `.astream` and `.batch` are not forwarded (use the original Runnable).
 - Graph agents (LangGraph, `create_agent`) are observed through public callbacks only: model calls, tool calls and an anonymous

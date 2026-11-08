@@ -82,6 +82,8 @@ def _inspect_artifacts(wheel: Path, sdist: Path) -> str:
         f"agent_reliability-{version}.dist-info/licenses/LICENSE",
         "agent_reliability/experimental/instrumentation/__init__.py",
         "agent_reliability/adapters/langchain_instrumentation.py",
+        "agent_reliability/adapters/http_execution_exporter.py",
+        "agent_reliability/experimental/instrumentation/export.py",
         "agent_reliability/experimental/judge/__init__.py",
         "agent_reliability/experimental/judge/schemas/calibration-case.schema.json",
         "agent_reliability/experimental/judge/schemas/calibration-report.schema.json",
@@ -373,6 +375,9 @@ try:
     assert sink.flush(2).counts_by_disposition["committed"] == 1
 finally:
     sink.close(0)
+from agent_reliability.adapters.http_execution_exporter import ExecutionHTTPExporter
+from agent_reliability.experimental.instrumentation import build_requests
+assert ExecutionHTTPExporter and build_requests
 print("HTTP-extra installed-wheel mocked delivery: ok")
 """
     print(_run(str(python), "-c", probe), end="")

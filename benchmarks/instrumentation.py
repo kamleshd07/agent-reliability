@@ -141,7 +141,7 @@ def main() -> None:
         ),
         (
             "twenty_tool_calls_exported",
-            "one invocation with20tool calls plus in-memory export hand-off "
+            "one invocation with 20 tool calls plus in-memory export hand-off "
             "(mock transport, no network)",
             lambda: frequent.invoke(None),
             lambda: high_exported.invoke(None),

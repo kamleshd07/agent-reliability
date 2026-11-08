@@ -239,7 +239,7 @@ def test_close_abandons_unsent_jobs_and_counts_them():
     for _ in range(3):
         wrapper.invoke("x")
     status = exp.close(0.2)
-    assert status.closed and status.abandoned_jobs >= 1
+    assert status.closed and status.abandoned_jobs + status.delivered_jobs == 3
     gate.set()
     assert exp.submit(wrapper.traces[0]) is False
 
@@ -307,7 +307,8 @@ def test_async_cancellation_exports_cancelled_state():
     asyncio.run(main())
     exp.flush(5)
     (structure,) = platform.bodies("/execution-structures/batches")
-    assert "cancelled" in {s["state"] for s in structure["steps"]}
+    states = [s["state"] for s in structure["steps"]]
+    assert states == ["cancelled"] and structure["steps"][0]["ended_at"]
     exp.close(1)
 
 
@@ -418,3 +419,45 @@ def test_depth_and_span_limits_hold_for_exported_nested_chains():
     ]
     assert 1 <= len(steps) <= 40
     exp.close(1)
+
+
+def test_close_is_prompt_even_during_retry_backoff():
+    platform = Platform([httpx.Response(503, headers={"retry-after": "30"})] * 5)
+    exp = exporter(platform)
+    wrap(RunnableLambda(lambda v: v), exp).invoke("x")
+    time.sleep(0.3)  # worker is now sleeping in a 30 s Retry-After backoff
+    started = time.monotonic()
+    status = exp.close(2)
+    assert time.monotonic() - started < 3.5
+    assert status.closed and status.failed_jobs + status.abandoned_jobs >= 1
+
+
+def test_systemexit_from_credential_provider_does_not_kill_the_worker():
+    calls = []
+
+    def provider():
+        calls.append(1)
+        if len(calls) == 1:
+            raise SystemExit(3)
+        return "t"
+
+    exp = ExecutionHTTPExporter(
+        base_url="http://127.0.0.1:9",
+        credential_provider=provider,
+        deployment_id=DEPLOYMENT,
+        _transport=httpx.MockTransport(Platform()),
+    )
+    wrapper = wrap(RunnableLambda(lambda v: v), exp)
+    wrapper.invoke("x")
+    wrapper.invoke("y")
+    status = exp.flush(5)
+    assert status.failed_jobs == 1 and status.delivered_jobs == 1
+    assert status.last_error in ("credential_unavailable", None)
+    exp.close(1)
+
+
+def test_component_quota_is_enforced_at_setup():
+    names = tuple(f"t{i}" for i in range(512))
+    with pytest.raises(ValueError):
+        wrap(RunnableLambda(lambda v: v), None, tool_names=names, model_id="m")
+    wrap(RunnableLambda(lambda v: v), None, tool_names=names)

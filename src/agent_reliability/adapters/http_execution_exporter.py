@@ -141,6 +141,8 @@ class ExecutionHTTPExporter:
         self._busy = False
         self._stop = False
         self._abandon = False
+        self._wake = threading.Event()
+        self._deadline = float(request_deadline_seconds)
         self._status = ExecutionDeliveryStatus(
             False, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, None
         )
@@ -204,8 +206,11 @@ class ExecutionHTTPExporter:
             self._stop = True
             self._abandon = True
             self._cond.notify_all()
+        self._wake.set()
         self._worker.join(max(0.0, min(timeout, 5.0)) or 0.1)
         with self._cond:
+            if self._busy:  # a request still in flight at the deadline
+                self._bump("abandoned_jobs")
             if self._jobs:
                 self._bump("abandoned_jobs", len(self._jobs))
                 self._jobs.clear()
@@ -248,7 +253,7 @@ class ExecutionHTTPExporter:
                 self._busy = True
             try:
                 self._deliver(job)
-            except Exception:
+            except BaseException:
                 self._count("failed_jobs", error="internal")
             finally:
                 with self._cond:
@@ -275,7 +280,7 @@ class ExecutionHTTPExporter:
                 token = self._credential()
                 if not isinstance(token, str) or not token:
                     return "credential_unavailable"
-            except Exception:
+            except BaseException:
                 return "credential_unavailable"
             try:
                 response = self._client.send(
@@ -326,20 +331,20 @@ class ExecutionHTTPExporter:
                     if delay is not None
                     else self._random.uniform(0, min(2.0, 0.1 * (2**attempt)))
                 )
-                time.sleep(pause)
+                self._wake.wait(pause)  # close() interrupts the backoff
         self._count("retry_exhausted")
         return label
 
-    @staticmethod
-    def _read(response: httpx.Response) -> bytes:
+    def _read(self, response: httpx.Response) -> bytes:
         data = bytearray()
+        end = time.monotonic() + self._deadline
         try:
             for chunk in (
                 (response.content,)
                 if response.is_stream_consumed
                 else response.iter_raw()
             ):
-                if len(data) + len(chunk) > _MAX_RESPONSE:
+                if len(data) + len(chunk) > _MAX_RESPONSE or time.monotonic() > end:
                     return b""
                 data.extend(chunk)
         except Exception:
