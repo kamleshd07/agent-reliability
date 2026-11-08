@@ -293,6 +293,11 @@ not production latency, maximum throughput or negligible-overhead claims.
   `other` step per graph node/chain. Node names, checkpoints and state are deliberately not interpreted or exported.
 - Retries are a local signal. Provider-internal retries are invisible, and the platform has no retry or loop field yet (roadmap
   P20c/d), so nothing about retries is exported.
+- Local-only spike (not exported, no wire contract): when the instrumented object is exactly a `RunnableRetry`, the handler tests
+  only the direct children of that root run against the exact framework marker `retry:attempt:N` (2..100; every other tag is
+  discarded unread and nothing is stored), corroborates order, kind, component and the previous attempt's failure, and records
+  `retry_links` / `retry_observation` (`observed`, `unknown`, `not_collected`) on the local trace. Tags are untrusted evidence;
+  nested or binding-wrapped retries and provider-internal retries stay `not_collected`.
 - A callback that raises a framework exception inside the application is the application's; the wrapper never retries it.
 - Tool outcome categories come from exception types only. Customer exception classes outside the builtin hierarchy are `execution_error`.
 - Cost is not computed; only provider-reported integer tokens are exported.

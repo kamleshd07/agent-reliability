@@ -27,8 +27,12 @@ from langchain_core.messages import AIMessage
 from langchain_core.outputs import ChatGeneration, LLMResult
 from langchain_core.runnables import Runnable
 from langchain_core.runnables.config import RunnableConfig, ensure_config
+from langchain_core.runnables.retry import RunnableRetry
 
-from agent_reliability.experimental.instrumentation.collector import Collector
+from agent_reliability.experimental.instrumentation.collector import (
+    MAX_RETRY_ATTEMPT,
+    Collector,
+)
 from agent_reliability.experimental.instrumentation.model import (
     ExecutionState,
     SpanKind,
@@ -36,6 +40,48 @@ from agent_reliability.experimental.instrumentation.model import (
 )
 
 P = ParamSpec("P")
+
+# The one framework marker the owner approved reading (P20c M3, 2026-11-08). The
+# framework sets it only on attempts after the first, so 1 is never a valid index.
+_RETRY_TAG = re.compile(r"retry:attempt:([1-9][0-9]{0,2})", re.ASCII)
+_MAX_TAGS_SCANNED = 64
+_MAX_TAG_LENGTH = 32
+
+
+def is_retry_wrapper(runnable: object) -> bool:
+    """True only for an exact RunnableRetry: the sole verifiable wrapper context.
+
+    Callbacks carry no wrapper identity (``serialized`` is None and ``run_type`` is
+    unset for it in every tested langchain-core 1.x), so nothing else is trusted.
+    """
+    return type(runnable) is RunnableRetry
+
+
+def retry_attempt(tags: Any) -> int | None:
+    """Parse only the approved marker from a verified wrapper's child.
+
+    Each tag is tested against the exact pattern and discarded; nothing but a bounded
+    integer is returned. None = no marker; 0 = unusable marker (ambiguous, repeated,
+    out of range or not exactly the framework's form). Tags are untrusted evidence.
+    """
+    if tags is None:
+        return None
+    if type(tags) is not list:
+        return 0
+    found: int | None = None
+    for index, tag in enumerate(tags):
+        if index >= _MAX_TAGS_SCANNED:
+            return 0
+        if type(tag) is not str or len(tag) > _MAX_TAG_LENGTH:
+            continue
+        match = _RETRY_TAG.fullmatch(tag)
+        if match is None:
+            continue
+        number = int(match.group(1))
+        if found is not None or not 2 <= number <= MAX_RETRY_ATTEMPT:
+            return 0
+        found = number
+    return found
 
 
 def _guard(method: Callable[P, None]) -> Callable[P, None]:
@@ -115,19 +161,27 @@ class _Handler(BaseCallbackHandler):
     run_inline = True
     raise_error = False
 
-    def __init__(self, collector: Collector, approved_tools: frozenset[str]) -> None:
+    def __init__(
+        self,
+        collector: Collector,
+        approved_tools: frozenset[str],
+        retry_root: UUID | None = None,
+    ) -> None:
         self.collector = collector
         self._tools = approved_tools
+        self._retry_root = retry_root
 
     def _start(
         self, kind: SpanKind, values: dict[str, Any], component: str | None = None
     ) -> None:
         parent = values.get("parent_run_id")
+        parent_id = _uuid(parent) if parent is not None else None
+        attempt = None
+        # Tags are read only for direct children of the verified retry wrapper.
+        if self._retry_root is not None and parent_id == self._retry_root:
+            attempt = retry_attempt(values.get("tags"))
         self.collector.start(
-            _uuid(values.get("run_id")),
-            _uuid(parent) if parent is not None else None,
-            kind,
-            component,
+            _uuid(values.get("run_id")), parent_id, kind, component, attempt
         )
 
     def _end(
@@ -225,11 +279,15 @@ def root_identity(config: Any) -> UUID:
 
 
 def callback_config(
-    config: Any, collector: Collector, tools: frozenset[str], root: UUID
+    config: Any,
+    collector: Collector,
+    tools: frozenset[str],
+    root: UUID,
+    retry_wrapper: bool = False,
 ) -> RunnableConfig:
     copied = ensure_config(config)
     callbacks = copied.get("callbacks")
-    handler = _Handler(collector, tools)
+    handler = _Handler(collector, tools, root if retry_wrapper else None)
     if isinstance(callbacks, BaseCallbackManager):
         manager = callbacks.copy()
         for existing in tuple(manager.handlers):

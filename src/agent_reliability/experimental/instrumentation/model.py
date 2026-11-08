@@ -9,6 +9,8 @@ from typing import Literal
 
 SpanKind = Literal["run", "step", "tool", "model"]
 ExecutionState = Literal["completed", "failed", "cancelled", "incomplete"]
+# Local-only retry observation (P20c M3 spike). Never exported; no wire contract exists.
+RetryObservation = Literal["not_collected", "observed", "unknown"]
 _ALIAS = re.compile(r"[A-Za-z0-9._-]{1,128}\Z", re.ASCII)
 MAX_COUNT = 2**63 - 1
 
@@ -155,6 +157,9 @@ class ExecutionSummary:
     token_unknown_models: int
     retry_signals: int
     complete: bool
+    # Local-only (not exported): see ExecutionTrace.retry_observation.
+    retry_observation: RetryObservation = "not_collected"
+    retry_link_count: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -163,6 +168,15 @@ class ExecutionTrace:
     parent_run_id: str | None
     events: tuple[ExecutionEvent, ...]
     diagnostics: CaptureDiagnostics
+    # Local-only retry evidence (P20c M3 detection spike). build_requests never reads
+    # these fields; there is no public retry-link wire contract. ``retry_links`` holds
+    # (retry_span_id, retry_of_span_id) pairs and is non-empty only when
+    # ``retry_observation == "observed"``. "not_collected" means the retry context could
+    # not be verified (nothing was read); "unknown" means it was verified but the
+    # evidence did not corroborate. Neither is ever evidence of "no retry".
+    retry_links: tuple[tuple[str, str], ...] = ()
+    retry_observation: RetryObservation = "not_collected"
+    retry_attempts: int = 0
 
     @property
     def complete(self) -> bool:
@@ -223,4 +237,6 @@ class ExecutionTrace:
             unknown,
             self.diagnostics.retry_signals,
             self.complete,
+            self.retry_observation,
+            len(self.retry_links),
         )

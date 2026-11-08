@@ -147,6 +147,7 @@ class InstrumentedRunnable:
 
         adapter.validate_runnable(runnable)
         self._adapter = adapter
+        self._retry_wrapper = adapter.is_retry_wrapper(runnable)
         self._runnable = runnable
         self._sdk = sdk
         self._limits = limits
@@ -240,9 +241,10 @@ class InstrumentedRunnable:
                 self._provider,
                 self._model,
                 self._semantics,
+                self._retry_wrapper,
             )
             prepared = self._adapter.callback_config(
-                config, collector, self._tools, root
+                config, collector, self._tools, root, self._retry_wrapper
             )
         except Exception:
             self._failure()

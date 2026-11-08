@@ -17,9 +17,13 @@ from .model import (
     ExecutionEvent,
     ExecutionState,
     ExecutionTrace,
+    RetryObservation,
     SpanKind,
     TokenUsage,
 )
+
+# Hard cap for an attempt index: three digits, and far below max_spans.
+MAX_RETRY_ATTEMPT = 100
 
 
 @dataclass(slots=True)
@@ -34,6 +38,12 @@ class _Span:
     tool_class: str | None = None
     action_class: str | None = None
     closed: bool = False
+    # Retry corroboration inputs (integers/enums only; the tag itself is never kept).
+    # attempt: None = no retry marker, 0 = unusable marker, 2..100 = parsed index.
+    attempt: int | None = None
+    start_seq: int = 0
+    end_seq: int = 0
+    state: ExecutionState | None = None
 
 
 class Collector:
@@ -46,7 +56,11 @@ class Collector:
         provider_id: str | None,
         model_id: str | None,
         tool_semantics: Mapping[str, tuple[str | None, str | None]] | None = None,
+        retry_wrapper_root: bool = False,
     ) -> None:
+        # True only when the instrumented object itself is a RunnableRetry, so the
+        # root run is a verified retry wrapper. No callback field identifies one.
+        self._retry_root = retry_wrapper_root
         self._semantics = tool_semantics or {}
         self.run_id = run_id
         self._parent = parent_run_id
@@ -86,6 +100,7 @@ class Collector:
         parent: UUID | None,
         kind: SpanKind,
         component: str | None = None,
+        attempt: int | None = None,
     ) -> None:
         with self._lock:
             if self._closed:
@@ -127,6 +142,8 @@ class Collector:
                 component,
                 parent,
                 *self._semantics.get(component or "", (None, None)),
+                attempt=attempt,
+                start_seq=len(self._events) + 1,
             )
             self._spans[key] = span
             self._events.append(
@@ -154,6 +171,8 @@ class Collector:
         outcome: str | None = None,
     ) -> None:
         span.closed = True
+        span.state = state
+        span.end_seq = len(self._events) + 1
         if span.kind != "tool" or synthetic:
             outcome = None
         elif state == "completed":
@@ -206,6 +225,48 @@ class Collector:
             else:
                 self._end(span, state, usage, outcome=outcome)
 
+    def _retry_links(
+        self,
+    ) -> tuple[tuple[tuple[str, str], ...], RetryObservation, int]:
+        """Corroborate retry attempts under the verified root wrapper (lock held).
+
+        All-or-nothing: any anomaly yields "unknown" and no links, never a guess.
+        """
+        if not self._retry_root:
+            return (), "not_collected", 0
+        root = self._spans.get(self._root)
+        if root is None or root.kind != "step" or self._diagnostics.partial:
+            return (), "unknown", 0
+        kids = sorted(
+            (s for s in self._spans.values() if s.framework_parent == self._root),
+            key=lambda s: s.start_seq,
+        )
+        first = kids[0] if kids else None
+        if first is None or first.kind == "run":
+            return (), "unknown", len(kids)
+        if first.kind == "tool" and first.component is None:
+            return (), "unknown", len(kids)
+        links: list[tuple[str, str]] = []
+        for index, span in enumerate(kids):
+            expected = None if index == 0 else index + 1
+            if expected is not None and expected > MAX_RETRY_ATTEMPT:
+                return (), "unknown", len(kids)
+            if (
+                span.attempt != expected
+                or span.kind != first.kind
+                or span.component != first.component
+            ):
+                return (), "unknown", len(kids)
+            if index:
+                previous = kids[index - 1]
+                if (
+                    previous.state not in ("failed", "incomplete")
+                    or not 0 < previous.end_seq < span.start_seq
+                ):
+                    return (), "unknown", len(kids)
+                links.append((span.id, previous.id))
+        return tuple(links), "observed", len(kids)
+
     def finish(self, state: ExecutionState) -> ExecutionTrace:
         with self._lock:
             self._closed = True
@@ -233,8 +294,15 @@ class Collector:
                     max(0, time.perf_counter_ns() - self._started),
                 )
             )
+            links, observation, attempts = self._retry_links()
             result = ExecutionTrace(
-                self.run_id, self._parent, tuple(self._events), self._diagnostics
+                self.run_id,
+                self._parent,
+                tuple(self._events),
+                self._diagnostics,
+                links,
+                observation,
+                attempts,
             )
             self._spans.clear()
             self._events.clear()
