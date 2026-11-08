@@ -288,7 +288,7 @@ def _verify_base(python: Path, wheel: Path, version: str) -> None:
         "-c",
         "from agent_reliability.experimental.judge import "
         "REFERENCE_RUBRIC_IDS, load_reference_rubric; "
-        "assert len(REFERENCE_RUBRIC_IDS) == 5; "
+        "assert len(REFERENCE_RUBRIC_IDS) == 6; "
         "assert all(load_reference_rubric(i).rubric_id == i "
         "for i in REFERENCE_RUBRIC_IDS)",
     )
