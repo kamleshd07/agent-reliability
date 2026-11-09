@@ -223,7 +223,7 @@ def _decimal(value: object, name: str, *, positive: bool) -> Decimal:
 
 
 #: Known prompt templates, oldest first. ``jp1`` must never change.
-PROMPT_TEMPLATES: Final = ("jp1", "jp2")
+PROMPT_TEMPLATES: Final = ("jp1", "jp2", "jp3")
 
 
 @dataclass(frozen=True, slots=True)
@@ -234,7 +234,8 @@ class JudgePolicy:
     repeats: int = 1
     capture_reason: bool = False
     #: Prompt template. ``jp1`` (default) is the historical template, byte-identical
-    #: to earlier releases. ``jp2`` differs only when no context block is sent.
+    #: to earlier releases. ``jp2`` differs only when no context block is sent;
+    #: ``jp3`` adds an explicit verdict/code contract.
     prompt_template: str = "jp1"
 
     def __post_init__(self) -> None:

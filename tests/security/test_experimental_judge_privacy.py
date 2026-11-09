@@ -332,9 +332,10 @@ def test_namespace_has_no_logging_print_or_content_interpolating_fstrings() -> N
             if path.name == "core.py" and fn.name in {
                 "build_prompt",
                 "_system_message",
+                "_system_message_jp3",
             }:
                 # build_prompt: the one place evaluated content enters the user
-                # message. _system_message: trusted operator rubric text only.
+                # message. _system_message(_jp3): trusted operator rubric text only.
                 continue
             for node in ast.walk(fn):
                 if isinstance(node, ast.JoinedStr):

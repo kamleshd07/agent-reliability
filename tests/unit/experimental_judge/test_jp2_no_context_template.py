@@ -77,10 +77,10 @@ def test_jp2_with_context_is_identical_to_jp1():
 def test_unknown_template_is_rejected():
     with pytest.raises(ValueError):
         build_prompt(
-            _rubric("judge-answer-relevance"), QA, nonce=NONCE, template_id="jp3"
+            _rubric("judge-answer-relevance"), QA, nonce=NONCE, template_id="jp9"
         )
     with pytest.raises(ValueError):
-        JudgePolicy(prompt_template="jp3")
+        JudgePolicy(prompt_template="jp9")
 
 
 def test_citation_validation_is_not_relaxed_by_jp2():
