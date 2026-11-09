@@ -221,6 +221,14 @@ def test_historical_template_digests_are_pinned():
     )
 
 
+def test_jp3_digest_is_pinned_at_freeze():
+    # jp3 was frozen for the preregistered smoke test at this digest. Any text
+    # change must introduce a new template id, not edit jp3.
+    assert template_digest("jp3") == (
+        "99a39773ee061e444b4c30f829b5686966a04c61f7784539417971d3b0626b67"
+    )
+
+
 def test_jp3_digest_covers_the_repair_variants():
     # The digest must change if the jp3 repair text changes, so it renders them.
     r = _rubric("judge-answer-relevance")
@@ -266,7 +274,8 @@ def test_engine_sends_jp3_repair_text_on_the_second_call_and_recovers():
     assert "verdicts, not codes" not in provider.calls[0].user
     assert "verdicts, not codes" in provider.calls[1].user
     assert provider.calls[0].system == provider.calls[1].system
-    assert decision is not None
+    assert decision.outcome.value == "pass"
+    assert decision.reason_code == "answer-relevance.addresses_question"
 
 
 def test_engine_still_fails_when_the_code_stays_invalid():
