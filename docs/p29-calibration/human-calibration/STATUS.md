@@ -58,3 +58,10 @@ The private key mapping opaque ids to golden-set case ids was generated alongsid
 
 Qwen3-14B was downloaded locally (official Ollama library; digest recorded) and smoke-tested on synthetic data: **22-42 % evaluator failures against the approved 2 % ceiling**, caused by relevance replies citing a non-existent context block. It is therefore **not ready for a held-out run** as configured, and it is **not calibrated**. Details: `QWEN3_14B_SMOKE_2026-11-08.md`. No thresholds were changed; human labelling and adjudication are still outstanding.
 
+## Update 2026-11-09 (relevance round 1 readiness; still no human labels)
+
+- A private 300-item relevance package exists outside every repository; `scripts/p29_relevance_round.py verify` checks it (complete, blinded, reproducible, not leaked) and `packages` builds minimum-access folders for two labellers. No label exists, no agreement was computed, and the held-out judge assessment has not been run and must not run before adjudication.
+- `dimension_not_applicable` is approved for labelling only: reported separately, excluded from class counts and the dataset, never mapped to UNKNOWN or an SDK verdict (tooling and tests added).
+- New documents: `ADJUDICATOR_INSTRUCTIONS.md`, `DECLARATION_TEMPLATE.md`, `RELEVANCE_ROUND1_OWNER_CHECKLIST.md`, `KNOWN_JUDGE_CONCERNS_FOR_CALIBRATION.md`.
+- Still required from people: Labeller A, Labeller B and a separate Adjudicator (not assigned), their declarations, a time box, and a private distribution channel.
+

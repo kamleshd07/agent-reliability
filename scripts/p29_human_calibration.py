@@ -82,6 +82,10 @@ LABEL_COLUMNS = (
 )
 COLUMNS = FIXED + LABEL_COLUMNS
 NOTE_COLUMNS = ("note", "labeller_id")
+#: Labeller-only reason (owner-approved for the labelling tooling only). It is never an SDK verdict, is never mapped to UNKNOWN in a
+#: merged dataset, and items settled as not applicable are excluded from class-level counts and reported separately.
+NOT_APPLICABLE = "dimension_not_applicable"
+MIN_PER_CLASS = 30  # PREDECLARED_THRESHOLDS.json adjudicated_set.min_cases_per_class_for_any_calibration_claim
 
 
 def columns_for(dimensions: tuple[str, ...]) -> tuple[str, ...]:
@@ -496,7 +500,12 @@ def agreement_report(
     if set(by_a) != set(by_b):
         raise ToolError("the two sheets do not cover the same items")
     ids = sorted(by_a)
-    report: dict[str, Any] = {"items": len(ids), "dimensions": {}, "disagreements": []}
+    report: dict[str, Any] = {
+        "items": len(ids),
+        "dimensions": {},
+        "disagreements": [],
+        "applicability_disagreements": [],
+    }
     for dimension in dimensions_of(rows_a[0]) if rows_a else DIMENSIONS:
         la = [by_a[i][f"{dimension}_label"] for i in ids]
         lb = [by_b[i][f"{dimension}_label"] for i in ids]
@@ -520,7 +529,31 @@ def agreement_report(
             "one_labeller_unknown": sum(
                 1 for x, y in zip(la, lb, strict=True) if x != y and "UNKNOWN" in (x, y)
             ),
+            "not_applicable_counts": {
+                "labeller_a": sum(
+                    by_a[i][f"{dimension}_reason"] == NOT_APPLICABLE for i in ids
+                ),
+                "labeller_b": sum(
+                    by_b[i][f"{dimension}_reason"] == NOT_APPLICABLE for i in ids
+                ),
+                "both": sum(
+                    by_a[i][f"{dimension}_reason"] == NOT_APPLICABLE
+                    and by_b[i][f"{dimension}_reason"] == NOT_APPLICABLE
+                    for i in ids
+                ),
+            },
         }
+        for i in ids:
+            na_a = by_a[i][f"{dimension}_reason"] == NOT_APPLICABLE
+            na_b = by_b[i][f"{dimension}_reason"] == NOT_APPLICABLE
+            if (
+                na_a != na_b
+                and by_a[i][f"{dimension}_label"] == by_b[i][f"{dimension}_label"]
+            ):
+                # same label, but only one labeller judged the dimension inapplicable
+                report["applicability_disagreements"].append(
+                    {"item_id": i, "dimension": dimension}
+                )
         for i, x, y in zip(ids, la, lb, strict=True):
             if x != y:
                 report["disagreements"].append(
@@ -545,7 +578,7 @@ def adjudication_template(
     a = {r["item_id"]: r for r in rows_a}
     b = {r["item_id"]: r for r in rows_b}
     out = []
-    for d in report["disagreements"]:
+    for d in [*report["disagreements"], *report["applicability_disagreements"]]:
         i, dim = d["item_id"], d["dimension"]
         out.append(
             {
@@ -585,7 +618,10 @@ def check_adjudication(
     *,
     allow_example: bool = False,
 ) -> dict[tuple[str, str], tuple[str, str]]:
-    needed = {(d["item_id"], d["dimension"]) for d in report["disagreements"]}
+    needed = {
+        (d["item_id"], d["dimension"])
+        for d in [*report["disagreements"], *report["applicability_disagreements"]]
+    }
     decided: dict[tuple[str, str], tuple[str, str]] = {}
     errors: list[str] = []
     adjudicators: set[str] = set()
@@ -705,11 +741,21 @@ def merge(
     for dimension in dimensions_of(rows_a[0]):
         docs = []
         provenances = []
+        not_applicable_ids: list[str] = []
         for blank in sorted(blank_rows, key=lambda r: r["item_id"]):
             i = blank["item_id"]
             la, lb = by_a[i][f"{dimension}_label"], by_b[i][f"{dimension}_label"]
             adjudicated = (i, dimension) in decided
             final = decided[(i, dimension)][0] if adjudicated else la
+            final_reason = (
+                decided[(i, dimension)][1]
+                if adjudicated
+                else by_a[i][f"{dimension}_reason"]
+            )
+            if final_reason == NOT_APPLICABLE:
+                # Not a verdict and not UNKNOWN: left out of the dataset and every class count.
+                not_applicable_ids.append(i)
+                continue
             parts: list[dict[str, str]] = []
             if blank["question"].strip():
                 parts.append({"role": "question", "text": blank["question"]})
@@ -746,7 +792,14 @@ def merge(
                     "source": key["items"][i]["source"],
                 }
             )
-        weakest = min(provenances, key=PROVENANCE_ORDER.index)
+        weakest = (
+            min(provenances, key=PROVENANCE_ORDER.index)
+            if provenances
+            else "human_multi"
+        )
+        class_counts = dict.fromkeys(LABELS, 0)
+        for d in docs:
+            class_counts[d["human_label"].upper()] += 1
         data = ("\n".join(json.dumps(d, sort_keys=True) for d in docs) + "\n").encode(
             "utf-8"
         )
@@ -778,9 +831,31 @@ def merge(
         }
         raw = (json.dumps(manifest, sort_keys=True, indent=2) + "\n").encode("utf-8")
         (target / "manifest.json").write_bytes(raw)
+        merge_report = {
+            "schema": "p29-human-calibration-merge-report/1",
+            "dimension": dimension,
+            "applicable_cases": len(docs),
+            "class_counts": class_counts,
+            "min_cases_per_class": MIN_PER_CLASS,
+            "every_class_meets_minimum": all(
+                n >= MIN_PER_CLASS for n in class_counts.values()
+            ),
+            "below_minimum_means": "indicative only; no calibration claim",
+            "not_applicable": {
+                "reason": NOT_APPLICABLE,
+                "count": len(not_applicable_ids),
+                "item_ids": not_applicable_ids,
+                "note": "Reported separately. Excluded from the dataset and from every class count; never mapped to UNKNOWN or to any SDK verdict.",
+            },
+        }
+        report_raw = (json.dumps(merge_report, sort_keys=True, indent=2) + "\n").encode(
+            "utf-8"
+        )
+        (target / "merge_report.json").write_bytes(report_raw)
         result[dimension] = {
             "manifest": str(target / "manifest.json"),
             "manifest_sha256": _sha256_bytes(raw),
+            "merge_report": str(target / "merge_report.json"),
         }
     return result
 

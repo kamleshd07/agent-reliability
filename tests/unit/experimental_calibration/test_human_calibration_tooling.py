@@ -649,3 +649,152 @@ def test_salt_changes_the_blind_order_and_ids_stay_opaque(tmp_path: Path) -> Non
     assert [r["question"] for r in rows1] != [r["question"] for r in rows2]
     assert all(r["item_id"].startswith("L") for r in rows1)
     assert key1["salted"] is True
+
+
+# --- dimension_not_applicable: labeller-only, reported separately ------------
+
+
+def _na_round(tmp_path: Path, plan: dict[int, tuple[tuple[str, str], tuple[str, str]]]):
+    """Relevance-only round of 60 items (base labels cycle PASS, FAIL, UNKNOWN); ``plan`` overrides (label, reason) for A and B by item index."""
+    items = [
+        {
+            "case_id": f"c{i}",
+            "source": "constructed",
+            "question": f"Q{i}?",
+            "context": [],
+            "answer": f"A{i}.",
+        }
+        for i in range(60)
+    ]
+    rows, key = T.build_export(items, seed="na", salt="s", dimensions=("relevance",))
+
+    def sheet(who: str, side: int) -> list[dict[str, str]]:
+        out = []
+        for n, r in enumerate(rows):
+            label, reason = (
+                ("PASS", "addresses_question"),
+                ("FAIL", "off_topic"),
+                ("UNKNOWN", "question_missing"),
+            )[n % 3]
+            if n in plan:
+                label, reason = plan[n][side]
+            out.append(
+                {
+                    **r,
+                    "relevance_label": label,
+                    "relevance_reason": reason,
+                    "relevance_confidence": "HIGH",
+                    "note": "SYNTHETIC EXAMPLE",
+                    "labeller_id": who,
+                }
+            )
+        return out
+
+    na, _ = T.validate_sheet(sheet("example-a", 0), rows, allow_example=True)
+    nb, _ = T.validate_sheet(sheet("example-b", 1), rows, allow_example=True)
+    return rows, key, na, nb
+
+
+NA = ("UNKNOWN", T.NOT_APPLICABLE)
+
+
+def test_not_applicable_is_counted_separately_and_one_sided_use_needs_adjudication(
+    tmp_path: Path,
+) -> None:
+    rows, _, na, nb = _na_round(
+        tmp_path,
+        {
+            0: (NA, NA),  # both: not applicable
+            1: (NA, ("UNKNOWN", "low_confidence")),  # same label, only A says n/a
+            2: (("PASS", "addresses_question"), ("FAIL", "off_topic")),  # label split
+        },
+    )
+    report = T.agreement_report(na, nb, resamples=50)
+    counts = report["dimensions"]["relevance"]["not_applicable_counts"]
+    assert counts == {"labeller_a": 2, "labeller_b": 1, "both": 1}
+    assert [d["item_id"] for d in report["applicability_disagreements"]] == [
+        rows[1]["item_id"]
+    ]
+    template = list(
+        csv.DictReader(T.adjudication_template(rows, na, nb, report).splitlines(True))
+    )
+    assert {r["item_id"] for r in template} == {rows[1]["item_id"], rows[2]["item_id"]}
+    # an unsettled applicability disagreement blocks the merge inputs
+    with pytest.raises(T.ToolError, match="no adjudication"):
+        T.check_adjudication([], report, ("example-a", "example-b"), allow_example=True)
+
+
+def test_merge_excludes_not_applicable_items_and_never_maps_them_to_unknown(
+    tmp_path: Path,
+) -> None:
+    rows, key, na, nb = _na_round(
+        tmp_path,
+        {
+            0: (NA, NA),  # agreed n/a: excluded
+            1: (NA, ("UNKNOWN", "low_confidence")),  # adjudicated as n/a: excluded
+            2: (
+                ("PASS", "addresses_question"),
+                ("FAIL", "off_topic"),
+            ),  # adjudicated FAIL
+            3: (
+                ("UNKNOWN", "question_missing"),
+                ("UNKNOWN", "question_missing"),
+            ),  # a real UNKNOWN
+        },
+    )
+    sheet_a, sheet_b = tmp_path / "a.csv", tmp_path / "b.csv"
+    sheet_a.write_text(T.render_csv(na), encoding="utf-8")
+    sheet_b.write_text(T.render_csv(nb), encoding="utf-8")
+    report = T.agreement_report(na, nb, resamples=50)
+    adj_rows = list(
+        csv.DictReader(T.adjudication_template(rows, na, nb, report).splitlines(True))
+    )
+    for r in adj_rows:
+        is_na = r["item_id"] == rows[1]["item_id"]
+        r.update(
+            adjudicated_label="UNKNOWN" if is_na else "FAIL",
+            adjudicated_reason=T.NOT_APPLICABLE if is_na else "off_topic",
+            rationale="SYNTHETIC EXAMPLE adjudication rationale",
+            adjudicator_id="example-adjudicator",
+        )
+    adj = tmp_path / "adj.csv"
+    adj.write_text(T.render_csv(adj_rows, T.ADJ_COLUMNS), encoding="utf-8")
+    thresholds = json.loads(
+        (DOC_DIR / "PREDECLARED_THRESHOLDS.json").read_text(encoding="utf-8")
+    )
+    result = T.merge(
+        blank_rows=rows,
+        sheet_a=sheet_a,
+        sheet_b=sheet_b,
+        adjudication_path=adj,
+        key=key,
+        split="heldout",
+        dataset_id="example-na",
+        dataset_version="1",
+        created_at="2026-11-09T00:00:00+00:00",
+        license_id="CC0-1.0",
+        confirmed_thresholds_sha256=thresholds["thresholds_sha256"],
+        out_dir=tmp_path / "out",
+        _allow_example_labellers=True,
+    )
+    info = result["relevance"]
+    merged = json.loads(Path(info["merge_report"]).read_text(encoding="utf-8"))
+    assert merged["not_applicable"]["count"] == 2
+    assert set(merged["not_applicable"]["item_ids"]) == {
+        rows[0]["item_id"],
+        rows[1]["item_id"],
+    }
+    assert merged["applicable_cases"] == 58
+    assert sum(merged["class_counts"].values()) == 58
+    assert (
+        merged["class_counts"]["UNKNOWN"] == 20
+    )  # genuine UNKNOWN only; n/a is not pooled
+    assert merged["every_class_meets_minimum"] is False  # 30 per class is not met
+    text = (Path(info["manifest"]).parent / "heldout.jsonl").read_text(encoding="utf-8")
+    cases = [json.loads(line)["case_id"] for line in text.splitlines()]
+    assert rows[0]["item_id"] not in cases and rows[1]["item_id"] not in cases
+    assert T.NOT_APPLICABLE not in text
+    loaded = ds.load_reference_dataset(
+        info["manifest"], expected_manifest_sha256=info["manifest_sha256"]
+    )
+    assert len(loaded.splits[ds.Split.HELDOUT]) == 58
