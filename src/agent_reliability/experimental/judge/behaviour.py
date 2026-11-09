@@ -93,7 +93,12 @@ def template_digest(template_id: str = TEMPLATE_ID) -> str:
             ContentPart(ContentRole(role), f"probe {role}"),
             ContentPart(ContentRole.ANSWER, "probe answer"),
         )
-        for repair in (None, "probe_error_class"):
+        # jp3 has repair text keyed on the error class; probe those too. jp1/jp2
+        # keep their historical probe set so their digests do not move.
+        repairs: tuple[str | None, ...] = (None, "probe_error_class")
+        if template_id == "jp3":
+            repairs += ("invalid_code", "invalid_citations")
+        for repair in repairs:
             prompt = build_prompt(
                 rubric,
                 parts,
