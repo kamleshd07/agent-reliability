@@ -3,7 +3,7 @@
 Synthetic data, local Ollama, one run per rubric, nothing tuned. **Not a calibration; no accuracy claim.** The generator's
 `author_intent` is an expectation, never a human label, and is not scored. `customer_readiness=NO-GO`.
 
-## Frozen before any run (`PREREGISTERED_CONFIG.json`, commit 415205b)
+## Frozen before any run (`PREREGISTERED_CONFIG.json`, commit 3b0e433)
 
 Model qwen3:14b digest bdbd181c33f2, Q4_K_M; prompt jp3 (template digest 99a39773...626b67); each reference rubric unmodified;
 reasoning disabled; context 4096; output budget 512; temperature 0.0; one attempt plus one repair; one run per case.
