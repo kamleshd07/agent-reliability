@@ -10,7 +10,7 @@ Date: ______________________ (the person fills this in, not the coordinator)
 
 | # | Question | Yes / No | If yes, explain briefly |
 |---|---|---|---|
-| 1 | Did you write, review or help build the assistant, the store text, the evaluation code, the judge prompts or their documentation? | | |
+| 1 | Did you write, review or help build the assistant, the store text, the evaluation code or its documentation? | | |
 | 2 | Do you have a financial or reporting-line interest in the result of this evaluation? | | |
 | 3 | Have you seen any model verdict, any earlier label, or any discussion of these items (or of this evaluation's expected answers)? | | |
 | 4 | Have you used AI systems on this project in a way that shaped what you expect the answers to be? | | |

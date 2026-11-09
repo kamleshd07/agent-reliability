@@ -35,7 +35,7 @@ Owner-approved for labelling only. It is a reason attached to label UNKNOWN, nev
 The tooling reports it separately: `agreement` counts it per labeller and lists as **applicability disagreements** the items where the labellers chose the
 same label but exactly one used it (these are adjudicated like any disagreement). `merge` leaves items whose final reason is `dimension_not_applicable`
 out of the dataset and out of every class count, and records their count and ids in `merge_report.json` beside the class counts, which are the
-denominators for the 30-per-class minimum.
+denominators for the 30-per-class minimum. Items both labellers judged not applicable are also left out of percent agreement, Cohen's kappa and their intervals (reported as `excluded_both_not_applicable`), so they cannot inflate agreement.
 
 ## Reporting disagreement and ambiguity (always, whatever the result)
 

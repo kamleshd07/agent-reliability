@@ -11,7 +11,7 @@
 ## Which rows you will see
 - **Label disagreements:** A and B chose different labels.
 - **Applicability disagreements:** A and B chose the same label but exactly one of them used the reason `dimension_not_applicable`.
-Items on which both labellers agreed (including both choosing `dimension_not_applicable`) are not sent to you; their agreed result stands.
+Items on which both labellers agreed (including both choosing `dimension_not_applicable`) are not sent to you; their agreed result stands, and items both judged not applicable are left out of the agreement statistics.
 
 ## What to do on each row
 1. Judge the item afresh under the relevance definition. You are **not** bound to A's or B's choice, and you may choose UNKNOWN.

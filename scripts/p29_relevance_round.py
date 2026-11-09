@@ -284,6 +284,13 @@ def verify(private: Path, repo: Path | None) -> dict[str, Any]:
 
 def _labeller_declaration(template: str) -> str:
     """Declaration without the adjudicator-only rows (a labeller must not read about model verdicts or adjudication)."""
+    if (
+        "Adjudicator only:" not in template
+        or "I confirm that my answers" not in template
+    ):
+        raise SystemExit(
+            "declaration template markers changed; refusing to build labeller packages"
+        )
     head, _, rest = template.partition("Adjudicator only:")
     tail = rest.split("I confirm that my answers", 1)
     return head + ("I confirm that my answers" + tail[1] if len(tail) == 2 else "")
