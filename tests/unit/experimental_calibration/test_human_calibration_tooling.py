@@ -565,3 +565,87 @@ def test_labeller_only_reason_code_is_not_in_any_shipped_source_or_rubric() -> N
         and "dimension_not_applicable" in p.read_text(encoding="utf-8")
     ]
     assert offenders == []
+
+
+# --- relevance-only round (items-file + dimensions) -------------------------
+
+
+def _relevance_items(n: int = 6) -> list[dict[str, Any]]:
+    return [
+        {
+            "case_id": f"src-{i}",
+            "source": "constructed",
+            "question": f"Question {i}?",
+            "context": [] if i % 2 else [f"block {i}"],
+            "answer": f"Answer {i}.",
+        }
+        for i in range(n)
+    ]
+
+
+def test_relevance_only_export_has_no_groundedness_columns(tmp_path: Path) -> None:
+    T.export(
+        tmp_path / "out",
+        tmp_path / "key" / "k.json",
+        seed="s",
+        salt="secret",
+        items=_relevance_items(),
+        dimensions=("relevance",),
+    )
+    header = (tmp_path / "out" / "blank_sheet.csv").read_text().splitlines()[0]
+    assert "relevance_label" in header and "groundedness" not in header
+    doc = json.loads((tmp_path / "out" / "blank_sheet.json").read_text())
+    assert list(doc["allowed"]["reason"]) == ["relevance"]
+    for row in doc["rows"]:
+        assert row["relevance_label"] == ""  # the tool never writes a label
+
+
+def test_relevance_only_sheet_validates_and_agreement_covers_one_dimension(
+    tmp_path: Path,
+) -> None:
+    T.export(
+        tmp_path / "out",
+        tmp_path / "key" / "k.json",
+        seed="s",
+        salt="secret",
+        items=_relevance_items(),
+        dimensions=("relevance",),
+    )
+    blank = T.read_sheet(tmp_path / "out" / "blank_sheet.json")
+
+    def filled(who: str) -> list[dict[str, str]]:
+        rows = []
+        for r in blank:
+            r = dict(r)
+            r.update(
+                relevance_label="PASS",
+                relevance_reason="addresses_question",
+                relevance_confidence="HIGH",
+                note="SYNTHETIC EXAMPLE",
+                labeller_id=who,
+            )
+            rows.append(r)
+        return rows
+
+    a, errors = T.validate_sheet(filled("role-a"), blank, allow_example=True)
+    assert errors == []
+    b, errors = T.validate_sheet(filled("role-b"), blank, allow_example=True)
+    assert errors == []
+    report = T.agreement_report(a, b)
+    assert list(report["dimensions"]) == ["relevance"]
+    # a groundedness column in a relevance-only sheet is a schema mismatch
+    bad = [{**r, "groundedness_label": ""} for r in filled("role-a")]
+    _, errors = T.validate_sheet(bad, blank, allow_example=True)
+    assert errors
+
+
+def test_salt_changes_the_blind_order_and_ids_stay_opaque(tmp_path: Path) -> None:
+    rows1, key1 = T.build_export(
+        _relevance_items(), seed="s", salt="one", dimensions=("relevance",)
+    )
+    rows2, _ = T.build_export(
+        _relevance_items(), seed="s", salt="two", dimensions=("relevance",)
+    )
+    assert [r["question"] for r in rows1] != [r["question"] for r in rows2]
+    assert all(r["item_id"].startswith("L") for r in rows1)
+    assert key1["salted"] is True

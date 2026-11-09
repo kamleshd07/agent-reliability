@@ -81,6 +81,22 @@ LABEL_COLUMNS = (
     "labeller_id",
 )
 COLUMNS = FIXED + LABEL_COLUMNS
+NOTE_COLUMNS = ("note", "labeller_id")
+
+
+def columns_for(dimensions: tuple[str, ...]) -> tuple[str, ...]:
+    """Sheet columns for a round that labels only ``dimensions`` (default: both)."""
+    labels = tuple(
+        f"{d}_{part}" for d in dimensions for part in ("label", "reason", "confidence")
+    )
+    return FIXED + labels + NOTE_COLUMNS
+
+
+def dimensions_of(row: dict[str, Any]) -> tuple[str, ...]:
+    """The dimensions a sheet row carries, in canonical order."""
+    return tuple(d for d in DIMENSIONS if f"{d}_label" in row)
+
+
 ADJ_COLUMNS = (
     "item_id",
     "dimension",
@@ -189,7 +205,11 @@ def _context_text(blocks: list[str]) -> str:
 
 
 def build_export(
-    items: list[dict[str, Any]], *, seed: str = DEFAULT_SEED, salt: str = ""
+    items: list[dict[str, Any]],
+    *,
+    seed: str = DEFAULT_SEED,
+    salt: str = "",
+    dimensions: tuple[str, ...] = DIMENSIONS,
 ) -> tuple[list[dict[str, str]], dict[str, Any]]:
     """Deterministic blind rows plus the private key document. Order and ids depend only on seed, salt and case id."""
     if len({i["case_id"] for i in items}) != len(items):
@@ -203,7 +223,7 @@ def build_export(
     mapping: dict[str, dict[str, str]] = {}
     for index, item in enumerate(ordered, start=1):
         item_id = f"L{index:03d}"
-        row = dict.fromkeys(COLUMNS, "")
+        row = dict.fromkeys(columns_for(dimensions), "")
         row.update(
             item_id=item_id,
             question=item["question"],
@@ -225,8 +245,13 @@ def build_export(
     return rows, key
 
 
-def render_csv(rows: list[dict[str, str]], columns: tuple[str, ...] = COLUMNS) -> str:
+def render_csv(
+    rows: list[dict[str, str]], columns: tuple[str, ...] | None = None
+) -> str:
     import io
+
+    if columns is None:
+        columns = tuple(rows[0]) if rows else COLUMNS
 
     buffer = io.StringIO(newline="")
     writer = csv.DictWriter(buffer, fieldnames=list(columns), lineterminator="\n")
@@ -236,13 +261,14 @@ def render_csv(rows: list[dict[str, str]], columns: tuple[str, ...] = COLUMNS) -
 
 
 def render_json(rows: list[dict[str, str]]) -> str:
+    dimensions = dimensions_of(rows[0]) if rows else DIMENSIONS
     document = {
         "schema": SHEET_SCHEMA,
         "allowed": {
             "label": list(LABELS),
             "confidence": list(CONFIDENCE),
             "reason": {
-                d: {k: list(v) for k, v in REASONS[d].items()} for d in DIMENSIONS
+                d: {k: list(v) for k, v in REASONS[d].items()} for d in dimensions
             },
         },
         "rows": rows,
@@ -251,14 +277,25 @@ def render_json(rows: list[dict[str, str]]) -> str:
 
 
 def export(
-    out_dir: Path, key_out: Path, *, seed: str = DEFAULT_SEED, salt: str = ""
+    out_dir: Path,
+    key_out: Path,
+    *,
+    seed: str = DEFAULT_SEED,
+    salt: str = "",
+    items: list[dict[str, Any]] | None = None,
+    dimensions: tuple[str, ...] = DIMENSIONS,
 ) -> dict[str, str]:
     out_dir, key_out = Path(out_dir), Path(key_out)
     if key_out.resolve().parent == out_dir.resolve():
         raise ToolError(
             "write the private key outside the directory that holds the sheet"
         )
-    rows, key = build_export(golden_items(), seed=seed, salt=salt)
+    rows, key = build_export(
+        golden_items() if items is None else items,
+        seed=seed,
+        salt=salt,
+        dimensions=dimensions,
+    )
     out_dir.mkdir(parents=True, exist_ok=True)
     key_out.parent.mkdir(parents=True, exist_ok=True)
     csv_bytes = render_csv(rows).encode("utf-8")
@@ -303,7 +340,8 @@ def read_sheet(path: Path) -> list[dict[str, str]]:
         import io
 
         reader = csv.DictReader(io.StringIO(text, newline=""))
-        if reader.fieldnames is None or tuple(reader.fieldnames) != COLUMNS:
+        allowed = {COLUMNS, columns_for(("relevance",)), columns_for(("groundedness",))}
+        if reader.fieldnames is None or tuple(reader.fieldnames) not in allowed:
             raise ToolError("sheet CSV header does not match the expected columns")
         return [dict(r) for r in reader]
     raise ToolError("sheet must be .csv or .json")
@@ -318,14 +356,16 @@ def validate_sheet(
     """Return (normalised rows, errors). Errors name columns and item ids only."""
     errors: list[str] = []
     blank = {r["item_id"]: r for r in blank_rows}
+    dimensions = dimensions_of(blank_rows[0]) if blank_rows else DIMENSIONS
+    columns = columns_for(dimensions)
     seen: set[str] = set()
     normalised: list[dict[str, str]] = []
     labeller_ids: set[str] = set()
     for position, raw in enumerate(rows, start=1):
-        if not isinstance(raw, dict) or set(raw) != set(COLUMNS):
+        if not isinstance(raw, dict) or set(raw) != set(columns):
             errors.append(f"row {position}: columns do not match the schema")
             continue
-        row = {k: ("" if raw[k] is None else str(raw[k])) for k in COLUMNS}
+        row = {k: ("" if raw[k] is None else str(raw[k])) for k in columns}
         item_id = row["item_id"].strip()
         if item_id not in blank:
             errors.append(f"row {position}: unknown item_id")
@@ -337,7 +377,7 @@ def validate_sheet(
         for column in FIXED:
             if row[column] != blank[item_id][column]:
                 errors.append(f"{item_id}: {column} differs from the blank sheet")
-        for dimension in DIMENSIONS:
+        for dimension in dimensions:
             label = row[f"{dimension}_label"].strip().upper()
             reason = row[f"{dimension}_reason"].strip()
             confidence = row[f"{dimension}_confidence"].strip().upper()
@@ -457,7 +497,7 @@ def agreement_report(
         raise ToolError("the two sheets do not cover the same items")
     ids = sorted(by_a)
     report: dict[str, Any] = {"items": len(ids), "dimensions": {}, "disagreements": []}
-    for dimension in DIMENSIONS:
+    for dimension in dimensions_of(rows_a[0]) if rows_a else DIMENSIONS:
         la = [by_a[i][f"{dimension}_label"] for i in ids]
         lb = [by_b[i][f"{dimension}_label"] for i in ids]
         agree = sum(x == y for x, y in zip(la, lb, strict=True))
@@ -662,7 +702,7 @@ def merge(
     by_b = {r["item_id"]: r for r in rows_b}
     out_dir = Path(out_dir)
     result: dict[str, dict[str, str]] = {}
-    for dimension in DIMENSIONS:
+    for dimension in dimensions_of(rows_a[0]):
         docs = []
         provenances = []
         for blank in sorted(blank_rows, key=lambda r: r["item_id"]):
@@ -765,6 +805,15 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--key-out", required=True)
     p.add_argument("--seed", default=DEFAULT_SEED)
     p.add_argument(
+        "--items-file",
+        help="JSON array of source items {case_id, source, question, context[], answer}; default is the golden set",
+    )
+    p.add_argument(
+        "--dimensions",
+        default="groundedness,relevance",
+        help="comma-separated dimensions the labellers label (default both)",
+    )
+    p.add_argument(
         "--salt-file",
         help="file holding a secret salt kept by the owner; makes the key non-derivable from the seed",
     )
@@ -808,6 +857,12 @@ def main(argv: list[str] | None = None) -> int:
                         Path(args.key_out),
                         seed=args.seed,
                         salt=salt,
+                        items=(
+                            json.loads(Path(args.items_file).read_text("utf-8"))
+                            if args.items_file
+                            else None
+                        ),
+                        dimensions=tuple(args.dimensions.split(",")),
                     ),
                     indent=2,
                 )
