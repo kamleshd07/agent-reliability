@@ -85,7 +85,7 @@ NOTE_COLUMNS = ("note", "labeller_id")
 #: Labeller-only reason (owner-approved for the labelling tooling only). It is never an SDK verdict, is never mapped to UNKNOWN in a
 #: merged dataset, and items settled as not applicable are excluded from class-level counts and reported separately.
 NOT_APPLICABLE = "dimension_not_applicable"
-MIN_PER_CLASS = 30  # PREDECLARED_THRESHOLDS.json adjudicated_set.min_cases_per_class_for_any_calibration_claim
+MIN_PER_CLASS_DEFAULT = 30  # fallback only; merge reads adjudicated_set.min_cases_per_class_for_any_calibration_claim
 
 
 def columns_for(dimensions: tuple[str, ...]) -> tuple[str, ...]:
@@ -280,6 +280,20 @@ def render_json(rows: list[dict[str, str]]) -> str:
     return json.dumps(document, indent=2, ensure_ascii=False) + "\n"
 
 
+def _inside_git_work_tree(path: Path) -> bool:
+    import subprocess
+
+    probe = Path(path).resolve()
+    while not probe.exists():
+        probe = probe.parent
+    done = subprocess.run(
+        ["git", "-C", str(probe), "rev-parse", "--is-inside-work-tree"],
+        capture_output=True,
+        text=True,
+    )
+    return done.returncode == 0 and done.stdout.strip() == "true"
+
+
 def export(
     out_dir: Path,
     key_out: Path,
@@ -290,6 +304,14 @@ def export(
     dimensions: tuple[str, ...] = DIMENSIONS,
 ) -> dict[str, str]:
     out_dir, key_out = Path(out_dir), Path(key_out)
+    if dimensions != DIMENSIONS and not set(dimensions) <= set(DIMENSIONS):
+        raise ToolError(f"dimensions must be a subset of {DIMENSIONS}")
+    if items is not None:
+        for target in (out_dir, key_out.parent):
+            if _inside_git_work_tree(target):
+                raise ToolError(
+                    "refusing to write private round material inside a git work tree"
+                )
     if key_out.resolve().parent == out_dir.resolve():
         raise ToolError(
             "write the private key outside the directory that holds the sheet"
@@ -499,7 +521,8 @@ def agreement_report(
     by_b = {r["item_id"]: r for r in rows_b}
     if set(by_a) != set(by_b):
         raise ToolError("the two sheets do not cover the same items")
-    ids = sorted(by_a)
+    all_ids = sorted(by_a)
+    ids = all_ids
     report: dict[str, Any] = {
         "items": len(ids),
         "dimensions": {},
@@ -507,6 +530,16 @@ def agreement_report(
         "applicability_disagreements": [],
     }
     for dimension in dimensions_of(rows_a[0]) if rows_a else DIMENSIONS:
+        # Items both labellers judged not applicable are not a label decision: they are
+        # counted separately and kept out of agreement, kappa and its intervals.
+        ids = [
+            i
+            for i in all_ids
+            if not (
+                by_a[i][f"{dimension}_reason"] == NOT_APPLICABLE
+                and by_b[i][f"{dimension}_reason"] == NOT_APPLICABLE
+            )
+        ]
         la = [by_a[i][f"{dimension}_label"] for i in ids]
         lb = [by_b[i][f"{dimension}_label"] for i in ids]
         agree = sum(x == y for x, y in zip(la, lb, strict=True))
@@ -514,6 +547,7 @@ def agreement_report(
         analytic = _kappa_analytic_ci(la, lb)
         report["dimensions"][dimension] = {
             "n": len(ids),
+            "excluded_both_not_applicable": len(all_ids) - len(ids),
             "agree": agree,
             "percent_agreement": agree / len(ids) if ids else None,
             "percent_agreement_wilson95": list(w) if w else None,
@@ -531,19 +565,19 @@ def agreement_report(
             ),
             "not_applicable_counts": {
                 "labeller_a": sum(
-                    by_a[i][f"{dimension}_reason"] == NOT_APPLICABLE for i in ids
+                    by_a[i][f"{dimension}_reason"] == NOT_APPLICABLE for i in all_ids
                 ),
                 "labeller_b": sum(
-                    by_b[i][f"{dimension}_reason"] == NOT_APPLICABLE for i in ids
+                    by_b[i][f"{dimension}_reason"] == NOT_APPLICABLE for i in all_ids
                 ),
                 "both": sum(
                     by_a[i][f"{dimension}_reason"] == NOT_APPLICABLE
                     and by_b[i][f"{dimension}_reason"] == NOT_APPLICABLE
-                    for i in ids
+                    for i in all_ids
                 ),
             },
         }
-        for i in ids:
+        for i in all_ids:
             na_a = by_a[i][f"{dimension}_reason"] == NOT_APPLICABLE
             na_b = by_b[i][f"{dimension}_reason"] == NOT_APPLICABLE
             if (
@@ -797,6 +831,9 @@ def merge(
             if provenances
             else "human_multi"
         )
+        min_per_class = thresholds.get("adjudicated_set", {}).get(
+            "min_cases_per_class_for_any_calibration_claim", MIN_PER_CLASS_DEFAULT
+        )
         class_counts = dict.fromkeys(LABELS, 0)
         for d in docs:
             class_counts[d["human_label"].upper()] += 1
@@ -836,9 +873,9 @@ def merge(
             "dimension": dimension,
             "applicable_cases": len(docs),
             "class_counts": class_counts,
-            "min_cases_per_class": MIN_PER_CLASS,
+            "min_cases_per_class": min_per_class,
             "every_class_meets_minimum": all(
-                n >= MIN_PER_CLASS for n in class_counts.values()
+                n >= min_per_class for n in class_counts.values()
             ),
             "below_minimum_means": "indicative only; no calibration claim",
             "not_applicable": {

@@ -14,8 +14,7 @@ in it is committed or pushed.
 | `KEY_PRIVATE.json`, `export_manifest_PRIVATE.json`, `salt.txt`, `seed.txt` | owner / merging coordinator only |
 | `item_bank_private.json` | owner only: carries the generator's stratification tag, which is **not** a label |
 
-- 300 synthetic items with opaque ids (L001..L300), shuffled with a secret salt; none overlaps (question, answer) any prompt-development,
-  smoke-test or golden-set item (checked by exact string; product names are drawn from a secret seed).
+- 300 synthetic items with opaque ids (L001..L300), shuffled with a secret salt; none repeats an exact question or answer string found in the golden set or in any committed JSON dataset under `docs/p29-calibration/` (checked by exact string only; product names are drawn from a secret seed; this is not a semantic-similarity check).
 - The bank is stratified to give both PASS-leaning and FAIL-leaning items (responsive, different-question, unrelated, evasive,
   injection-bearing) plus UNKNOWN-leaning items (no usable question) and borderline items (admits the information is unavailable, partial,
   compound). Final classes come only from human labels and adjudication; the 30-per-class minimum (PASS, FAIL, UNKNOWN) is checked after adjudication, and

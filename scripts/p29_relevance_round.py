@@ -15,6 +15,7 @@ import csv
 import hashlib
 import importlib.util
 import json
+import os
 import stat
 import subprocess
 import sys
@@ -110,6 +111,7 @@ def verify(private: Path, repo: Path | None) -> dict[str, Any]:
     if not all(p.exists() for p in required):
         return {"all_ok": False, "checks": checks}
 
+    check("repository leak scan was performed (--repo given)", repo is not None)
     if repo is not None:
         resolved = private.resolve()
         check(
@@ -121,10 +123,12 @@ def verify(private: Path, repo: Path | None) -> dict[str, Any]:
         _mode(private) & 0o077 == 0,
         oct(_mode(private)),
     )
-    check(
-        "secret files are mode 600",
-        all(_mode(p) & 0o077 == 0 for p in (salt_path, seed_path)),
-    )
+    loose = [
+        str(p.relative_to(private))
+        for p in private.rglob("*")
+        if p.is_file() and _mode(p) & 0o077
+    ]
+    check("no private file is group/world accessible", not loose, len(loose) or None)
 
     manifest = json.loads(manifest_path.read_text("utf-8"))
     rows = tool.read_sheet(package / "blank_sheet.csv")
@@ -217,12 +221,8 @@ def verify(private: Path, repo: Path | None) -> dict[str, Any]:
         and fresh["private_key_sha256"] == manifest["private_key_sha256"],
     )
     check(
-        "blinding depends on the secret salt (a different salt changes the order)",
-        tool.build_export(
-            items, seed=manifest["seed"], salt="x", dimensions=("relevance",)
-        )[0][0]["question"]
-        != rows[0]["question"]
-        or len(rows) < 2,
+        "the key records a secret salt and the salt file is non-trivial",
+        key.get("salted") is True and len(salt_path.read_text("utf-8").strip()) >= 32,
     )
 
     # disjoint from every dataset committed in the repository
@@ -261,12 +261,32 @@ def verify(private: Path, repo: Path | None) -> dict[str, Any]:
             "no private answer appears in any tracked file",
             not any(a in text for a in long_answers),
         )
-        check("the key sha is the only private-package hash recorded as such", True)
+        history = subprocess.run(
+            ["git", "-C", str(repo), "log", "-p", "--all"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        check(
+            "seed and salt do not appear anywhere in the repository history",
+            not any(s and s in history for s in secrets),
+        )
+        check(
+            "no private answer appears anywhere in the repository history",
+            not any(a in history for a in long_answers),
+        )
     return {
         "all_ok": all(c["ok"] for c in checks),
         "item_count": len(rows),
         "checks": checks,
     }
+
+
+def _labeller_declaration(template: str) -> str:
+    """Declaration without the adjudicator-only rows (a labeller must not read about model verdicts or adjudication)."""
+    head, _, rest = template.partition("Adjudicator only:")
+    tail = rest.split("I confirm that my answers", 1)
+    return head + ("I confirm that my answers" + tail[1] if len(tail) == 2 else "")
 
 
 def _shuffled(rows: list[dict[str, str]], salt: str, role: str) -> list[dict[str, str]]:
@@ -304,7 +324,10 @@ def packages(private: Path, out_dir: Path) -> dict[str, Any]:
             writer.writeheader()
             writer.writerows(ordered)
         (folder / INSTRUCTIONS).write_bytes((HC / INSTRUCTIONS).read_bytes())
-        (folder / "DECLARATION.md").write_bytes((HC / DECLARATION).read_bytes())
+        (folder / "DECLARATION.md").write_text(
+            _labeller_declaration((HC / DECLARATION).read_text("utf-8")),
+            encoding="utf-8",
+        )
         (folder / "README_FIRST.md").write_text(
             f"""# Relevance labelling: your package
 
@@ -332,6 +355,9 @@ You have received nothing else, and you should not look for anything else (no re
     (out_dir / "distribution_record_PRIVATE.json").write_text(
         json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
+    # Private by default: owner-only permissions on every folder and file written here.
+    for path in [out_dir, *out_dir.rglob("*")]:
+        os.chmod(path, 0o700 if path.is_dir() else 0o600)
     return record
 
 

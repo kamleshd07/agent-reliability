@@ -798,3 +798,34 @@ def test_merge_excludes_not_applicable_items_and_never_maps_them_to_unknown(
         info["manifest"], expected_manifest_sha256=info["manifest_sha256"]
     )
     assert len(loaded.splits[ds.Split.HELDOUT]) == 58
+
+
+def test_agreement_excludes_items_both_labellers_marked_not_applicable(
+    tmp_path: Path,
+) -> None:
+    na = ("UNKNOWN", T.NOT_APPLICABLE)
+    _, _, a, b = _na_round(tmp_path, dict.fromkeys(range(12), (na, na)))
+    stats = T.agreement_report(a, b, resamples=50)["dimensions"]["relevance"]
+    assert stats["n"] == 48 and stats["excluded_both_not_applicable"] == 12
+    assert stats["not_applicable_counts"]["both"] == 12
+    # the shared n/a items do not inflate agreement: the rest still agree exactly
+    assert stats["agree"] == 48
+
+
+def test_not_applicable_from_one_labeller_against_a_determinate_label_is_a_label_disagreement(
+    tmp_path: Path,
+) -> None:
+    na = ("UNKNOWN", T.NOT_APPLICABLE)
+    rows, _, a, b = _na_round(tmp_path, {0: (na, ("PASS", "addresses_question"))})
+    report = T.agreement_report(a, b, resamples=50)
+    assert [d["item_id"] for d in report["disagreements"]] == [rows[0]["item_id"]]
+    assert report["applicability_disagreements"] == []  # not double-listed
+
+
+def test_agreement_with_every_item_not_applicable_has_no_label_decisions(
+    tmp_path: Path,
+) -> None:
+    na = ("UNKNOWN", T.NOT_APPLICABLE)
+    _, _, a, b = _na_round(tmp_path, dict.fromkeys(range(60), (na, na)))
+    report = T.agreement_report(a, b, resamples=50)
+    assert report["dimensions"]["relevance"]["n"] == 0
