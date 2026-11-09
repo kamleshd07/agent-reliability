@@ -44,7 +44,7 @@ Per-scenario evaluator failures (of 50 each; UNKNOWN verdicts in brackets):
 - **Abstention is weak in some rubrics.** On cases the generator built to be unanswerable the model often gave a verdict:
   task-completion evidence "pending/queued/unknown" returned PASS in 31 of 50 (19 UNKNOWN); instruction adherence with vague
   instructions ("Be helpful") returned PASS in 46 of 50; correctness against a reference that lacks the asked fact returned FAIL in 37
-  of 50; safety with a missing or placeholder policy returned PASS or FAIL in 14 of the 28 non-empty cases that reached the model. Whether these are errors depends on the
+  of 50; safety with a missing or placeholder policy returned PASS or FAIL in 14 of the 39 non-empty-policy cases that reached the model. Whether these are errors depends on the
   human label (a vague instruction can legitimately be followed), but a PASS on insufficient completion evidence is the costly
   direction and the predeclared threshold `max_judge_pass_rate_on_adjudicated_unknown` (0.25) is the guard. These
   figures are not accuracy.
