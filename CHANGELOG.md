@@ -6,6 +6,11 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Added (docs and tooling only): relevance calibration round 1 readiness
+
+- `scripts/p29_relevance_round.py` verifies a private relevance package (complete, blinded, reproducible, not leaked into a repository) and builds minimum-access labeller folders; `scripts/p29_human_calibration.py` gained `--items-file`/`--dimensions` for a relevance-only round and reports `dimension_not_applicable` (labelling only) separately: it is excluded from datasets, agreement statistics and class counts and never mapped to UNKNOWN. This also applies to the existing groundedness dimension: items both labellers judge not applicable no longer merge as UNKNOWN.
+- Adjudicator instructions, a declaration template, an owner checklist and the known judge concerns. No labels, no human agreement, no judge run, no SDK API or behaviour change.
+
 ### Added (docs and tooling only): P29 human-labelling and different-model calibration preparation
 
 - `docs/p29-calibration/human-calibration/`: blind labelling sheet, labeller instructions, adjudication protocol, calibration procedure with

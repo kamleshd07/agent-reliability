@@ -239,17 +239,32 @@ def build(secret, per_total=300):
 
 
 def seen_strings():
+    """Every question and answer string in the golden set and in any committed JSON dataset under the calibration docs."""
     seen = set()
     from examples.semantic_shopping_evaluation.golden import cases as golden
 
     for g in golden():
         seen |= {g["question"], g["answer"]}
-    for path in HC.glob("qwen-*/*.json"):
-        doc = json.loads(path.read_text())
-        for c in (
-            doc.get("cases", doc.get("examples", [])) if isinstance(doc, dict) else []
-        ):
-            seen |= {c.get("question"), c.get("answer")}
+
+    def harvest(node):
+        if isinstance(node, dict):
+            if "question" in node or "answer" in node:
+                seen.update(
+                    v
+                    for v in (node.get("question"), node.get("answer"))
+                    if isinstance(v, str)
+                )
+            for value in node.values():
+                harvest(value)
+        elif isinstance(node, list):
+            for value in node:
+                harvest(value)
+
+    for path in sorted((ROOT / "docs" / "p29-calibration").rglob("*.json")):
+        try:
+            harvest(json.loads(path.read_text()))
+        except ValueError:
+            continue
     return seen
 
 

@@ -14,8 +14,7 @@ in it is committed or pushed.
 | `KEY_PRIVATE.json`, `export_manifest_PRIVATE.json`, `salt.txt`, `seed.txt` | owner / merging coordinator only |
 | `item_bank_private.json` | owner only: carries the generator's stratification tag, which is **not** a label |
 
-- 300 synthetic items with opaque ids (L001..L300), shuffled with a secret salt; none overlaps (question, answer) any prompt-development,
-  smoke-test or golden-set item (checked by exact string; product names are drawn from a secret seed).
+- 300 synthetic items with opaque ids (L001..L300), shuffled with a secret salt; none repeats an exact question or answer string found in the golden set or in any committed JSON dataset under `docs/p29-calibration/` (checked by exact string only; product names are drawn from a secret seed; this is not a semantic-similarity check).
 - The bank is stratified to give both PASS-leaning and FAIL-leaning items (responsive, different-question, unrelated, evasive,
   injection-bearing) plus UNKNOWN-leaning items (no usable question) and borderline items (admits the information is unavailable, partial,
   compound). Final classes come only from human labels and adjudication; the 30-per-class minimum (PASS, FAIL, UNKNOWN) is checked after adjudication, and
@@ -31,7 +30,7 @@ in it is committed or pushed.
 3. Each person's conflict-of-interest and exposure declaration (see the instructions) recorded and a go/no-go decision on any "yes".
 4. A time budget (proposal: up to about 3 hours per labeller for 300 items in sessions of at most 60 minutes, so the owner may reduce the count or accept several sessions).
 5. Confirmation that the secret salt and key stay with the owner, and a private channel to hand each labeller only the sheet and instructions.
-6. Decision on `dimension_not_applicable` (labeller-only code, not in any shipped rubric).
+6. `dimension_not_applicable` is approved for labelling only (decided 2026-11-09); see the checklist and the adjudication protocol.
 
 ## Then
 
@@ -44,3 +43,5 @@ python scripts/p29_human_calibration.py merge ... --confirmed-thresholds-sha256 
 Tooling change in this branch: the export accepts `--items-file` and `--dimensions relevance`; validation and agreement derive
 dimensions from the sheet header (tested). The public generator `scripts/p29_relevance_calibration_items.py` needs a secret seed file and a private phrase-pool file (no item text lives in the repository) and
 refuses to write inside the repository, so the public branch cannot regenerate or read the items.
+
+See also `RELEVANCE_ROUND1_OWNER_CHECKLIST.md` (distribution, collection, validation), `ADJUDICATOR_INSTRUCTIONS.md`, `DECLARATION_TEMPLATE.md` and `KNOWN_JUDGE_CONCERNS_FOR_CALIBRATION.md`.

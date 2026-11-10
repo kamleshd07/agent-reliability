@@ -29,6 +29,14 @@ The adjudicator is not bound to pick A's or B's label. They label the item afres
 4. The adjudicator works under the same independence rules: no model assistance, no discussion with the labellers.
 5. `merge` refuses unless every disagreement has an adjudication, no agreed item has one, and the adjudicator differs from both labellers.
 
+## `dimension_not_applicable` (labelling tooling only)
+
+Owner-approved for labelling only. It is a reason attached to label UNKNOWN, never an SDK verdict and never silently mapped to UNKNOWN.
+The tooling reports it separately: `agreement` counts it per labeller and lists as **applicability disagreements** the items where the labellers chose the
+same label but exactly one used it (these are adjudicated like any disagreement). `merge` leaves items whose final reason is `dimension_not_applicable`
+out of the dataset and out of every class count, and records their count and ids in `merge_report.json` beside the class counts, which are the
+denominators for the 30-per-class minimum. Items both labellers judged not applicable are also left out of percent agreement, Cohen's kappa and their intervals (reported as `excluded_both_not_applicable`), so they cannot inflate agreement.
+
 ## Reporting disagreement and ambiguity (always, whatever the result)
 
 Report, per dimension: number of items; percent agreement with Wilson 95% interval; Cohen's kappa with an analytic (large-sample) 95%
