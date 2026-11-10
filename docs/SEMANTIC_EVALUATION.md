@@ -159,6 +159,8 @@ judge at least three times with `JudgePolicy(repeats=3)` or repeated runs and re
 (for example a false-positive ceiling) fixed *before* the run, using `run_calibration` and the calibration gate so only judged-acceptable evidence is admitted.
 No managed-model service or hosted key is needed or authorised for this.
 
+Preparation for steps (2) and (5) (blind sheet, instructions, adjudication, thresholds, tooling) exists, with no human labels and no results: see [docs/p29-calibration/human-calibration/STATUS.md](p29-calibration/human-calibration/STATUS.md).
+
 ## End-to-end roundtrip
 
 SDK facade -> `HTTPEventSink` -> platform (uvicorn, OIDC mode) -> PostgreSQL 16, locally on a disposable database. `python -m tools.pilot.semantic_e2e`

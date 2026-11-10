@@ -1,0 +1,103 @@
+{
+ "rubrics": {
+  "groundedness": {
+   "rubric_file": "judge-groundedness.json",
+   "dataset": "dataset_groundedness.json",
+   "dataset_sha256": "22252337ab8bcb865ce8dea42ffbaff0ada2a47e3b8370a1ba7526bc08c1eb70",
+   "case_count": 250,
+   "per_scenario": {
+    "normal": 50,
+    "missing_evidence": 50,
+    "conflicting_evidence": 50,
+    "unknown_expected": 50,
+    "adversarial": 50
+   }
+  },
+  "correctness": {
+   "rubric_file": "judge-answer-correctness.json",
+   "dataset": "dataset_correctness.json",
+   "dataset_sha256": "2e0c0f68efcd9f781a4dcc2816ae8f927bbf4900800e150f16bdfc94949dddc8",
+   "case_count": 250,
+   "per_scenario": {
+    "normal": 50,
+    "missing_evidence": 50,
+    "conflicting_evidence": 50,
+    "unknown_expected": 50,
+    "adversarial": 50
+   }
+  },
+  "requirements": {
+   "rubric_file": "judge-instruction-adherence.json",
+   "dataset": "dataset_requirements.json",
+   "dataset_sha256": "90fc1263f7cae9d5c9de91efadb682671374668052b98690b1344096f28286c0",
+   "case_count": 250,
+   "per_scenario": {
+    "normal": 50,
+    "missing_evidence": 50,
+    "conflicting_evidence": 50,
+    "unknown_expected": 50,
+    "adversarial": 50
+   }
+  },
+  "completion": {
+   "rubric_file": "judge-task-completion-evidence.json",
+   "dataset": "dataset_completion.json",
+   "dataset_sha256": "ed3555136e2217d52729223a0141a599199289afc1a7ad11bf89f6a270262be6",
+   "case_count": 250,
+   "per_scenario": {
+    "normal": 50,
+    "missing_evidence": 50,
+    "conflicting_evidence": 50,
+    "unknown_expected": 50,
+    "adversarial": 50
+   }
+  },
+  "safety": {
+   "rubric_file": "judge-safety-policy.json",
+   "dataset": "dataset_safety.json",
+   "dataset_sha256": "dc83ee4f630f9c4a66dc96db1615c8a6f64e6b592a733c948d11f64105d2e5e7",
+   "case_count": 250,
+   "per_scenario": {
+    "normal": 50,
+    "missing_evidence": 50,
+    "conflicting_evidence": 50,
+    "unknown_expected": 50,
+    "adversarial": 50
+   }
+  }
+ },
+ "preregistered": true,
+ "note": "Fixed BEFORE any measured run. The run command refuses to proceed if this file or a dataset changes, never edits it, and never tunes on a measured set. No jp4 or other prompt version is introduced.",
+ "model": "qwen3:14b",
+ "manifest_digest": "bdbd181c33f2",
+ "quantization": "Q4_K_M",
+ "prompt_template": "jp3",
+ "jp3_template_digest": "99a39773ee061e444b4c30f829b5686966a04c61f7784539417971d3b0626b67",
+ "rubrics_unmodified": "reference rubrics as shipped (versions in the rubric files)",
+ "reasoning_mode": "no-think: request body reasoning_effort=none",
+ "context_size_tokens": 4096,
+ "max_output_tokens": 512,
+ "requested_temperature": 0.0,
+ "limits": {
+  "provider_timeout_seconds": 180,
+  "evaluation_deadline_seconds": 300,
+  "max_attempts": 1,
+  "repair_attempts": 1
+ },
+ "policy": {
+  "repeats": 1,
+  "prompt_template": "jp3"
+ },
+ "evaluation_method": "SyncLLMJudge over the local Ollama OpenAI-compatible endpoint; every case once; an evaluator failure is any JudgeError (strict parser unmodified); a determinate or unknown verdict is NOT a failure; author_intent is never scored as correctness",
+ "ceiling": "evaluator-failure rate 2% (approved, unchanged); met only if failures <= 5 of 250 (point estimate); the Wilson 95% interval is reported and an upper bound above 2% is called out",
+ "early_stop": "assessment stops when failures exceed 5; reported as UNSUCCESSFUL (stopped early), never as a pass or a partial pass",
+ "run_order": [
+  "groundedness",
+  "correctness",
+  "requirements",
+  "completion",
+  "safety"
+ ],
+ "sdk_commit_frozen": "831b621c1f18114b411d78e57dead32c18105c54",
+ "ollama_version": "ollama version is 0.40.13"
+}

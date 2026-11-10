@@ -16,8 +16,12 @@ pytestmark = pytest.mark.unit
 _PINNED_SOURCE_SHA256 = (
     "4589e4f94dc8df7c0da7b1b091e59260e41bb4428e37e29ef95cace0b78fc77b"
 )
+# Re-pinned for the opt-in ``jp2`` template: the only edit to _engine.py passes
+# ``policy.prompt_template`` to the prompt builder. Retry, repair, attempt, deadline
+# and budget logic is unchanged and ``jp1`` output is byte-identical, so the engine
+# revision stays "1" (a bump would needlessly invalidate existing calibrations).
 _PINNED_ENGINE_SHA256 = (
-    "21202b98e53a0445489c4b843a958892e438b8b357dd2f00abb1753d1533a851"
+    "7fdb9aec51427786d884ba5f20d12cfff0927d1aeb591f29bf3019e0f8d78953"
 )
 _PINNED_REVISION = "1"
 

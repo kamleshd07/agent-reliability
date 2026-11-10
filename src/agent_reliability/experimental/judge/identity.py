@@ -97,6 +97,7 @@ def compose_identity(
         min_confidence=effective_min_confidence(rubric, policy),
         repeats=policy.repeats,
         require_citations=rubric.require_citations,
+        template_id=policy.prompt_template,
     )
     return EvaluatorIdentity(
         name=rubric.rubric_id,

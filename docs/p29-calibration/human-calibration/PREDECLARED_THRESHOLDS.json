@@ -1,0 +1,61 @@
+{
+  "schema": "p29-human-calibration-thresholds/1",
+  "status": "PROPOSED. Not owner-confirmed. Fixed before any human label exists. A starting point, not a safety claim.",
+  "declared_on": "2026-11-08",
+  "owner_confirmation": "NONE RECORDED. The owner confirms by passing this file's thresholds_sha256 to the merge command; nothing in this file records approval.",
+  "editing_rule": "Any edit changes thresholds_sha256 and breaks the pinned test. A change after labels exist invalidates the run; start a new version instead.",
+  "inter_labeller": {
+    "applies_per_dimension": true,
+    "min_cohens_kappa_point": 0.7,
+    "min_cohens_kappa_bootstrap_ci_lower": 0.5,
+    "min_percent_agreement": 0.8,
+    "on_failure": "stop; revise rubric guidance; relabel with a new blind ordering; never lower these numbers"
+  },
+  "adjudicated_set": {
+    "min_cases_per_class_for_any_calibration_claim": 30,
+    "classes": [
+      "PASS",
+      "FAIL",
+      "UNKNOWN"
+    ],
+    "per_dimension": true,
+    "below_minimum": "report as indicative only; make no calibration claim"
+  },
+  "judge_vs_adjudicated": {
+    "basis": "adjudicated PASS/FAIL cases for which the judge gave a determinate verdict",
+    "min_agreement_wilson95_lower": 0.8,
+    "false_positive": {
+      "definition": "judge PASS on adjudicated FAIL; denominator is ALL adjudicated FAIL cases (a judge UNKNOWN or failure is not hidden)",
+      "max_rate_point": 0.1,
+      "max_rate_wilson95_upper": 0.15,
+      "max_adversarial_pass_on_fail": 0
+    },
+    "false_negative": {
+      "definition": "judge FAIL on adjudicated PASS; denominator is ALL adjudicated PASS cases",
+      "max_rate_wilson95_upper": 0.25
+    },
+    "max_abstention_rate": 0.2,
+    "max_evaluator_failure_rate": 0.02,
+    "evaluator_failure_is_never_a_verdict": true
+  },
+  "unknown_handling": {
+    "adjudicated_unknown": "excluded from agreement and error rates; reported separately",
+    "min_judge_unknown_rate_on_adjudicated_unknown_point": 0.5,
+    "max_judge_pass_rate_on_adjudicated_unknown_point": 0.25,
+    "dimension_not_applicable_reason": "reported as its own count; not pooled with context_insufficient or question_missing"
+  },
+  "repeatability": {
+    "min_repeats": 3,
+    "min_repeat_cases": 90,
+    "max_unstable_case_rate_point": 0.05,
+    "unstable_definition": "a case whose verdict (PASS, FAIL or UNKNOWN) is not identical across all repeats"
+  },
+  "judge_model": {
+    "different_family_from_agent_model_required": true,
+    "declared_before_run": true,
+    "tuned_on_evaluation_split": false,
+    "heldout_attempts_per_configuration_max": 1,
+    "leakage_check_required_clean": true
+  },
+  "thresholds_sha256": "31fb3e7a87ae4e287ff68854ba7fe145be76fa7d883cbdec0377057d5c561263"
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "gentlity.rubric/1",
+  "rubric_id": "judge-answer-relevance",
+  "rubric_version": "2026-11.r1-smoke1",
+  "dimension": "answer-relevance",
+  "inputs_required": [
+    "answer",
+    "question"
+  ],
+  "inputs_optional": [
+    "context"
+  ],
+  "criteria": [
+    {
+      "id": "responsive",
+      "text": "The ANSWER addresses what the QUESTION actually asks, not a different or merely related question."
+    },
+    {
+      "id": "on-topic",
+      "text": "The ANSWER does not consist mainly of material unrelated to the QUESTION."
+    },
+    {
+      "id": "not-evasive",
+      "text": "The ANSWER does not evade the QUESTION (for example by only restating it or deferring without reason)."
+    },
+    {
+      "id": "no-context-blocks",
+      "text": "No context blocks are supplied for this evaluation. The citations member must be [] (the question and answer blocks are not context blocks and must not be cited)."
+    }
+  ],
+  "reason_codes": {
+    "pass": [
+      "addresses_question"
+    ],
+    "fail": [
+      "off_topic",
+      "evasive_or_non_answer"
+    ],
+    "unknown": [
+      "question_missing",
+      "judge_abstained",
+      "low_confidence",
+      "judge_disagreement"
+    ]
+  },
+  "min_confidence": "medium",
+  "description": "LOCAL SMOKE VARIANT of the UNCALIBRATED reference rubric: adds one trusted operator criterion stating no context blocks are sent. Not calibrated; no accuracy claim."
+}

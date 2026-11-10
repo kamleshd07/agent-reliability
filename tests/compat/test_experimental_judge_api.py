@@ -225,6 +225,7 @@ def test_value_type_fields_and_defaults_snapshot() -> None:
         "min_confidence": None,
         "repeats": 1,
         "capture_reason": False,
+        "prompt_template": "jp1",
     }
     assert _fields(judge.JudgeBudget) == {
         "window_seconds": 3_600,

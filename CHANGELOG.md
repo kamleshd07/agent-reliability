@@ -6,6 +6,13 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Added (docs and tooling only): P29 human-labelling and different-model calibration preparation
+
+- `docs/p29-calibration/human-calibration/`: blind labelling sheet, labeller instructions, adjudication protocol, calibration procedure with
+  sample-size arithmetic, hash-pinned PROPOSED thresholds, and a status page. `scripts/p29_human_calibration.py` (stdlib) exports, validates,
+  measures agreement (percent, Cohen's kappa with CIs) and merges adjudicated labels into the reference dataset format, refusing placeholder or incomplete input.
+- No human evaluation has been performed and no label or result is included. No API, behaviour, dependency or wire change.
+
 ### Added (Experimental): LangChain execution observability export (P30, RM-SDK-006)
 
 - `agent_reliability.adapters.http_execution_exporter.ExecutionHTTPExporter`: bounded, failure-isolated, idempotent delivery of

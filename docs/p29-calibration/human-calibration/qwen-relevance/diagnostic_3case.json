@@ -1,0 +1,128 @@
+[
+ {
+  "case": "q01",
+  "evidence_headers_sent": [
+   "role=question index=0",
+   "role=answer index=0"
+  ],
+  "context_blocks_sent": 0,
+  "rubric_require_citations": false,
+  "system_citation_rule": [
+   "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass|fail|unknown\",\"code\":\"<allowed code for the verdict>\",\"confidence\":\"high|medium|low\",\"citations\":[<context block indexes>],\"reason\":\"<optional, at most 300 characters>\"}",
+   "- \"citations\" is always present; use [] when nothing is cited. Each entry is the index of a context block (role=context) that supports the verdict."
+  ],
+  "model_members": {
+   "verdict": "pass",
+   "code": "addresses_question",
+   "confidence": "high",
+   "citations": [
+    0
+   ]
+  },
+  "cited": [
+   0
+  ],
+  "strict_parse": "rejected:judge output invalid",
+  "finish": "stop"
+ },
+ {
+  "case": "q01",
+  "evidence_headers_sent": [
+   "role=question index=0",
+   "role=answer index=0"
+  ],
+  "context_blocks_sent": 0,
+  "rubric_require_citations": false,
+  "system_citation_rule": [
+   "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass|fail|unknown\",\"code\":\"<allowed code for the verdict>\",\"confidence\":\"high|medium|low\",\"citations\":[<context block indexes>],\"reason\":\"<optional, at most 300 characters>\"}",
+   "- \"citations\" is always present; use [] when nothing is cited. Each entry is the index of a context block (role=context) that supports the verdict."
+  ],
+  "model_members": {
+   "verdict": "pass",
+   "code": "addresses_question",
+   "confidence": "high",
+   "citations": [
+    0
+   ]
+  },
+  "cited": [
+   0
+  ],
+  "strict_parse": "rejected:judge output invalid",
+  "finish": "stop"
+ },
+ {
+  "case": "q02",
+  "evidence_headers_sent": [
+   "role=question index=0",
+   "role=answer index=0"
+  ],
+  "context_blocks_sent": 0,
+  "rubric_require_citations": false,
+  "system_citation_rule": [
+   "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass|fail|unknown\",\"code\":\"<allowed code for the verdict>\",\"confidence\":\"high|medium|low\",\"citations\":[<context block indexes>],\"reason\":\"<optional, at most 300 characters>\"}",
+   "- \"citations\" is always present; use [] when nothing is cited. Each entry is the index of a context block (role=context) that supports the verdict."
+  ],
+  "model_members": {
+   "verdict": "pass",
+   "code": "addresses_question",
+   "confidence": "high",
+   "citations": [
+    0
+   ]
+  },
+  "cited": [
+   0
+  ],
+  "strict_parse": "rejected:judge output invalid",
+  "finish": "stop"
+ },
+ {
+  "case": "q02",
+  "evidence_headers_sent": [
+   "role=question index=0",
+   "role=answer index=0"
+  ],
+  "context_blocks_sent": 0,
+  "rubric_require_citations": false,
+  "system_citation_rule": [
+   "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass|fail|unknown\",\"code\":\"<allowed code for the verdict>\",\"confidence\":\"high|medium|low\",\"citations\":[<context block indexes>],\"reason\":\"<optional, at most 300 characters>\"}",
+   "- \"citations\" is always present; use [] when nothing is cited. Each entry is the index of a context block (role=context) that supports the verdict."
+  ],
+  "model_members": {
+   "verdict": "pass",
+   "code": "addresses_question",
+   "confidence": "high",
+   "citations": [
+    0
+   ]
+  },
+  "cited": [
+   0
+  ],
+  "strict_parse": "rejected:judge output invalid",
+  "finish": "stop"
+ },
+ {
+  "case": "q03",
+  "evidence_headers_sent": [
+   "role=question index=0",
+   "role=answer index=0"
+  ],
+  "context_blocks_sent": 0,
+  "rubric_require_citations": false,
+  "system_citation_rule": [
+   "{\"schema\":\"gentlity.judge-output/1\",\"verdict\":\"pass|fail|unknown\",\"code\":\"<allowed code for the verdict>\",\"confidence\":\"high|medium|low\",\"citations\":[<context block indexes>],\"reason\":\"<optional, at most 300 characters>\"}",
+   "- \"citations\" is always present; use [] when nothing is cited. Each entry is the index of a context block (role=context) that supports the verdict."
+  ],
+  "model_members": {
+   "verdict": "fail",
+   "code": "evasive_or_non_answer",
+   "confidence": "high",
+   "citations": []
+  },
+  "cited": [],
+  "strict_parse": "accepted",
+  "finish": "stop"
+ }
+]

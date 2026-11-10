@@ -237,7 +237,11 @@ class JudgeEngine:
                 self._tracker.check()
             nonce = draw_nonce(selected, self._nonce_source)
             prompt = build_prompt(
-                self._rubric, selected, nonce=nonce, repair_error_class=repair_class
+                self._rubric,
+                selected,
+                nonce=nonce,
+                repair_error_class=repair_class,
+                template_id=self._policy.prompt_template,
             )
             call = ProviderCall(
                 system=prompt.system,

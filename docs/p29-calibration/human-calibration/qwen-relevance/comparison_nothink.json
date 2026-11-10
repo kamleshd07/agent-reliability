@@ -1,0 +1,354 @@
+{
+ "baseline": {
+  "evaluations": 20,
+  "evaluator_failures": 7,
+  "evaluator_failure_rate": 0.35,
+  "failure_classes": [
+   "JudgeInvalidOutputError"
+  ],
+  "by_dim_failures": {
+   "groundedness": 0,
+   "relevance": 7
+  },
+  "determinate_agreeing_with_author_intent": 13,
+  "determinate": 13,
+  "latency_p50_s": 2.34,
+  "rows": [
+   {
+    "id": "r01",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "evaluator_failure",
+    "outcome": null,
+    "failure": "JudgeInvalidOutputError"
+   },
+   {
+    "id": "r02",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "evaluator_failure",
+    "outcome": null,
+    "failure": "JudgeInvalidOutputError"
+   },
+   {
+    "id": "r03",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "evaluator_failure",
+    "outcome": null,
+    "failure": "JudgeInvalidOutputError"
+   },
+   {
+    "id": "r04",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "evaluator_failure",
+    "outcome": null,
+    "failure": "JudgeInvalidOutputError"
+   },
+   {
+    "id": "r05",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "evaluator_failure",
+    "outcome": null,
+    "failure": "JudgeInvalidOutputError"
+   },
+   {
+    "id": "r06",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r07",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r08",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r09",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r10",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "evaluator_failure",
+    "outcome": null,
+    "failure": "JudgeInvalidOutputError"
+   },
+   {
+    "id": "r11",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r12",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "evaluator_failure",
+    "outcome": null,
+    "failure": "JudgeInvalidOutputError"
+   },
+   {
+    "id": "g01",
+    "dim": "groundedness",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "g02",
+    "dim": "groundedness",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "g03",
+    "dim": "groundedness",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "g04",
+    "dim": "groundedness",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "g05",
+    "dim": "groundedness",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "g06",
+    "dim": "groundedness",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "g07",
+    "dim": "groundedness",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "g08",
+    "dim": "groundedness",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   }
+  ]
+ },
+ "operator_note": {
+  "evaluations": 20,
+  "evaluator_failures": 0,
+  "evaluator_failure_rate": 0.0,
+  "failure_classes": [],
+  "by_dim_failures": {
+   "groundedness": 0,
+   "relevance": 0
+  },
+  "determinate_agreeing_with_author_intent": 20,
+  "determinate": 20,
+  "latency_p50_s": 2.5,
+  "rows": [
+   {
+    "id": "r01",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "r02",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "r03",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "r04",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "r05",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "r06",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r07",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r08",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r09",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r10",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "r11",
+    "dim": "relevance",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "r12",
+    "dim": "relevance",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "g01",
+    "dim": "groundedness",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "g02",
+    "dim": "groundedness",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "g03",
+    "dim": "groundedness",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "g04",
+    "dim": "groundedness",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "g05",
+    "dim": "groundedness",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "g06",
+    "dim": "groundedness",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   },
+   {
+    "id": "g07",
+    "dim": "groundedness",
+    "expected": "pass",
+    "status": "determinate",
+    "outcome": "pass",
+    "failure": null
+   },
+   {
+    "id": "g08",
+    "dim": "groundedness",
+    "expected": "fail",
+    "status": "determinate",
+    "outcome": "fail",
+    "failure": null
+   }
+  ]
+ }
+}

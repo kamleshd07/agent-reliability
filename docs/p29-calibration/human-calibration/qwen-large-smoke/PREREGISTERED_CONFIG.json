@@ -1,0 +1,39 @@
+{
+ "preregistered": true,
+ "note": "Fixed BEFORE the measured run. The run command refuses to proceed if this file or the dataset changes, and never edits it. Any later exploration is reported separately.",
+ "model": "qwen3:14b (official Ollama library)",
+ "manifest_digest": "bdbd181c33f2",
+ "weights_blob_sha256": "a8cc1361f3145dc01f6d77c6c82c9116b9ffe3c97b34716fe20418455876c40e",
+ "quantization": "Q4_K_M",
+ "parameters": "14.77B",
+ "prompt_template": "jp2",
+ "rubric": "judge-answer-relevance 2026-11.r1 (default, unmodified)",
+ "reasoning_mode": "no-think: request body reasoning_effort=none",
+ "context_size_tokens": 4096,
+ "context_note": "Ollama default load; model supports 40960; not changed",
+ "max_output_tokens": 512,
+ "requested_temperature": 0.0,
+ "other_sampling": "Ollama model defaults for top_k/top_p (not set by the SDK)",
+ "limits": {
+  "provider_timeout_seconds": 180,
+  "evaluation_deadline_seconds": 300,
+  "max_attempts": 1,
+  "repair_attempts": 1
+ },
+ "policy": {
+  "repeats": 1,
+  "prompt_template": "jp2"
+ },
+ "citation_validation": "unmodified strict parser; nonexistent context references rejected",
+ "dataset_sha256": "e881000c51b5c8ff584a891ad9253b8793dbb6fbed2632b7d9a76687836befed",
+ "case_count": 250,
+ "per_scenario": {
+  "adversarial": 50,
+  "conflicting_evidence": 50,
+  "grounded_context": 50,
+  "missing_evidence": 50,
+  "no_context": 50
+ },
+ "ceiling": "evaluator-failure rate 2% (approved, unchanged)",
+ "ollama_version": "ollama version is 0.40.13"
+}

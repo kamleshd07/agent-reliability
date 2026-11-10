@@ -1,0 +1,10 @@
+{
+  "blank_sheet_csv_sha256": "52e5bec48f48bd78ea7c69e37bfed8584d96e3ae643baaa2a84c6340d2ae41f5",
+  "blank_sheet_json_sha256": "9b16d638aab7fe38da6993b508c06031180c00f9c180716baebf08d31e99dafc",
+  "item_count": 53,
+  "note": "Preparation artefact. Contains no labels. Do not give this file to labellers: it records the shuffle seed.",
+  "private_key_sha256": "bc5bf7b68175f307f1494b7c09b15a48af61f519a61eb97d1c32d4e7b2bdac70",
+  "salted": false,
+  "schema": "p29-human-calibration-export-manifest/1",
+  "seed": "p29-human-calibration-blind-v1"
+}

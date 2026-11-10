@@ -1,0 +1,10 @@
+{
+ "cases_rerun": 19,
+ "provider_replies": 37,
+ "verdict_code_pairs": {
+  "pass/pass": 34,
+  "pass/responsive": 1,
+  "pass/addresses_question": 1,
+  "pass/evasive_or_non_answer": 1
+ }
+}
