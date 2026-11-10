@@ -101,6 +101,14 @@ path = "src/agent_reliability/__init__.py"
 line-length = 88
 target-version = "py311"
 src = ["src", "tests"]
+# One-off harnesses that produced the preregistered Qwen smoke results. They are kept
+# byte-for-byte as run, so they are not reformatted or linted.
+extend-exclude = [
+    "scripts/p29_qwen_large_smoke.py",
+    "scripts/p29_qwen_large_smoke_explore.py",
+    "scripts/p29_qwen_jp3_smoke.py",
+    "scripts/p29_qwen_rubric_smoke.py",
+]
 
 [tool.ruff.lint]
 select = [
