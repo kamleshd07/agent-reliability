@@ -38,6 +38,15 @@ This public addition ships in 1.1.0 as a backward-compatible minor release.
 The patch release adds tests, examples, documentation, and artifact checks only; the `1.1.1`
 release leaves the `1.1.0` public and semantic contract unchanged.
 
+## Additive Experimental extension (1.4.0)
+
+1.4 adds only Experimental, optional surfaces: LangChain execution instrumentation, the execution exporter, the
+semantic-evaluation facade and judge calibration/admission (see [GA_CONTRACT.md](GA_CONTRACT.md) and
+[RELEASE_NOTES_1_4.md](RELEASE_NOTES_1_4.md)). Stable 1.0-1.3 export sets, signatures, enum semantics, event payloads,
+wire schema version 2 and SLO/reliability calculations are unchanged, and base runtime dependencies remain zero.
+One Experimental-only behaviour change (a trailing newline no longer matches an anchored schema pattern) is documented
+there. Backward-compatible minor release; rollback is `agent-reliability==1.3.0`.
+
 ## Additive HTTP exporter extension (1.3.0)
 
 1.3 adds the optional `agent-reliability[http]` extra and the HTTP exporter entry points,

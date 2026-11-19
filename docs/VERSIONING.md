@@ -70,6 +70,11 @@ evidence admission, Session 4). It has the same terms and additionally ships thr
 see [p29-calibration](p29-calibration/README.md). The additive admission hook in `experimental.judge` follows the
 same experimental terms.
 
+The execution-observability surface is Experimental on the same terms: `agent_reliability.experimental.instrumentation`,
+`agent_reliability.adapters.langchain_instrumentation` and `agent_reliability.adapters.http_execution_exporter`
+(see [AUTOMATIC_INSTRUMENTATION.md](AUTOMATIC_INSTRUMENTATION.md)). Living under `adapters` does not make them stable.
+The semantic-evaluation facade (`SemanticChecks` in `experimental.judge`) is part of the Experimental judge namespace.
+
 ## Supported Python and dependencies
 
 The 1.0 support matrix is Python 3.11, 3.12, and 3.13. Dropping a supported

@@ -6,6 +6,23 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+## [1.4.0]
+
+A backward-compatible minor release under [docs/VERSIONING.md](docs/VERSIONING.md). The release date is the upload
+date shown by the package index and the GitHub release, and is not stated here until publication. Everything new is
+Experimental, optional or documentation/tooling only: no stable API, wire contract or mandatory runtime dependency
+changed (`dependencies = []`), and nothing is sent anywhere unless an exporter is passed. Migration, limitations and
+rollback to 1.3.0: [docs/RELEASE_NOTES_1_4.md](docs/RELEASE_NOTES_1_4.md).
+
+### Changed (Experimental): trailing newline no longer matches an anchored schema pattern
+
+- The internal schema validator used only by `agent_reliability.experimental.judge.calibration.load_cases` (calibration-case files),
+  the calibration report self-check and the new `agent_reliability.experimental.calibration` file formats now follows ECMA-262:
+  a value that ends in a single newline does not match a pattern ending in `$`. In 1.3.0 such a value (for example the
+  identifier `"a01\n"`) was accepted. Every other pattern verdict is identical to 1.3.0 (differential check over all bundled
+  schema patterns). Only callers who passed identifiers with a trailing newline through those Experimental entry points are
+  affected; the fix is to remove the newline. `tests/unit/experimental_judge/test_validator_compat_1_3_0.py` pins this.
+
 ### Added (docs and tooling only): relevance calibration round 1 readiness
 
 - `scripts/p29_relevance_round.py` verifies a private relevance package (complete, blinded, reproducible, not leaked into a repository) and builds minimum-access labeller folders; `scripts/p29_human_calibration.py` gained `--items-file`/`--dimensions` for a relevance-only round and reports `dimension_not_applicable` (labelling only) separately: it is excluded from datasets, agreement statistics and class counts and never mapped to UNKNOWN. This also applies to the existing groundedness dimension: items both labellers judge not applicable no longer merge as UNKNOWN.
@@ -18,7 +35,7 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
   measures agreement (percent, Cohen's kappa with CIs) and merges adjudicated labels into the reference dataset format, refusing placeholder or incomplete input.
 - No human evaluation has been performed and no label or result is included. No API, behaviour, dependency or wire change.
 
-### Added (Experimental): LangChain execution observability export (P30, RM-SDK-006)
+### Added (Experimental): LangChain execution observability export (P30)
 
 - `agent_reliability.adapters.http_execution_exporter.ExecutionHTTPExporter`: bounded, failure-isolated, idempotent delivery of
   content-free execution facts (steps, tool outcomes, declared tool/action classes, provider-reported token counts) to the platform's
