@@ -8,7 +8,7 @@ It brings evaluations, SLOs, error budgets, burn rates, and measurement
 provenance to agent applications—and refuses to produce a misleading number
 when evaluation methodologies are incompatible.
 
-**Status: GA (`1.3.0` is the latest stable release; the HTTP exporter and the LLM-judge adapter are Experimental, see [release notes](https://github.com/kamleshd07/agent-reliability/blob/main/docs/RELEASE_NOTES_1_3.md)).** Public APIs documented as stable in
+**Status: GA (`1.4.0` is the version prepared on this branch and is not published until the maintainer releases it; the latest published stable release is `1.3.0`). The HTTP exporter, the LLM-judge adapter, the semantic and calibration components and the LangChain execution instrumentation are Experimental, see the [1.4 release notes](https://github.com/kamleshd07/agent-reliability/blob/main/docs/RELEASE_NOTES_1_4.md).** Public APIs documented as stable in
 [GA_CONTRACT.md](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/GA_CONTRACT.md) follow Semantic Versioning.
 See [compatibility](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/COMPATIBILITY.md).
 
@@ -168,7 +168,7 @@ assertions for tests and CI.
 The SDK is designed to work standalone. It requires no hosted account,
 API key, or network service, and has zero mandatory runtime dependencies.
 
-**Current stable release: 1.3.0**
+**Latest published stable release: 1.3.0. Version in this source tree: 1.4.0 (release prepared, not yet published).**
 
 The public API follows semantic versioning, with compatibility and
 installed-artifact verification included in the release process.
@@ -178,7 +178,7 @@ auto-instrumentation, or framework-specific adapter. Release 1.3 adds an optiona
 **Experimental** HTTP evidence exporter (`pip install 'agent-reliability[http]'`, see
 [HTTP exporter](https://github.com/kamleshd07/agent-reliability/blob/main/docs/HTTP_EXPORTER.md)) and an
 Experimental LLM-judge adapter (described below); it still has no dashboard, persistence or
-auto-instrumentation. See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).
+auto-instrumentation in 1.3. Release 1.4 adds Experimental LangChain execution instrumentation and an Experimental execution exporter (below). See the [roadmap](https://github.com/kamleshd07/agent-reliability/blob/main/docs/ROADMAP.md).
 
 ### LLM-judge evaluators (experimental)
 
@@ -187,14 +187,14 @@ supply. It adds no dependency and sends raw content only to your provider. The r
 [Evaluate](https://github.com/kamleshd07/agent-reliability/blob/main/docs/EVALUATE.md).
 A sync judge's timeout is best effort unless the provider is wrapped in `ExecutorSyncProvider`; the provider's own client timeout is the real bound (see the same page).
 
-### Automatic execution instrumentation (experimental, unreleased)
+### Automatic execution instrumentation (experimental, new in 1.4)
 
-This development branch adds opt-in LangChain Runnable instrumentation for run, tool,
+Release 1.4 adds opt-in LangChain Runnable instrumentation for run, tool,
 model and framework-step events. Core runtime dependencies remain empty. Detailed
 traces stay local; execution completion never manufactures a correct outcome.
 See the [guide and offline example](https://github.com/kamleshd07/agent-reliability/blob/main/docs/AUTOMATIC_INSTRUMENTATION.md) for the tested
 optional dependency, explicit enable/disable lifecycle, privacy boundaries and limits.
-This feature is not present in the published 1.3.0 package until a later release is approved.
+It needs the optional `langchain` extra (`langchain-core>=1.0,<2`) and, to export, the `http` extra. It is not present in the published 1.3.0 package.
 
 ## Documentation
 

@@ -256,6 +256,17 @@ the acknowledgement) is defined by the platform's published contract and is vers
 separately from this Python API. The exporter is promoted to **STABLE** only by a later
 documented decision after hosted validation.
 
+### Execution instrumentation and execution exporter (next minor): EXPERIMENTAL
+
+Contract class **EXPERIMENTAL**, not in any stable inventory, public and documented in
+[AUTOMATIC_INSTRUMENTATION.md](AUTOMATIC_INSTRUMENTATION.md): `agent_reliability.experimental.instrumentation`
+(`instrument`, the trace and summary types), `agent_reliability.adapters.langchain_instrumentation`,
+and `agent_reliability.adapters.http_execution_exporter` (`ExecutionHTTPExporter`). Living under
+`adapters` does not make the two adapter modules stable. They need the optional `langchain` and `http`
+extras, send nothing unless an exporter is passed, add no runtime dependency, and may change in a minor
+release with release notes. The execution wire contract is the platform's published contract, versioned
+separately from this Python API.
+
 ### Experimental namespace: `agent_reliability.experimental.judge` (Experimental)
 
 Contract class **EXPERIMENTAL** (see Contract classes above; not part of 1.0,
