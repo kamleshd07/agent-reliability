@@ -8,7 +8,7 @@ It brings evaluations, SLOs, error budgets, burn rates, and measurement
 provenance to agent applications—and refuses to produce a misleading number
 when evaluation methodologies are incompatible.
 
-**Status: GA (`1.4.0` is the version prepared on this branch and is not published until the maintainer releases it; the latest published stable release is `1.3.0`). The HTTP exporter, the LLM-judge adapter, the semantic and calibration components and the LangChain execution instrumentation are Experimental, see the [1.4 release notes](https://github.com/kamleshd07/agent-reliability/blob/main/docs/RELEASE_NOTES_1_4.md).** Public APIs documented as stable in
+**Status: GA (`1.4.0` is the latest stable release). The HTTP exporter, the LLM-judge adapter, the semantic and calibration components and the LangChain execution instrumentation are Experimental, see the [1.4 release notes](https://github.com/kamleshd07/agent-reliability/blob/main/docs/RELEASE_NOTES_1_4.md).** Public APIs documented as stable in
 [GA_CONTRACT.md](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/GA_CONTRACT.md) follow Semantic Versioning.
 See [compatibility](https://github.com/kamleshd07/agent-reliability/blob/v1.0.0/docs/COMPATIBILITY.md).
 
@@ -168,7 +168,7 @@ assertions for tests and CI.
 The SDK is designed to work standalone. It requires no hosted account,
 API key, or network service, and has zero mandatory runtime dependencies.
 
-**Latest published stable release: 1.3.0. Version in this source tree: 1.4.0 (release prepared, not yet published).**
+**Current stable release: 1.4.0**
 
 The public API follows semantic versioning, with compatibility and
 installed-artifact verification included in the release process.
