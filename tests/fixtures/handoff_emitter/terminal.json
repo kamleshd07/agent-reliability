@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "source": "agent-reliability",
+  "handoff_id": "h-1",
+  "kind": "terminal",
+  "idempotency_key": "hk1-9f9bcdeae6d6cd65f61640b0f971d99a118790c4172d6f040ed308f0a383db50",
+  "originating_agent_id": "00000000-0000-4000-8000-0000000000a1",
+  "originating_producer_run_id": "run-orig-1",
+  "receiving_agent_id": "00000000-0000-4000-8000-0000000000b2",
+  "receiving_producer_run_id": "run-rcv-1",
+  "event_time": "2026-01-02T03:04:05.000000Z",
+  "terminal_state": "completed"
+}

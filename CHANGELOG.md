@@ -6,6 +6,10 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Added (Experimental, optional): P25 handoff event emitter
+
+- `agent_reliability.experimental.handoff`: opt-in, bounded, failure-isolated emitter of content-free handoff events for the platform's `POST /api/v1/handoff-events` (schema_version 1). Disabled by default (nothing sent, no thread), no new dependency, not exported from the stable namespace. See [docs/HANDOFF_EMITTER.md](docs/HANDOFF_EMITTER.md).
+
 ## [1.4.0]
 
 A backward-compatible minor release under [docs/VERSIONING.md](docs/VERSIONING.md). The release date is the upload

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "source": "agent-reliability",
+  "handoff_id": "h-1",
+  "kind": "acknowledged",
+  "idempotency_key": "hk1-edf61a3cb6df089b92c6dd825e190e5f27cb78abe7b6bad2024336a3bcdd0603",
+  "originating_agent_id": "00000000-0000-4000-8000-0000000000a1",
+  "originating_producer_run_id": "run-orig-1",
+  "receiving_agent_id": "00000000-0000-4000-8000-0000000000b2",
+  "receiving_producer_run_id": "run-rcv-1",
+  "event_time": "2026-01-02T03:04:05.000000Z",
+  "acceptance": "accepted"
+}

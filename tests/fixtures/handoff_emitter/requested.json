@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "source": "agent-reliability",
+  "handoff_id": "h-1",
+  "kind": "requested",
+  "idempotency_key": "hk1-53e7fadebe52ea0e291b385b377a2b94c839987a84630dee76d1c2a18ce8564a",
+  "originating_agent_id": "00000000-0000-4000-8000-0000000000a1",
+  "originating_producer_run_id": "run-orig-1",
+  "receiving_agent_id": "00000000-0000-4000-8000-0000000000b2",
+  "outcome_correlation_id": "corr-1",
+  "event_time": "2026-01-02T03:04:05.000000Z"
+}
