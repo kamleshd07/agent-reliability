@@ -74,7 +74,9 @@ def _step(
             if end.duration_ns is not None and not end.synthetic
             else max(end.at, begun)
         )
-    component = start.component if start.kind == "tool" else start.model_id
+    # Tool and step spans carry an application-approved alias (or none); a
+    # model span carries the configured model alias.
+    component = start.component if start.kind in ("tool", "step") else start.model_id
     return {
         "step_id": start.span_id,
         "parent_step_id": None

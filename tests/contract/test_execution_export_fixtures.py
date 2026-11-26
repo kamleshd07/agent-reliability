@@ -25,7 +25,7 @@ def trace():
     ms = timedelta(milliseconds=1)
     events = (
         e(1, RUN, None, "run", "start", 0 * ms),
-        e(2, "s1", RUN, "step", "start", 1 * ms),
+        e(2, "s1", RUN, "step", "start", 1 * ms, component="planner"),
         e(3, "m1", "s1", "model", "start", 2 * ms, model_id="model-a"),
         e(
             4,
@@ -74,6 +74,7 @@ def trace():
             30 * ms,
             state="completed",
             duration_ns=29_000_000,
+            component="planner",
         ),
         e(
             9,

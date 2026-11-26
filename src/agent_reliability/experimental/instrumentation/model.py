@@ -191,7 +191,9 @@ class ExecutionTrace:
             if event.kind == "run":
                 root_state, root_duration = event.state, event.duration_ns
                 continue
-            label = event.component if event.kind == "tool" else event.model_id
+            label = (
+                event.component if event.kind in ("tool", "step") else event.model_id
+            )
             groups.setdefault((event.kind, label), []).append(event)
             if event.kind == "model":
                 if event.usage is not None and event.usage.availability == "reported":

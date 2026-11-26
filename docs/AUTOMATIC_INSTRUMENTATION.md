@@ -75,7 +75,8 @@ not a total order of independent concurrent operations. Model latency includes c
 is not pure provider-network latency.
 
 - Run: start and terminal state through the existing SDK lifecycle.
-- Step: framework chain start/end/error hooks; no invented business goals or semantic steps.
+- Step: framework chain start/end/error hooks; no invented business goals or semantic steps. A step is anonymous unless the
+  application opts in with `step_names` (see "Naming steps (opt-in)").
 - Tool: start/end/error, approved name only, captured parent and duration.
 - Model: start/end/error, captured invocation count and optional configured provider/model aliases.
 - Usage: documented provider-supplied integer counts only. For one chat generation, `usage_metadata` is used;
@@ -189,10 +190,45 @@ models report token usage; neither scope can submit PASS/FAIL evidence. Read bac
 `GET /api/v1/execution-structures/runs/{run_id}`, `GET /api/v1/execution-classifications/runs?source=agent-reliability&producer_run_id=…`
 and `GET /api/v1/execution-reliability/runs?source=agent-reliability&producer_run_id=…`.
 
+## Naming steps (opt-in)
+
+By default every chain, graph node and agent step is exported as an anonymous `other` step, exactly as before. To make the
+steps you care about recognisable in the dashboard, approve their names explicitly, the same way you approve tool names:
+
+```python
+observed = instrument(
+    graph,
+    sdk=sdk,
+    agent_id="order-agent",
+    name="OrderAgent",
+    version="1",
+    tool_names=("order_status",),
+    step_names=("fetch_order", "write_reply"),  # optional; default: no step is named
+)
+```
+
+Rules (all enforced, none inferred):
+
+- **Source.** The only name read is the framework's own name for the run, the `name` argument of the chain-start callback: the
+  LangGraph node name, a runnable's name or an explicit `run_name`. Tags, metadata, constructor/serialized data, prompts, inputs
+  and outputs are never read.
+- **Approval.** A step is named only if that exact name is in `step_names`. Anything else stays anonymous (`component_name: null`).
+- **Grammar.** Each approved name must be 1-128 ASCII characters from `[A-Za-z0-9._-]`; an invalid entry is rejected at setup, and a
+  framework name is never normalised, truncated or rewritten to fit.
+- **Bound.** Tool names, step names and the model alias together may not exceed the platform's 512 distinct components per agent version.
+- **Wire.** The existing nullable `component_name` of an `other` step is used; no new field, no schema change, historical unnamed
+  steps are unaffected. Parent links, step ids, timestamps and tool/model spans are unchanged.
+- **Identity.** A name is a label, not an identity: several steps may share a name; they stay distinct by `step_id`.
+- **Privacy.** Approval is your statement that the name is a non-sensitive logical alias. The grammar cannot detect a secret inside a
+  valid-looking name, and a dynamically built `run_name` that embeds user data would be exported if you approved that exact string: approve fixed names only.
+
+Tested in this repository against `langchain-core` 1.x callbacks. LangGraph is not an SDK dependency, so no repository test imports it; it was checked by hand against a LangGraph 1.2 `StateGraph` (approved nodes named, unapproved nodes and the root graph anonymous), and the same `name` callback argument carries the node name.
+
+
 | Exported (closed, bounded) | Never exported |
 |---|---|
 | Random span ids, parent links, `step_type` (`model`/`tool`/`other`), start/terminal state, start and end timestamps | Prompts, answers, messages, tool arguments or results, documents |
-| Configured aliases: approved tool names, optional model alias | Unapproved tool names, chain/graph node names, run names, tags, metadata |
+| Configured aliases: approved tool names, approved `step_names` (opt-in, default none), optional model alias | Unapproved tool names, unapproved chain/graph node names and run names, tags, metadata |
 | Tool outcome from the exception *type*: `success`, `timeout`, `permission_denied`, `unavailable`, `cancelled`, `execution_error` | Exception messages and customer exception class names |
 | Declared `tool_class` / `action_class` for approved tools (never inferred) | Retry counts (the platform has no retry field yet), cost, pricing |
 | Provider-reported integer token counts per model call, only when reported | Estimated tokens; zero is never invented for missing usage |
@@ -227,7 +263,7 @@ flowchart LR
 
 This capture path does not retain prompts, model-response text, tool inputs/results, documents, headers,
 credentials, arbitrary metadata, tags, exception messages or customer exception class names. Only explicitly
-approved safe tool names can appear; unknown names are omitted. Callback payloads are handled by the framework
+approved safe tool names and, only if the application opts in with `step_names`, approved step names can appear; unknown names are omitted. Callback payloads are handled by the framework
 itself, which naturally still sees the application data. This guarantee does not change third-party tracing,
 customer callbacks or existing custom SDK sinks/diagnostic handlers. Configure LangSmith/other tracers separately;
 this adapter neither enables them nor changes their configuration.
@@ -274,7 +310,7 @@ not production latency, maximum throughput or negligible-overhead claims.
 - No outcome reliability: add an explicit appropriate evaluator; execution alone cannot supply a business result.
 - SDK run has partial health: remove callback defects or raise configured limits within the hard caps; do not erase health flags.
 - Nothing on the platform: check `exporter.status` (`failed_jobs`, `last_error`, `dropped_queue_full`) and that the credential has `execution:ingest`; a 403 is a missing scope, a 404 an unknown deployment.
-- Steps without names: only configured tool aliases and the model alias are exported by design; chain/graph nodes are anonymous `other` steps.
+- Steps without names: by default only configured tool aliases and the model alias are exported; chain/graph nodes are anonymous `other` steps. Name steps you want to recognise by approving them in `step_names` (below). A framework name that is not approved, or does not match the alias grammar, is never exported or rewritten.
 - Wrong run attribution on the platform: the wrapper identity must match the evidence sink's `AgentIdentity` exactly.
 
 ## Known limitations
@@ -290,7 +326,8 @@ not production latency, maximum throughput or negligible-overhead claims.
 
 - Only `.invoke`/`.ainvoke` of the wrapper are instrumented; `.stream`, `.astream` and `.batch` are not forwarded (use the original Runnable).
 - Graph agents (LangGraph, `create_agent`) are observed through public callbacks only: model calls, tool calls and an anonymous
-  `other` step per graph node/chain. Node names, checkpoints and state are deliberately not interpreted or exported.
+  `other` step per graph node/chain. Node names are exported only if you approve them in `step_names`; checkpoints and state are
+  never interpreted or exported.
 - Retries are a local signal. Provider-internal retries are invisible, and the platform has no retry or loop field yet (roadmap
   P20c/d), so nothing about retries is exported.
 - A callback that raises a framework exception inside the application is the application's; the wrapper never retries it.
