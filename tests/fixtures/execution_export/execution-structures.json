@@ -8,7 +8,7 @@
       "step_id": "s1",
       "parent_step_id": null,
       "step_type": "other",
-      "component_name": null,
+      "component_name": "planner",
       "state": "completed",
       "started_at": "2026-01-02T03:04:05.001000Z",
       "ended_at": "2026-01-02T03:04:05.030000Z"

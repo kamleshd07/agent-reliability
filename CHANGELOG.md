@@ -6,6 +6,16 @@ follows [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## [Unreleased]
 
+### Added (Experimental, optional, opt-in): producer-approved step names
+
+- `instrument(..., step_names=...)`: an explicit allow-list of chain, graph-node and agent step names. A step is exported with its
+  framework-reported name (the chain-start callback's `name`) only when that exact, grammar-valid name is approved; the default is
+  unchanged (every step anonymous). Uses the existing nullable `component_name` of an `other` step: no wire, schema or field change,
+  historical unnamed steps keep working, tool and model spans are unchanged. Tags, metadata, constructor data and unapproved names are
+  never read or exported. The local `ExecutionSummary` now groups steps by their approved name. Documented in
+  `docs/AUTOMATIC_INSTRUMENTATION.md` ("Naming steps (opt-in)"); the privacy statements that said node names are never exported now say
+  "unapproved".
+
 ### Added (Experimental, optional): P25 handoff event emitter
 
 - `agent_reliability.experimental.handoff`: opt-in, bounded, failure-isolated emitter of content-free handoff events for the platform's `POST /api/v1/handoff-events` (schema_version 1). Disabled by default (nothing sent, no thread), no new dependency, not exported from the stable namespace. See [docs/HANDOFF_EMITTER.md](docs/HANDOFF_EMITTER.md).

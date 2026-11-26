@@ -105,6 +105,7 @@ class InstrumentedRunnable:
         tool_classes: Mapping[str, str] | None = None,
         tool_actions: Mapping[str, str] | None = None,
         exporter: TraceExporter | None = None,
+        step_names: Collection[str] = (),
     ) -> None:
         if not isinstance(sdk, AgentReliability):
             raise TypeError("sdk must be an AgentReliability instance")
@@ -124,6 +125,14 @@ class InstrumentedRunnable:
             raise ValueError(
                 "tool_names must be a bounded collection of approved aliases"
             )
+        if (
+            isinstance(step_names, (str, bytes))
+            or not isinstance(step_names, Collection)
+            or len(step_names) > 512
+        ):
+            raise ValueError(
+                "step_names must be a bounded collection of approved aliases"
+            )
         self._identity: _Identity = {
             "agent_id": alias(agent_id),
             "name": alias(name),
@@ -131,9 +140,12 @@ class InstrumentedRunnable:
             "environment": alias(environment) if environment is not None else None,
         }
         self._tools = frozenset(alias(item) for item in tool_names)
-        if len(self._tools) + (model_id is not None) > 512:
+        # Explicitly approved chain/graph-node/agent step names (opt-in; empty
+        # means every step stays anonymous).
+        self._steps = frozenset(alias(item) for item in step_names)
+        if len(self._tools | self._steps) + (model_id is not None) > 512:
             raise ValueError(
-                "tool names plus the model alias must not exceed the 512 "
+                "tool names, step names and the model alias must not exceed the 512 "
                 "components the platform accepts per agent version"
             )
         self._semantics = _semantics(self._tools, tool_classes, tool_actions)
@@ -242,7 +254,7 @@ class InstrumentedRunnable:
                 self._semantics,
             )
             prepared = self._adapter.callback_config(
-                config, collector, self._tools, root
+                config, collector, self._tools, root, self._steps
             )
         except Exception:
             self._failure()
@@ -369,6 +381,7 @@ def instrument(
     tool_classes: Mapping[str, str] | None = None,
     tool_actions: Mapping[str, str] | None = None,
     exporter: TraceExporter | None = None,
+    step_names: Collection[str] = (),
 ) -> InstrumentedRunnable:
     """Opt into experimental LangChain execution capture.
 
@@ -395,4 +408,5 @@ def instrument(
         tool_classes=tool_classes,
         tool_actions=tool_actions,
         exporter=exporter,
+        step_names=step_names,
     )

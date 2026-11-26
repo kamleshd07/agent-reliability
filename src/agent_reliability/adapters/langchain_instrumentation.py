@@ -115,9 +115,15 @@ class _Handler(BaseCallbackHandler):
     run_inline = True
     raise_error = False
 
-    def __init__(self, collector: Collector, approved_tools: frozenset[str]) -> None:
+    def __init__(
+        self,
+        collector: Collector,
+        approved_tools: frozenset[str],
+        approved_steps: frozenset[str] = frozenset(),
+    ) -> None:
         self.collector = collector
         self._tools = approved_tools
+        self._steps = approved_steps
 
     def _start(
         self, kind: SpanKind, values: dict[str, Any], component: str | None = None
@@ -148,7 +154,18 @@ class _Handler(BaseCallbackHandler):
 
     @_guard
     def on_chain_start(self, serialized: Any, inputs: Any, **kwargs: Any) -> None:
-        self._start("step", kwargs)
+        # The framework's own name for this run (the ``name`` callback argument:
+        # the graph node, the agent or the runnable, or an explicit ``run_name``)
+        # is exported only if the application approved exactly that name. Tags,
+        # metadata, constructor data and anything else are never read; no
+        # approval means the step stays anonymous.
+        name = kwargs.get("name")
+        approved = (
+            name
+            if type(name) is str and len(name) <= 128 and name in self._steps
+            else None
+        )
+        self._start("step", kwargs, approved)
 
     @_guard
     def on_tool_start(self, serialized: Any, input_str: Any, **kwargs: Any) -> None:
@@ -225,11 +242,15 @@ def root_identity(config: Any) -> UUID:
 
 
 def callback_config(
-    config: Any, collector: Collector, tools: frozenset[str], root: UUID
+    config: Any,
+    collector: Collector,
+    tools: frozenset[str],
+    root: UUID,
+    steps: frozenset[str] = frozenset(),
 ) -> RunnableConfig:
     copied = ensure_config(config)
     callbacks = copied.get("callbacks")
-    handler = _Handler(collector, tools)
+    handler = _Handler(collector, tools, steps)
     if isinstance(callbacks, BaseCallbackManager):
         manager = callbacks.copy()
         for existing in tuple(manager.handlers):

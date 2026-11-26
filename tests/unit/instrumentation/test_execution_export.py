@@ -208,3 +208,33 @@ def test_summary_reports_time_tools_failures_and_tokens():
     assert by[("model", "model-alias")].calls == 1
     assert summary.total_tokens == 15 and summary.token_unknown_models == 0
     assert summary.state == "completed" and summary.complete
+
+
+def test_an_approved_step_alias_is_exported_for_the_step_only_never_for_its_children():
+    c, root, _ = make()
+    tool, inner = uuid4(), uuid4()
+    c.start(root, None, "step", "planner")
+    c.start(inner, root, "step")  # a nested chain nobody approved
+    c.start(tool, inner, "tool", "search")
+    c.end(tool, "completed")
+    c.end(inner, "completed")
+    c.end(root, "completed")
+    trace = c.finish("completed")
+    steps = json.loads(build_requests(trace, deployment_id=DEPLOYMENT)[0].body)["steps"]
+    assert [(s["step_type"], s["component_name"]) for s in steps] == [
+        ("other", "planner"),
+        ("other", None),
+        ("tool", "search"),
+    ]
+    rows = {(r.kind, r.component): r.calls for r in trace.summary().components}
+    assert rows == {("step", "planner"): 1, ("step", None): 1, ("tool", "search"): 1}
+
+
+def test_a_step_without_an_approved_alias_stays_anonymous():
+    c, root, _ = make()
+    c.start(root, None, "step")
+    c.end(root, "completed")
+    steps = json.loads(
+        build_requests(c.finish("completed"), deployment_id=DEPLOYMENT)[0].body
+    )["steps"]
+    assert [s["component_name"] for s in steps] == [None]
